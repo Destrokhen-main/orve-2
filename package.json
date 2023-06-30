@@ -1,0 +1,21 @@
+{
+  "name": "orve-rxjs",
+  "version": "0.0.0",
+  "description": "orve with rxjs",
+  "main": "built/index.js",
+  "scripts": {
+    "test": "node test.js",
+    "watch": "tsc --watch",
+    "build": "tsc --build"
+  },
+  "author": "Destrokhen <armagiddon19@gmail.com>",
+  "license": "MIT",
+  "devDependencies": {
+    "eslint": "^8.43.0",
+    "prettier": "^2.8.8",
+    "typescript": "^5.1.3"
+  },
+  "dependencies": {
+    "rxjs": "^7.8.1"
+  }
+}

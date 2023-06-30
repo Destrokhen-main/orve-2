@@ -1,0 +1,12 @@
+node_modules
+.vscode
+.DS_Store
+.npmrc
+src
+jest.config.js
+tsconfig.json
+.eslintrc.json
+.eslintignore
+.prettierrc.json
+test
+.github
