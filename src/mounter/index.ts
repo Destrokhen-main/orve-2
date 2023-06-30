@@ -1,3 +1,4 @@
+import { InvokeHook } from "../helper/hookHelper";
 import { NodeOP } from "../parser/parser";
 import { mounterChildren } from "./children";
 import { propsWorker } from "./props";
@@ -5,6 +6,11 @@ import { propsWorker } from "./props";
 function mounterNode(root: Element | null, tree: NodeOP) {
   if (typeof tree.tag !== "string") {
     return null
+  }
+
+  // before mount
+  if (tree.hooks && !InvokeHook(tree, "beforeMount", null)) {
+    console.warn("Before mount hook error")
   }
 
   const elem = document.createElement(tree.tag);
@@ -21,6 +27,10 @@ function mounterNode(root: Element | null, tree: NodeOP) {
 
   if (root !== null) {
     root.appendChild(elem);
+  }
+
+  if (tree.hooks && !InvokeHook(tree, "mounted", null)) {
+    console.warn("Before mount hook error")
   }
 
   return tree;

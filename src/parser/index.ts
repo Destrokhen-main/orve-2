@@ -2,6 +2,7 @@ import { OrveInstance } from "../instance";
 import { Node, Fragment } from "../jsx";
 import { parserNodeF } from "./parser";
 import { mounterNode } from "../mounter";
+import { InvokeAllNodeHook } from "../helper/hookHelper";
 
 export interface OptionsInstance {
   root: boolean
@@ -55,6 +56,21 @@ function createApp(entry: unknown = null, options: OptionsInstance | null = null
 
   const workFunction = entry as () => unknown;
   allContext.tree = parserNodeF.call(allContext.context, workFunction);
+
+  if (allContext.tree !== null && window !== undefined) {
+    window.onbeforeunload = function() {
+      if (allContext.tree) {
+        InvokeAllNodeHook(allContext.tree, "beforeUnmount");
+      }
+    }
+
+    window.onunload = function() {
+      if (allContext.tree) {
+        InvokeAllNodeHook(allContext.tree, "unmounted");
+      }
+    }
+  }
+
   return {
     mount: (root: string | Element) => {
       let rootElement: Element | null = null;

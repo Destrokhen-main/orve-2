@@ -1,11 +1,12 @@
-import { Props, Children } from "../jsx";
+import { Props, Children, NodeB } from "../jsx";
 import { validationNode } from "./helper"
 import { genUID } from "../helper/generation";
 import { parseChildren } from "./children";
 import { propsWorker } from "./props";
 import { TypeNode } from "./type";
+import { InvokeHook } from "../helper/hookHelper";
 
-export interface NodeO {
+export interface NodeO extends NodeB {
   tag: string | ((props?: Record<string, any>) => unknown),
   props ?: Props,
   children ?: Children 
@@ -98,6 +99,11 @@ function parserNodeF(app: () => unknown, props: Props | null = null, parent : No
     type: TypeNode.Component
   };
 
+  //NOTE beforeCreate 
+  if (componentO.hooks && !InvokeHook(componentO, "beforeCreate", null)) {
+    console.warn(`Error in hook "beforeCreate"`)
+  }
+
   if (componentO.props !== undefined) {
     componentO.props = propsWorker.call(this, componentO.props);
   }
@@ -105,6 +111,11 @@ function parserNodeF(app: () => unknown, props: Props | null = null, parent : No
   if (componentO.children !== undefined) {
     componentO.children = parseChildren.call(this, componentO.children, componentO);
   }
+
+  if (component.hooks && !InvokeHook(componentO, "created", null)) {
+    console.warn(`Error in hook "beforeCreate"`)
+  }
+
   return componentO;
 }
 
