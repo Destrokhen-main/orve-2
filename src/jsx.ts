@@ -8,14 +8,14 @@ export type FragmentT = { children?: Children };
 export const HOOKS_STRING_NAME = ["beforeCreate", "created", "beforeMount", "mounted", "beforeUpdate", "updated", "beforeUnmount", "unmounted"]; 
 
 export interface NodeHooks {
-  beforeCreate: (instance: any) => void,
-  created: (instance: any) => void,
-  beforeMount: (instance: any) => void,
-  mounted: (instance: any) => void,
-  beforeUpdate: (instance: any) => void,
-  updated: (instance: any) => void,
-  beforeUnmount: (instance: any) => void,
-  unmounted: (instance: any) => void
+  beforeCreate: (instance?: any) => void,
+  created: (instance?: any) => void,
+  beforeMount: (instance?: any) => void,
+  mounted: (instance?: any) => void,
+  beforeUpdate: (instance?: any) => void,
+  updated: (instance?: any) => void,
+  beforeUnmount: (instance?: any) => void,
+  unmounted: (instance?: any) => void
 }
 
 export const ACCESS_KEY = ['tag', 'props', 'children', 'hooks', 'ref'];

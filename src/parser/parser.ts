@@ -25,7 +25,7 @@ function prepareComponent(func: (props?: Props) => unknown, props: Props | null 
   try {
     component = func.call(this, props !== null ? props : {})
   } catch(error) {
-    console.warn(`Parser error ${error}`);
+    console.error(`[Parser error]: ${error}`);
   }
 
   if (component !== null && validationNode(component) === true && component !== undefined) {
@@ -113,7 +113,7 @@ function parserNodeF(app: () => unknown, props: Props | null = null, parent : No
   }
 
   if (component.hooks && !InvokeHook(componentO, "created", null)) {
-    console.warn(`Error in hook "beforeCreate"`)
+    console.error(`Error in hook "beforeCreate"`)
   }
 
   return componentO;

@@ -58,17 +58,27 @@ function createApp(entry: unknown = null, options: OptionsInstance | null = null
   allContext.tree = parserNodeF.call(allContext.context, workFunction);
 
   if (allContext.tree !== null && window !== undefined) {
-    window.onbeforeunload = function() {
+    const beforeUnmounter = function() {
       if (allContext.tree) {
         InvokeAllNodeHook(allContext.tree, "beforeUnmount");
       }
     }
 
-    window.onunload = function() {
+    const unmounter = function() {
       if (allContext.tree) {
         InvokeAllNodeHook(allContext.tree, "unmounted");
       }
     }
+    
+
+
+    window.addEventListener("beforeunload", beforeUnmounter);
+
+    //window.onbeforeunload = beforeUnmounter;
+
+    window.addEventListener('unload', unmounter);
+
+    //window.onunload = unmounter;
   }
 
   return {
