@@ -1,5 +1,6 @@
 import { Subject, startWith, share } from "rxjs";
 import { Reactive, ReactiveType } from "./type";
+import { refArrayBuilder } from "./refHelper";
 
 type refInput = string | number | Function;
 
@@ -7,6 +8,11 @@ interface Ref extends Reactive {
   value: refInput,
   $sub: any,
   formate: (func: (e: any) => any) => any 
+}
+
+export interface RefA extends Reactive {
+  value: any,
+  $sub: any
 }
 
 export interface RefFormater {
@@ -52,6 +58,27 @@ function ref(value: unknown) {
         return true;
       }
     })
+  }
+
+  if (Array.isArray(value)) {
+    const subject: Subject<any> = new Subject();
+
+    const obj: RefA = {
+      type: ReactiveType.RefA,
+      value: null,
+      $sub: subject.pipe(startWith(value), share()),
+    }
+
+    const arr = refArrayBuilder(value, obj);
+
+    obj['value'] = arr;
+
+    return obj;
+  }
+
+  if (typeValue === "object") {
+    console.log("Object");
+    return;
   }
 }
 
