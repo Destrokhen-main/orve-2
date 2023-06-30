@@ -112,7 +112,7 @@ function parserNodeF(app: () => unknown, props: Props | null = null, parent : No
     componentO.children = parseChildren.call(this, componentO.children, componentO);
   }
 
-  if (component.hooks && !InvokeHook(componentO, "created", null)) {
+  if (componentO.hooks && !InvokeHook(componentO, "created", null)) {
     console.error(`Error in hook "beforeCreate"`)
   }
 
@@ -140,6 +140,10 @@ function parserNodeO(node: NodeO, parent : NodeOP | null = null): NodeOP | null 
     parent,
     type: TypeNode.Component
   }
+  
+  if (componentO.hooks && !InvokeHook(componentO, "beforeCreate", null)) {
+    console.warn(`Error in hook "beforeCreate"`)
+  }
 
   if (componentO.props !== undefined) {
     componentO.props = propsWorker.call(this, componentO.props);
@@ -147,6 +151,10 @@ function parserNodeO(node: NodeO, parent : NodeOP | null = null): NodeOP | null 
 
   if (componentO.children !== undefined) {
     componentO.children = parseChildren.call(this, componentO.children, componentO);
+  }
+
+  if (componentO.hooks && !InvokeHook(componentO, "created", null)) {
+    console.error(`Error in hook "beforeCreate"`)
   }
   return componentO;
 }

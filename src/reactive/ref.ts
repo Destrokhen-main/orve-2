@@ -12,7 +12,8 @@ interface Ref extends Reactive {
 
 export interface RefA extends Reactive {
   value: any,
-  $sub: any
+  $sub: any,
+  for: (item: any, index: number) => any 
 }
 
 export interface RefFormater {
@@ -67,6 +68,13 @@ function ref(value: unknown) {
       type: ReactiveType.RefA,
       value: null,
       $sub: subject.pipe(startWith(value), share()),
+      for: function(func) {
+        return {
+          type: ReactiveType.RefFormater,
+          value: func,
+          parent: this
+        }
+      }
     }
 
     const arr = refArrayBuilder(value, obj);

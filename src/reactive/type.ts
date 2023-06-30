@@ -3,6 +3,7 @@ export enum ReactiveType {
   RefFormater = "RefFormater",
 
   RefA = "RefA",
+  RefArrFor = "RefArrFor" 
 }
 
 export interface Reactive {
