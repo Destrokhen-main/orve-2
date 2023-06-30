@@ -1,4 +1,5 @@
 import { InvokeHook } from "../helper/hookHelper";
+import { FRAGMENT } from "../keys";
 import { NodeOP } from "../parser/parser";
 import { mounterChildren } from "./children";
 import { propsWorker } from "./props";
@@ -6,6 +7,10 @@ import { propsWorker } from "./props";
 function mounterNode(root: Element | null, tree: NodeOP) {
   if (typeof tree.tag !== "string") {
     return null
+  }
+
+  if (tree.tag === FRAGMENT) {
+    return mounterChildren(root, tree.children)
   }
 
   // before mount
