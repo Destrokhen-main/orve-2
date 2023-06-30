@@ -1,11 +1,11 @@
-import { Subject, share, startWith } from "rxjs";
+import { Subject, startWith, share } from "rxjs";
 import { Reactive, ReactiveType } from "./type";
 
 type refInput = string | number | Function;
 
 interface Ref extends Reactive {
   value: refInput,
-  $sub: Subject<refInput>,
+  $sub: any,
   formate: (func: (e: any) => any) => any 
 }
 
@@ -22,12 +22,11 @@ function ref(value: unknown) {
     const val = value as refInput;
 
     const subject: Subject<refInput> = new Subject();
-    subject.pipe(startWith(val), share());
 
     const obj: Ref = {
       type: ReactiveType.Ref,
       value: val,
-      $sub: subject,
+      $sub: subject.pipe(startWith(val), share()),
       formate: function(func): RefFormater {
         return {
           type: ReactiveType.RefFormater,

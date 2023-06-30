@@ -1,5 +1,6 @@
 import { NodeChild, NodeHtml } from "../parser/type";
 import { Ref, RefFormater } from "../reactive/ref";
+import { pairwise, startWith } from "rxjs";
 
 function textNodeCreator(item: NodeChild) {
   const textNode = document.createTextNode(String(item.value));
@@ -19,10 +20,13 @@ function htmlNodeCreate(item: NodeHtml) {
 
 function RefChildCreator(root: Element | null, item: Ref) {
   const textNode = document.createTextNode(String(item.value));
-        
-  item.$sub.subscribe({
-    next(value: string | number) {
-      textNode.textContent = String(value) 
+
+  const sub = item.$sub;
+  sub.pipe(startWith(item.value), pairwise()).subscribe({
+    next([before, after]: [string | number, string | number]) {
+      if (after !== undefined && before !== after) {
+        textNode.textContent = String(after);
+      }
     }
   } as any)
 
@@ -37,11 +41,12 @@ function RefFormateChildCreator(root: Element | null, item: RefFormater) {
   const textNode = document.createTextNode(String(formItem));
 
   item.parent.$sub.subscribe({
-    next(value: string | number) {
-      const formatedItem = item.value(value);
-      textNode.textContent = String(formatedItem);
+    next(after: string | number) {
+        const formatedItem = item.value(after);
+        textNode.textContent = String(formatedItem);
+      }
     }
-  })
+  )
 
   if (root !== null) {
     root.appendChild(textNode);
@@ -49,3 +54,4 @@ function RefFormateChildCreator(root: Element | null, item: RefFormater) {
 }
 
 export { textNodeCreator, htmlNodeCreate, RefChildCreator, RefFormateChildCreator }
+

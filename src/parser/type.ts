@@ -9,7 +9,11 @@ export enum TypeNode {
 
 export enum TypeProps {
   Static = "Static",
-  Event = "Event"
+  Event = "Event",
+  EventReactive = "EventReactive",
+  EventReactiveF = "EventReactiveF",
+  StaticReactive = "StaticReactive",
+  StaticReactiveF = "StaticReactiveF"
 }
 
 // Static Child Node
