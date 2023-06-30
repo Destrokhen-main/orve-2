@@ -58,14 +58,12 @@ export function refArrayBuilder(arr: any[], obj: RefA) {
         }
         if (['splice'].includes(p)) {
           return function(a: number, b: number, ...args: any[]) {
-            console.log(a, b, args);
-
             if (t.length > 0) {
               obj.$sub.next({
                 type: "splice",
                 start: a,
-                stop: b,
-                otherVal: args
+                count: b,
+                insert: args
               })
             }
             
