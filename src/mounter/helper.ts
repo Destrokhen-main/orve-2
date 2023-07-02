@@ -54,7 +54,7 @@ function RefFormateChildCreator(root: Element | null, item: RefFormater) {
   }
 }
 
-function RefArray(root: Element | null, item: RefA, parent: any = null) {
+function RefArray(root: Element | null, item: RefA, parent: any = null, callback: ((a: any, b: number) => any) | null = null) {
   /*
   Если есть списки то что-то вставляется + -
 
@@ -71,7 +71,9 @@ function RefArray(root: Element | null, item: RefA, parent: any = null) {
     root?.appendChild(comment);
     mountedNode = comment;
   } else {
-    const allNode = parseChildren(item.value, null);
+    const prepaire = callback !== null ? item.value.map(callback) : item.value;
+
+    const allNode = parseChildren(prepaire, null);
     const mounted = mounterChildren(null, allNode as InsertType[]);
     if (root === null) return mounted;
 
@@ -91,7 +93,14 @@ function RefArray(root: Element | null, item: RefA, parent: any = null) {
 
   item.$sub.subscribe((next: Record<string, any>) => {
     if (next.type === "insert") {
-      const newNode = parseChildren(next.value, null);
+      let m = 0;
+      if (Array.isArray(mountedNode)) {
+        m = next.dir === "right" ? mountedNode.length : 0;
+      }
+
+      const prepaire = callback !== null ? next.value.map((e: any, i: number) => callback(e, m + i)) : next.value;
+
+      const newNode = parseChildren(prepaire, null);
       const newMounted = mounterChildren(null, newNode as InsertType[]);
 
       const dir = next.dir;
@@ -153,12 +162,17 @@ function RefArray(root: Element | null, item: RefA, parent: any = null) {
     }
 
     if (next.type === "insertByIndex") {
-      const newNode = parseChildren(next.value, null);
+      let start = 0;
+      if(Array.isArray(mountedNode)) {
+        start = next.start <= mountedNode.length - 1 ? next.start : mountedNode.length - 1;
+      }
+      
+      const prepaire = callback !== null ? next.value.map((e: any, i: number) => callback(e, start + i)) : next.value;
+
+      const newNode = parseChildren(prepaire, null);
       const newMounted = mounterChildren(null, newNode as InsertType[]);
 
       if (Array.isArray(mountedNode)) {
-        const start = next.start <= mountedNode.length - 1 ? next.start : mountedNode.length - 1;
-
         let nd = mountedNode[start].node;
 
         for (let i = 0; i !== newMounted.length; i++) {

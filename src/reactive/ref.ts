@@ -70,7 +70,7 @@ function ref(value: unknown) {
       $sub: subject.pipe(startWith(value), share()),
       for: function(func) {
         return {
-          type: ReactiveType.RefFormater,
+          type: ReactiveType.RefArrFor,
           value: func,
           parent: this
         }
