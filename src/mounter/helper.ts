@@ -105,9 +105,8 @@ function RefArray(root: Element | null, item: RefA, parent: any = null) {
       
       let nodeStart = dir === "right" ? mountedNode[mountedNode.length - 1].node : mountedNode[0].node; 
       for(let i = 0; i !== newMounted.length; i++) {
-        if (i === 0) {
-          nodeStart[dir === "right" ? "after" : "before"](newMounted[i].node);
-        }
+        nodeStart[dir === "right" ? "after" : "before"](newMounted[i].node);
+        nodeStart = newMounted[i].node
       }
       mountedNode[dir === "right" ? "push" : "unshift"](...newMounted);
       return;

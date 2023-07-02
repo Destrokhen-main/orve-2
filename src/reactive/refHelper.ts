@@ -59,7 +59,6 @@ export function refArrayBuilder(arr: any[], obj: RefA) {
         if (['splice'].includes(p)) {
           return function(a: number, b: number, ...args: any[]) {
             if (t.length > 0) {
-
               if (b !== 0) {
                 obj.$sub.next({
                   type: "delete",
@@ -76,8 +75,7 @@ export function refArrayBuilder(arr: any[], obj: RefA) {
                 });
               }
             }
-
-            if (t.length === 0 && b === 0 && args.length > 0) {
+            if (t.length === 0 && args.length > 0) {
               obj.$sub.next({
                 type: "insert",
                 dir: "right",
