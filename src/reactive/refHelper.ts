@@ -59,12 +59,30 @@ export function refArrayBuilder(arr: any[], obj: RefA) {
         if (['splice'].includes(p)) {
           return function(a: number, b: number, ...args: any[]) {
             if (t.length > 0) {
+
+              if (b !== 0) {
+                obj.$sub.next({
+                  type: "delete",
+                  start: a,
+                  count: b
+                })
+              }
+              
+              if(args.length > 0) {
+                obj.$sub.next({
+                  type: "insertByIndex",
+                  start: a,
+                  value: args
+                });
+              }
+            }
+
+            if (t.length === 0 && b === 0 && args.length > 0) {
               obj.$sub.next({
-                type: "splice",
-                start: a,
-                count: b,
-                insert: args
-              })
+                type: "insert",
+                dir: "right",
+                value: args
+              });
             }
             
             return Array.prototype[p].apply(t, args);

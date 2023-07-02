@@ -56,7 +56,7 @@ function mounterChildren(root: Element | null, listNode: InsertType[]): any {
       }
 
       if (reactiveObject.type === ReactiveType.RefA) {
-        RefArray(root, reactiveObject as any);
+        RefArray(root, reactiveObject as any, item);
         return item;
       }
     }

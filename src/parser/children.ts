@@ -2,7 +2,8 @@ import { validationNode } from "./helper";
 import { NodeO, NodeOP } from "./parser"
 import { parserNodeO } from "./parser";
 import { TypeNode, NodeChild, NodeHtml } from "./type"
-import { isComponent, isFormater, isHtmlNode, isReactiveObject } from "./childrenHelper";
+import { isComponent, isHtmlNode, isReactiveObject } from "./childrenHelper";
+import { genUID } from "../helper/generation";
 
 function compareStatic(item: string | number): NodeChild {
   return {
@@ -31,6 +32,7 @@ const parseSingleChildren = function(parent: NodeOP | null) {
     if (typeof item === "object" && item !== null && isReactiveObject(item)) {
       return {
         type: TypeNode.Reactive,
+        keyNode: genUID(8),
         value: item
       };
     }
