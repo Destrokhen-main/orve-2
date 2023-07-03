@@ -81,7 +81,32 @@ function ref(value: unknown) {
 
     obj['value'] = arr;
 
-    return obj;
+    const refProxy = new Proxy(obj, {
+      set(t: RefA, p: string, v: any) {
+        if (p === "value") {
+          const newAr = refArrayBuilder(v, obj);
+          obj.$sub.next({
+            type: "delete",
+            start: 0,
+            count: t.value.length
+          })
+
+          obj.$sub.next({
+            type: "insert",
+            dir: "right",
+            value: v
+          })
+
+          t.value = newAr;
+        }
+        return true;
+      },
+      deleteProperty(t: RefA, p: keyof RefA) {
+        return false;
+      }
+    })
+
+    return refProxy;
   }
 
   if (typeValue === "object") {

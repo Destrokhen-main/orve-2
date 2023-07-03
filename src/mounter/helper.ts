@@ -1,10 +1,11 @@
-import { parseChildren } from "../parser/children";
+import { parseChildren, parseSingleChildren } from "../parser/children";
 import { NodeChild, NodeHtml } from "../parser/type";
 import { Ref, RefA, RefFormater } from "../reactive/ref";
 import { pairwise, startWith } from "rxjs";
 import { InsertType, mounterChildren } from "./children";
 
 import fastEqual from "fast-deep-equal"
+import { mounterNode } from "./index";
 
 function textNodeCreator(item: NodeChild) {
   const textNode = document.createTextNode(String(item.value));
@@ -265,6 +266,19 @@ function RefArray(root: Element | null, item: RefA, parent: any = null, callback
             mountedNode[i].node.replaceWith(mounted[i].node) 
             mountedNode[i] = mounted[i]
           }
+        }
+      }
+    }
+
+    if (next.type === "edit") {
+      const prepaire = callback !== null ? callback(next.value, Number(next.key)) : next.value;
+      const newNode = parseSingleChildren(null)(prepaire);
+      const mm = mounterNode(null, newNode as any);
+
+      if (mountedNode !== null && Array.isArray(mountedNode)) {
+        if (!fastEqual(mountedNode[next.key], mm)) {
+          mountedNode[next.key].node.replaceWith(mm.node);
+          mountedNode[next.key] = mm;
         }
       }
     }
