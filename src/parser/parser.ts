@@ -13,7 +13,7 @@ export interface NodeO extends NodeB {
 }
 
 export interface NodeOP extends NodeO {
-  keyNode: string,
+  keyNode?: string | number,
   node: Element | null,
   parent: NodeOP | null,
   type: TypeNode
@@ -93,11 +93,13 @@ function parserNodeF(app: () => unknown, props: Props | null = null, parent : No
 
   const componentO: NodeOP = {
     ...component,
-    keyNode: genUID(8),
     node: null,
     parent,
     type: TypeNode.Component
   };
+  if (component.keyNode === undefined) {
+    componentO.keyNode = genUID(8);
+  }
 
   //NOTE beforeCreate 
   if (componentO.hooks && !InvokeHook(componentO, "beforeCreate", null)) {
@@ -135,10 +137,13 @@ function parserNodeO(node: NodeO, parent : NodeOP | null = null): NodeOP | null 
 
   const componentO: NodeOP = {
     ...workNode,
-    keyNode: genUID(8),
     node: null,
     parent,
     type: TypeNode.Component
+  }
+
+  if (workNode.keyNode === undefined) {
+    componentO.keyNode = genUID(8);
   }
   
   if (componentO.hooks && !InvokeHook(componentO, "beforeCreate", null)) {

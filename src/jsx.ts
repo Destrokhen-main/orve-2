@@ -18,10 +18,11 @@ export interface NodeHooks {
   unmounted: (instance?: any) => void
 }
 
-export const ACCESS_KEY = ['tag', 'props', 'children', 'hooks', 'ref'];
+export const ACCESS_KEY = ['tag', 'props', 'children', 'hooks', 'ref', "keyNode"];
 
 export interface NodeB {
   tag: Tag,
+  keyNode?: string | number,
   props?: Props,
   children?: Children[],
   hooks?: NodeHooks,
@@ -33,7 +34,7 @@ export interface JSX {
   Fragment: (node: FragmentT) => NodeB
 }
 
-const DIRECTIVES_ORVE = ["o-hooks", "o-ref"];
+const DIRECTIVES_ORVE = ["o-hooks", "o-ref", "o-key"];
 /**
  * Node creater
  * @param tag - String or Component
@@ -54,7 +55,12 @@ function Node(tag: Tag, props: Props | null = null, ...children: Children): Node
     Object.keys(props).forEach((key) => {
       if (DIRECTIVES_ORVE.includes(key)) {
         const inseredKey = key.replace("o-", "").toLocaleLowerCase().trim() as keyof NodeB;
-        Node[inseredKey] = props[key];
+
+        if (inseredKey as string === "key") {
+          Node.keyNode = String(props[key]);
+        } else {
+          Node[inseredKey] = props[key];
+        }
       } else {
         SetProps[key] = props[key];
       }

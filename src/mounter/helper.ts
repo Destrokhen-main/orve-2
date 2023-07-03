@@ -4,6 +4,8 @@ import { Ref, RefA, RefFormater } from "../reactive/ref";
 import { pairwise, startWith } from "rxjs";
 import { InsertType, mounterChildren } from "./children";
 
+import fastEqual from "fast-deep-equal"
+
 function textNodeCreator(item: NodeChild) {
   const textNode = document.createTextNode(String(item.value));
   item.node = textNode;
@@ -55,16 +57,6 @@ function RefFormateChildCreator(root: Element | null, item: RefFormater) {
 }
 
 function RefArray(root: Element | null, item: RefA, parent: any = null, callback: ((a: any, b: number) => any) | null = null) {
-  /*
-  Если есть списки то что-то вставляется + -
-
-  Если нет списка что делать
-
-  Если новый список полностью новый
-
-  Если список очиститься полностью
-  */
-
   let mountedNode: Comment | any[] | null  = null;
   if (item.value.length === 0) {
     const comment = document.createComment(` refA - ${parent.keyNode} `);
@@ -72,9 +64,21 @@ function RefArray(root: Element | null, item: RefA, parent: any = null, callback
     mountedNode = comment;
   } else {
     const prepaire = callback !== null ? item.value.map(callback) : item.value;
-
     const allNode = parseChildren(prepaire, null);
-    const mounted = mounterChildren(null, allNode as InsertType[]);
+    const mm = mounterChildren(null, allNode as InsertType[]);
+
+    let mounted: any = [];
+
+    while(mm.length > 0) {
+      const item = mm.shift();
+
+      if (Array.isArray(item)) {
+        mm.unshift(...item);
+      } else {
+        mounted.push(item);
+      }
+    }
+
     if (root === null) return mounted;
 
     mountedNode = mounted;
@@ -89,6 +93,12 @@ function RefArray(root: Element | null, item: RefA, parent: any = null, callback
       }
       startNode = mounted[i].node;
     }
+
+    if (mounted.length === 0) {
+      const comment = document.createComment(` refA - ${parent.keyNode} `);
+      root?.appendChild(comment);
+      mountedNode = comment;
+    }
   }
 
   item.$sub.subscribe((next: Record<string, any>) => {
@@ -99,9 +109,20 @@ function RefArray(root: Element | null, item: RefA, parent: any = null, callback
       }
 
       const prepaire = callback !== null ? next.value.map((e: any, i: number) => callback(e, m + i)) : next.value;
-
       const newNode = parseChildren(prepaire, null);
-      const newMounted = mounterChildren(null, newNode as InsertType[]);
+      const mm = mounterChildren(null, newNode as InsertType[]);
+
+      let newMounted: any = [];
+
+      while(mm.length > 0) {
+        const item = mm.shift();
+
+        if (Array.isArray(item)) {
+          mm.unshift(...item);
+        } else {
+          newMounted.push(item);
+        }
+      }
 
       const dir = next.dir;
 
@@ -134,7 +155,6 @@ function RefArray(root: Element | null, item: RefA, parent: any = null, callback
           nd.node.replaceWith(comment);
           mountedNode = comment;
         }
-        return;
       } else if (next.start !== undefined && next.count !== undefined) {
         if (Array.isArray(mountedNode) && next.start >= 0) {
           const end = next.start + next.count > mountedNode.length ? mountedNode.length : next.start + next.count;
@@ -158,6 +178,32 @@ function RefArray(root: Element | null, item: RefA, parent: any = null, callback
           }
         }
       }
+
+      if (Array.isArray(mountedNode)) {
+        console.log(item.value);
+        const prepaire = callback !== null ? item.value.map(callback) : item.value;
+        const allNode = parseChildren(prepaire, null);
+        const mm = mounterChildren(null, allNode as InsertType[]);
+
+        let mounted: any = [];
+
+        while(mm.length > 0) {
+          const item = mm.shift();
+
+          if (Array.isArray(item)) {
+            mm.unshift(...item);
+          } else {
+            mounted.push(item);
+          }
+        }
+
+        for (let i = 0; i !== mountedNode.length; i++) {
+          if (!fastEqual(mountedNode[i], mounted[i])) {
+            mountedNode[i].node.replaceWith(mounted[i].node) 
+            mountedNode[i] = mounted[i]
+          }
+        }
+      }
       return;
     }
 
@@ -170,7 +216,19 @@ function RefArray(root: Element | null, item: RefA, parent: any = null, callback
       const prepaire = callback !== null ? next.value.map((e: any, i: number) => callback(e, start + i)) : next.value;
 
       const newNode = parseChildren(prepaire, null);
-      const newMounted = mounterChildren(null, newNode as InsertType[]);
+      const mm = mounterChildren(null, newNode as InsertType[]);
+
+      let newMounted: any = [];
+
+      while(mm.length > 0) {
+        const item = mm.shift();
+
+        if (Array.isArray(item)) {
+          mm.unshift(...item);
+        } else {
+          newMounted.push(item);
+        }
+      }
 
       if (Array.isArray(mountedNode)) {
         let nd = mountedNode[start].node;
@@ -184,6 +242,31 @@ function RefArray(root: Element | null, item: RefA, parent: any = null, callback
           nd = newMounted[i].node;
         }
         mountedNode.splice(start, 0, ...newMounted);
+      }
+
+      if (Array.isArray(mountedNode)) {
+        const prepaire = callback !== null ? item.value.map(callback) : item.value;
+        const allNode = parseChildren(prepaire, null);
+        const mm = mounterChildren(null, allNode as InsertType[]);
+
+        let mounted: any = [];
+
+        while(mm.length > 0) {
+          const item = mm.shift();
+
+          if (Array.isArray(item)) {
+            mm.unshift(...item);
+          } else {
+            mounted.push(item);
+          }
+        }
+
+        for (let i = 0; i !== mountedNode.length; i++) {
+          if (!fastEqual(mountedNode[i], mounted[i])) {
+            mountedNode[i].node.replaceWith(mounted[i].node) 
+            mountedNode[i] = mounted[i]
+          }
+        }
       }
     }
   });

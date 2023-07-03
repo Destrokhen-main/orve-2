@@ -35,30 +35,39 @@ export function refArrayBuilder(arr: any[], obj: RefA) {
         }
         if (['shift'].includes(p)) {
           return function() {
-            if (t.length > 0) {
+            const before = t.length;
+            const s = Array.prototype[p].apply(t);
+
+            if (before > 0) {
               obj.$sub.next({
                 type: "delete",
                 dir: "left"
               })
             }
 
-            return Array.prototype[p].apply(t);
+            return s;
           }
         }
         if (['pop'].includes(p)) {
           return function() {
-            if (t.length > 0) {
+            const before = t.length;
+            const s = Array.prototype[p].apply(t);
+
+            if (before > 0) {
               obj.$sub.next({
                 type: "delete",
                 dir: "right"
               })
             }
-            return Array.prototype[p].apply(t);
+            return s;
           }
         }
         if (['splice'].includes(p)) {
           return function(a: number, b: number, ...args: any[]) {
-            if (t.length > 0) {
+            const before = t.length;
+            const s = Array.prototype[p].apply(t, [a,b, ...args]);
+
+            if (before > 0) {
               if (b !== 0) {
                 obj.$sub.next({
                   type: "delete",
@@ -67,7 +76,7 @@ export function refArrayBuilder(arr: any[], obj: RefA) {
                 })
               }
               
-              if(args.length > 0) {
+              if(b === 0 && args.length > 0) {
                 obj.$sub.next({
                   type: "insertByIndex",
                   start: a,
@@ -75,7 +84,8 @@ export function refArrayBuilder(arr: any[], obj: RefA) {
                 });
               }
             }
-            if (t.length === 0 && args.length > 0) {
+
+            if (args.length > 0) {
               obj.$sub.next({
                 type: "insert",
                 dir: "right",
@@ -83,7 +93,7 @@ export function refArrayBuilder(arr: any[], obj: RefA) {
               });
             }
             
-            return Array.prototype[p].apply(t, args);
+            return s;
           }
         }
         return val.bind(t);

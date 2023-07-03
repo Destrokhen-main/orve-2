@@ -11,7 +11,11 @@ import { mounterNode } from "./index";
 export type InsertType = NodeOP | NodeChild | NodeHtml 
 
 function mounterChildren(root: Element | null, listNode: InsertType[]): any {
-  return listNode.map((item: InsertType) => {
+  const finaly = listNode.map((item: InsertType) => {
+    if (item === undefined || item === null) {
+      return null;
+    }
+
     if (item.type === TypeNode.Component) {
       const knowItem = item as NodeOP;
 
@@ -67,6 +71,8 @@ function mounterChildren(root: Element | null, listNode: InsertType[]): any {
       //console.log(item);
     }
   })
+
+  return finaly.filter((x) => x !== null)
 }
 
 export { mounterChildren }
