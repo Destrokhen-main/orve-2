@@ -101,7 +101,7 @@ function ref(value: unknown) {
         }
         return true;
       },
-      deleteProperty(t: RefA, p: keyof RefA) {
+      deleteProperty() {
         return false;
       }
     })
