@@ -68,7 +68,6 @@ function mounterChildren(root: Element | null, listNode: InsertType[]): any {
         RefArray(root, (reactiveObject as any).parent, item, reactiveObject.value as () => any);
         return item;
       }
-      //console.log(item);
     }
   })
 

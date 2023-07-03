@@ -180,7 +180,6 @@ function RefArray(root: Element | null, item: RefA, parent: any = null, callback
       }
 
       if (Array.isArray(mountedNode)) {
-        console.log(item.value);
         const prepaire = callback !== null ? item.value.map(callback) : item.value;
         const allNode = parseChildren(prepaire, null);
         const mm = mounterChildren(null, allNode as InsertType[]);
