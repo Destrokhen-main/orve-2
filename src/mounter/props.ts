@@ -1,6 +1,6 @@
 import { fromEvent, startWith, pairwise } from "rxjs";
 import { Props } from "../jsx";
-import { PropsItem } from "../parser/props";
+import { PropsItem, SPECIFIC_KEYS, objectToCss } from "../parser/props";
 import { TypeProps } from "../parser/type";
 
 function prepaireStaticRectF(item: any, key: string, val: any = null) {
@@ -15,6 +15,14 @@ function prepaireStaticRectF(item: any, key: string, val: any = null) {
   return value
 }
 
+function prepaireClass(insertValue: any) {
+  let insertV: string = insertValue;
+  if (typeof insertValue === "object") {
+    insertV = objectToCss(insertValue);
+  }
+
+  return insertV;
+}
 
 function propsWorker(root: HTMLElement, item: Props) {
   Object.keys(item).forEach((key: string) => {
@@ -74,16 +82,39 @@ function propsWorker(root: HTMLElement, item: Props) {
       const item = obj.value;
       const value = prepaireStaticRectF(item, key);
 
-      if (value !== null) {
-        root.setAttribute(key, String(value));
+      if (value !== null && value !== "") {
 
-        item.parent.$sub.pipe(startWith(value), pairwise()).subscribe(([before, after ]: [any, any]) => {
-          const newKey = prepaireStaticRectF(item, key, after);
+        let insertValue = value;
+        
+        if (SPECIFIC_KEYS.includes(key)) {
+          if (key === "style") {
+            let insertV: string = String(insertValue);
+            if (typeof insertValue === "object") {
+              insertV = objectToCss(insertValue);
+            }
 
-          if (newKey !== null && before !== newKey) {
-            root.setAttribute(key, String(newKey));
+            root.setAttribute(key, insertV);
+
+            item.parent.$sub.pipe(startWith(insertV), pairwise()).subscribe(([before, after ]: [any, any]) => {
+              const newKey = prepaireStaticRectF(item, key, after);
+              const st = prepaireClass(newKey);
+
+              if (st !== null && before !== st) {
+                root.setAttribute(key, st);
+              }
+            })
           }
-        })
+        } else {
+          root.setAttribute(key, insertValue);
+
+          item.parent.$sub.pipe(startWith(insertValue), pairwise()).subscribe(([before, after ]: [any, any]) => {
+            const newKey = prepaireStaticRectF(item, key, after);
+
+            if (newKey !== null && before !== newKey) {
+              root.setAttribute(key, String(newKey));
+            }
+          })
+        }
       }
     }
   })

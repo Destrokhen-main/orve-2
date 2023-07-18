@@ -1,6 +1,6 @@
 import { Props } from "../jsx";
 import { ReactiveType } from "../reactive/type";
-import { TypeProps } from "./type"; 
+import { TypeProps } from "./type";
 
 export interface PropsItem {
   type: TypeProps,
@@ -28,9 +28,72 @@ function workWithEvent(obj: any, key: string) {
   return obj;
 }
 
+const camelToSnakeCase = (str: string) => str.replace(/[A-Z]/g, letter => `-${letter.toLowerCase()}`);
+
+export function objectToCss(obj: Record<string, any>): string {
+  let o = "";
+
+  Object.keys(obj).forEach((k) => {
+    const nk = camelToSnakeCase(k);
+    o += `${nk}:${obj[k]};`;
+  })
+
+  return o;
+}
+
+function specificProps(obj: any, key: string): [Record<string, any> , boolean] {
+  const value = obj[key];
+
+  if (key === "style") {
+    if (typeof value === "object" && value.type === undefined) {
+      obj[key] = {
+        type: TypeProps.Static,
+        value: objectToCss(value)
+      }
+
+      return [obj, true];
+    } else if (typeof value === "string") {
+      obj[key] = {
+        type: TypeProps.Static,
+        value: value
+      }
+      return [obj, true];
+    } else if (typeof value === "object" && value.type === ReactiveType.RefFormater) {
+      obj[key] = {
+        type: TypeProps.StaticReactiveF,
+        value: value
+      }
+      return [ obj, true ];
+    }
+  }
+
+  if (key === "src") {
+    if (typeof value === "object" && value.default !== undefined) {
+      obj[key] = {
+        type: TypeProps.Static,
+        value: value.default
+      }
+    } else if (typeof value === "string") {
+      obj[key] = {
+        type: TypeProps.Static,
+        value: value
+      }
+    }
+    return [obj, true];
+  }
+
+  return [obj, false]
+}
+
+export const SPECIFIC_KEYS = ["style"];
 
 function workWithStaticProps(obj: any, key: string) {
   const value = obj[key];
+
+  if (SPECIFIC_KEYS.includes(key)) {
+    return specificProps(obj, key);
+  }
+
   
   if (typeof value === "string" || typeof value === "number") {
     obj[key] = {
@@ -63,7 +126,9 @@ function workWithStaticProps(obj: any, key: string) {
 }
 
 
-function propsWorker(obj: Props): Props {
+function propsWorker(insertoObj: Props): Props {
+  let obj: any = { ...insertoObj };
+
   Object.keys(obj).forEach((key: string) => {
     if (key.startsWith('on')) {
       obj = workWithEvent(obj, key);

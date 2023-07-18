@@ -103,7 +103,7 @@ function parserNodeF(app: () => unknown, props: Props | null = null, parent : No
 
   //NOTE beforeCreate 
   if (componentO.hooks && !InvokeHook(componentO, "beforeCreate", null)) {
-    console.warn(`Error in hook "beforeCreate"`)
+    console.error(`Error in hook "beforeCreate"`)
   }
 
   if (componentO.props !== undefined) {
@@ -115,7 +115,7 @@ function parserNodeF(app: () => unknown, props: Props | null = null, parent : No
   }
 
   if (componentO.hooks && !InvokeHook(componentO, "created", null)) {
-    console.error(`Error in hook "beforeCreate"`)
+    console.error(`Error in hook "created"`)
   }
 
   return componentO;

@@ -10,8 +10,8 @@ import { mounterNode } from "./index";
 
 export type InsertType = NodeOP | NodeChild | NodeHtml 
 
-function mounterChildren(root: Element | null, listNode: InsertType[]): any {
-  const finaly = listNode.map((item: InsertType) => {
+function singelMounterChildren(root: Element | null) {
+  return (item: InsertType) => {
     if (item === undefined || item === null) {
       return null;
     }
@@ -69,9 +69,15 @@ function mounterChildren(root: Element | null, listNode: InsertType[]): any {
         return item;
       }
     }
-  })
+  }
+}
+
+function mounterChildren(root: Element | null, listNode: InsertType[]): any {
+  const prepaireFunction = singelMounterChildren(root);
+
+  const finaly = listNode.map(prepaireFunction)
 
   return finaly.filter((x) => x !== null)
 }
 
-export { mounterChildren }
+export { mounterChildren, singelMounterChildren }

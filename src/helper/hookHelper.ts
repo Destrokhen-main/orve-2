@@ -12,11 +12,12 @@ export function InvokeHook(obj: NodeOP, nameHook: string | keyof NodeHooks, valu
       h[nameHook as keyof NodeHooks]({});
       return true;
     } catch (er) {
+      console.error(er);
       return false;
     }
+  } else {
+    return true;
   }
-
-  return false;
 }
 
 export function InvokeAllNodeHook(obj: NodeOP, hook: keyof NodeHooks): void {
