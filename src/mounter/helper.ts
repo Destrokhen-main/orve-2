@@ -1,6 +1,6 @@
 import { parseSingleChildren } from "../parser/children";
 import { NodeChild, NodeHtml } from "../parser/type";
-import { Ref, RefA, RefFormater } from "../reactive/ref";
+import { Ref, RefA, RefFormater, RefO, RefOF } from "../reactive/ref";
 import { pairwise, startWith } from "rxjs";
 import { InsertType, singelMounterChildren } from "./children";
 import { Dir, EtypeRefRequest } from "../reactive/refHelper"
@@ -56,6 +56,8 @@ function RefChildCreator(root: Element | null, item: Ref) {
 
   if (root !== null) {
     root.appendChild(textNode);
+  } else {
+    item.node = textNode;
   }
 }
 
@@ -406,6 +408,8 @@ interface RefAInsertByIndex extends refaSubscribe {
   value: any[]
 }
 
+// TODO fragment - там больно, надо доработать - [ ]
+// TODO По условию может приходить null и надо не отрисовывать ничего - [ ]
 function RefArray(
     root: Element | null,
     item: RefA,
@@ -737,6 +741,9 @@ function RefArray(
   })
 }
 
+function RefOWorker(root: Element | null, item: Record<string, any>) {
+}
 
-export { textNodeCreator, htmlNodeCreate, RefChildCreator, RefFormateChildCreator, RefArray }
+
+export { textNodeCreator, htmlNodeCreate, RefChildCreator, RefFormateChildCreator, RefArray, RefOWorker }
 

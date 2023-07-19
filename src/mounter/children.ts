@@ -4,7 +4,7 @@ import { NodeHtml, NodeChild } from "../parser/type"
 import { TypeNode } from "../parser/type"
 import { Ref } from "../reactive/ref";
 import { ReactiveType } from "../reactive/type";
-import { textNodeCreator, htmlNodeCreate, RefChildCreator, RefFormateChildCreator, RefArray } from "./helper";
+import { textNodeCreator, htmlNodeCreate, RefChildCreator, RefFormateChildCreator, RefArray, RefOWorker } from "./helper";
 
 import { mounterNode } from "./index";
 
@@ -59,13 +59,18 @@ function singelMounterChildren(root: Element | null) {
         return item;
       }
 
-      if (reactiveObject.type === ReactiveType.RefA) {
-        RefArray(root, reactiveObject as any, item);
-        return item;
-      }
+      // if (reactiveObject.type === ReactiveType.RefA) {
+      //   RefArray(root, (reactiveObject as any).parent, item, reactiveObject.value as () => any);
+      //   return item;
+      // }
 
       if (reactiveObject.type === ReactiveType.RefArrFor) {
         RefArray(root, (reactiveObject as any).parent, item, reactiveObject.value as () => any);
+        return item;
+      }
+
+      if (reactiveObject.type === ReactiveType.RefO) {
+        RefOWorker(root, item as any)
         return item;
       }
     }

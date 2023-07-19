@@ -5,11 +5,11 @@ interface refL {
   $sub: any
 }
 
-function refL(startValue: unknown = null) {
+function refL() {
   const subject: Subject<Element> = new Subject();
 
   const obj = {
-    value: startValue !== null ? startValue : "",
+    value: undefined,
     $sub: subject.pipe(startWith(undefined), share())
   }
 

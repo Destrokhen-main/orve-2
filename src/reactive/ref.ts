@@ -7,13 +7,23 @@ type refInput = string | number | Function;
 interface Ref extends Reactive {
   value: refInput,
   $sub: any,
-  formate: (func: (e: any) => any) => any 
+  formate: (func: (e: any) => any) => any,
+  node?: any,
 }
 
 export interface RefA extends Reactive {
   value: any,
   $sub: any,
   for: (item: any, index: number) => any 
+}
+
+export interface RefO extends Reactive {
+  $sub: Subject<any>,
+}
+
+export interface RefOF extends Reactive {
+  key: string,
+  value: RefO
 }
 
 export interface RefFormater {
@@ -24,8 +34,7 @@ export interface RefFormater {
 
 function ref(value: unknown) {
   const typeValue = typeof value;
-
-  if (["string", "number", "function"].includes(typeValue)) {
+  if (["string", "number", "function", "undefined"].includes(typeValue)) {
     const val = value as refInput;
 
     const subject: Subject<refInput> = new Subject();
@@ -110,8 +119,7 @@ function ref(value: unknown) {
   }
 
   if (typeValue === "object") {
-    console.log("Object");
-    return;
+    console.log('object');
   }
 }
 
