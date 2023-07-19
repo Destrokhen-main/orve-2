@@ -594,7 +594,7 @@ function RefArray(
       // Если нет dir, значит там есть start и count
       if (workObject.start !== undefined && workObject.count !== undefined) {
         // если мы сюда попали, значит в count точно нет 0.
-        if (Array.isArray(allInstruction) && (workObject.start >= allInstruction?.length || workObject.count >= allInstruction?.length)) {
+        if (Array.isArray(allInstruction) && (workObject.start > allInstruction?.length || workObject.count > allInstruction?.length)) {
           return;
         }
 

@@ -59,10 +59,10 @@ function singelMounterChildren(root: Element | null) {
         return item;
       }
 
-      // if (reactiveObject.type === ReactiveType.RefA) {
-      //   RefArray(root, (reactiveObject as any).parent, item, reactiveObject.value as () => any);
-      //   return item;
-      // }
+      if (reactiveObject.type === ReactiveType.RefA) {
+        console.warn(`Пожалуйста, используйте "for" для отображения массива правильно`)
+        return item;
+      }
 
       if (reactiveObject.type === ReactiveType.RefArrFor) {
         RefArray(root, (reactiveObject as any).parent, item, reactiveObject.value as () => any);
