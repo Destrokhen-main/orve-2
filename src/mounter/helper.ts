@@ -1,6 +1,6 @@
 import { parseSingleChildren } from "../parser/children";
 import { NodeChild, NodeHtml } from "../parser/type";
-import { Ref, RefA, RefFormater, RefO, RefOF } from "../reactive/ref";
+import { Ref, RefA, RefFormater } from "../reactive/ref";
 import { pairwise, startWith } from "rxjs";
 import { InsertType, singelMounterChildren } from "./children";
 import { Dir, EtypeRefRequest } from "../reactive/refHelper"
@@ -341,20 +341,6 @@ function fragmentWorker(mountedNode: any[]): any[] {
   }
 
   return newMounted
-}
-
-
-function insertNodeInHtml(root: Element, nodes: any[]) {
-  let startNode = root;
-
-  for(let i = 0; i !== nodes.length; i++) {
-    if (i === 0) {
-      startNode.appendChild(nodes[i].node)
-    } else {
-      startNode?.after(nodes[i].node);
-    }
-    startNode = nodes[i].node;
-  }
 }
 
 enum EtypeComment {
@@ -744,6 +730,4 @@ function RefArray(
 function RefOWorker(root: Element | null, item: Record<string, any>) {
 }
 
-
 export { textNodeCreator, htmlNodeCreate, RefChildCreator, RefFormateChildCreator, RefArray, RefOWorker }
-
