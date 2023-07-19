@@ -4,6 +4,7 @@ import { Ref, RefA, RefFormater } from "../reactive/ref";
 import { pairwise, startWith } from "rxjs";
 import { InsertType, singelMounterChildren } from "./children";
 import { Dir, EtypeRefRequest } from "../reactive/refHelper"
+import { EtypeComment, SettingNode, refaSubscribe, RefAInsert, RefAEdit, RefADelete, RefAInsertByIndex } from "./helperType";
 
 const compareObjects = (a: any, b: any) => {
   if (a === b) return true;
@@ -56,8 +57,6 @@ function RefChildCreator(root: Element | null, item: Ref) {
 
   if (root !== null) {
     root.appendChild(textNode);
-  } else {
-    item.node = textNode;
   }
 }
 
@@ -343,11 +342,6 @@ function fragmentWorker(mountedNode: any[]): any[] {
   return newMounted
 }
 
-enum EtypeComment {
-  append = "append",
-  replace = "replace"
-}
-
 function createCommentAndInsert(root: Element, text: string, type: EtypeComment = EtypeComment.append) {
   const comment = document.createComment(` refA - ${text} `);
 
@@ -361,37 +355,6 @@ function createCommentAndInsert(root: Element, text: string, type: EtypeComment 
   }
 
   return comment;
-}
-
-interface SettingNode {
-  prepaire: Record<string, any> | null,
-  mount: Record<string, any> | null
-}
-
-interface refaSubscribe {
-  type: EtypeRefRequest,
-}
-
-interface RefAInsert extends refaSubscribe {
-  dir: Dir,
-  value: any,
-}
-
-interface RefAEdit extends refaSubscribe {
-  key: string | number,
-  value: any
-}
-
-interface RefADelete extends refaSubscribe {
-  dir?: Dir,
-  start?: number,
-  count?: number,
-  needCheck?: boolean
-}
-
-interface RefAInsertByIndex extends refaSubscribe {
-  start: number,
-  value: any[]
 }
 
 // TODO fragment - там больно, надо доработать - [ ]
