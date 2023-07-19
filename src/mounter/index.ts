@@ -34,6 +34,10 @@ function mounterNode(root: Element | null, tree: NodeOP) {
     root.appendChild(elem);
   }
 
+  if (tree.ref !== undefined) {
+    tree.ref.value = elem;
+  }
+
   if (tree.hooks && !InvokeHook(tree, "mounted", null)) {
     console.warn("Before mount hook error")
   }

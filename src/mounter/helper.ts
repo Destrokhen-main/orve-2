@@ -604,6 +604,9 @@ function RefArray(
       // Если нет dir, значит там есть start и count
       if (workObject.start !== undefined && workObject.count !== undefined) {
         // если мы сюда попали, значит в count точно нет 0.
+        if (Array.isArray(allInstruction) && (workObject.start >= allInstruction?.length || workObject.count >= allInstruction?.length)) {
+          return;
+        }
 
         let removeAll = false;
 
@@ -618,9 +621,8 @@ function RefArray(
             for(let i = workObject.start; i !== workObject.start + workObject.count; i++) {
               allInstruction[i].mount?.node.remove();
             }
-
             // Теперь почистим сам массив
-            allInstruction.splice(workObject.start, workObject.count);
+            allInstruction.splice(workObject.start, workObject.count); 
           }
         } else {
           // тут значит, что выписали слишком много элементов, и надо удалить все и оставить комент.
