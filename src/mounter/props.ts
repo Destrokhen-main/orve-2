@@ -2,6 +2,7 @@ import { fromEvent, startWith, pairwise } from "rxjs";
 import { Props } from "../jsx";
 import { PropsItem, SPECIFIC_KEYS, objectToCss } from "../parser/props";
 import { TypeProps } from "../parser/type";
+import { changerAttributes } from "./propHelper";
 
 function prepaireStaticRectF(item: any, key: string, val: any = null) {
   let value = null
@@ -29,7 +30,7 @@ function propsWorker(root: HTMLElement, item: Props) {
     const obj: PropsItem = item[key];
 
     if (obj.type === TypeProps.Static) {
-      root.setAttribute(key, obj.value);
+      changerAttributes(root, key, obj.value)
     }
 
     if (obj.type === TypeProps.Event) {
@@ -69,11 +70,11 @@ function propsWorker(root: HTMLElement, item: Props) {
     }
 
     if (obj.type === TypeProps.StaticReactive) {
-      root.setAttribute(key, String(obj.value.value));
+      changerAttributes(root, key, obj.value.value)
 
       obj.value.$sub.pipe(startWith(obj.value.value), pairwise()).subscribe(([before, after]: [string | number, string | number]) => {
         if (before !== after) {
-          root.setAttribute(key, String(after));
+          changerAttributes(root, key, after)
         }
       })
     }
