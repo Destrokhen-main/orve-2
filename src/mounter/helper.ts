@@ -67,11 +67,10 @@ function RefFormateChildCreator(root: Element | null, item: RefFormater) {
 
   item.parent.$sub.subscribe({
     next(after: string | number) {
-        const formatedItem = item.value(after);
-        textNode.textContent = String(formatedItem);
-      }
+      const formatedItem = item.value(after);
+      textNode.textContent = String(formatedItem);
     }
-  )
+  })
 
   if (root !== null) {
     root.appendChild(textNode);

@@ -32,9 +32,11 @@ export interface RefFormater {
   parent: any
 }
 
+const TYPE_REF = ["string", "number", "function", "undefined", "boolean"]
+
 function ref(value: unknown) {
   const typeValue = typeof value;
-  if (["string", "number", "function", "undefined"].includes(typeValue)) {
+  if (TYPE_REF.includes(typeValue)) {
     const val = value as refInput;
 
     const subject: Subject<refInput> = new Subject();
@@ -55,7 +57,7 @@ function ref(value: unknown) {
     return new Proxy(obj, {
       set(t: Ref, p:string, v: unknown) {
         if (p === "value") {
-          if (typeof v === "string" || typeof v === "number" || typeof v === "function") {
+          if (TYPE_REF.includes(typeof v)) {
             t.$sub.next(v)
           }   
         }
