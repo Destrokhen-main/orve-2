@@ -1,10 +1,11 @@
 import { parseSingleChildren } from "../parser/children";
-import { NodeChild, NodeHtml } from "../parser/type";
+import { NodeChild, NodeHtml, TypeNode } from "../parser/type";
 import { Ref, RefA, RefFormater } from "../reactive/ref";
 import { pairwise, startWith } from "rxjs";
 import { InsertType, mounterChildren, singelMounterChildren } from "./children";
 import { Dir, EtypeRefRequest } from "../reactive/refHelper"
 import { EtypeComment, SettingNode, refaSubscribe, RefAInsert, RefAEdit, RefADelete, RefAInsertByIndex } from "./helperType";
+import { ReactiveType } from "../reactive/type";
 
 const compareObjects = (a: any, b: any) => {
   if (a === b) return true;
@@ -692,8 +693,12 @@ function RefArray(
 function RefOWorker(root: Element | null, item: Record<string, any>) {
 }
 
-function OifWorker(root: Element | null, item: Record<string, any>) {
-  let workedNode: Comment | HTMLElement | null = null;
+
+// TODO
+// [ ] - o-fragment attribute 
+// [x] - o-if in o-if
+function OifWorker(root: Element | null, item: Record<string, any>, needReturnRoot: boolean = false) {
+  let workedNode: Comment | HTMLElement | null | Element = null;
   let lastAnswer: any = null;
 
   const mounterInsance = singelMounterChildren(null);
@@ -702,8 +707,13 @@ function OifWorker(root: Element | null, item: Record<string, any>) {
   lastAnswer = currentRules;
   if (item.answer[currentRules] !== undefined) {
     const node = mounterInsance(item.answer[currentRules]);
-    
-    if (node.node !== undefined) {
+
+    if (node.type === TypeNode.Reactive) {
+      if (node.value.type === ReactiveType.Oif) {
+        const htmlNode: any = OifWorker(root, node.value, true);
+        workedNode = htmlNode;
+      }
+    } else if (node.node !== undefined) {
       workedNode = node.node;
       root?.appendChild(node.node);
     }
@@ -725,7 +735,13 @@ function OifWorker(root: Element | null, item: Record<string, any>) {
         if (lastAnswer !== currentRules) {
           if (item.answer[currentRules] !== undefined) {
             const node = mounterInsance(item.answer[currentRules]);
-            if (node.node !== undefined) {
+            if (node.type === TypeNode.Reactive) {
+              if (node.value.type === ReactiveType.Oif) {
+                const htmlNode: any = OifWorker(root, node.value, true);
+                workedNode?.replaceWith(htmlNode);
+                workedNode = htmlNode;
+              }
+            } else if (node.node !== undefined) {
               workedNode?.replaceWith(node.node);
               workedNode = node.node;
             }
@@ -744,6 +760,10 @@ function OifWorker(root: Element | null, item: Record<string, any>) {
         }
       })
     })
+  }
+
+  if (needReturnRoot) {
+    return workedNode;
   }
 }
 
