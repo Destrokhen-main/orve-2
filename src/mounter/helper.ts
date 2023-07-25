@@ -2,7 +2,7 @@ import { parseSingleChildren } from "../parser/children";
 import { NodeChild, NodeHtml } from "../parser/type";
 import { Ref, RefA, RefFormater } from "../reactive/ref";
 import { pairwise, startWith } from "rxjs";
-import { InsertType, singelMounterChildren } from "./children";
+import { InsertType, mounterChildren, singelMounterChildren } from "./children";
 import { Dir, EtypeRefRequest } from "../reactive/refHelper"
 import { EtypeComment, SettingNode, refaSubscribe, RefAInsert, RefAEdit, RefADelete, RefAInsertByIndex } from "./helperType";
 
@@ -692,4 +692,59 @@ function RefArray(
 function RefOWorker(root: Element | null, item: Record<string, any>) {
 }
 
-export { textNodeCreator, htmlNodeCreate, RefChildCreator, RefFormateChildCreator, RefArray, RefOWorker }
+function OifWorker(root: Element | null, item: Record<string, any>) {
+  let workedNode: Comment | HTMLElement | null = null;
+  let lastAnswer: any = null;
+
+  const mounterInsance = singelMounterChildren(null);
+  
+  const currentRules = item.rules();
+  lastAnswer = currentRules;
+  if (item.answer[currentRules] !== undefined) {
+    const node = mounterInsance(item.answer[currentRules]);
+    
+    if (node.node !== undefined) {
+      workedNode = node.node;
+      root?.appendChild(node.node);
+    }
+  } else if (item.answer["else"] !== undefined) {
+    const node = mounterInsance(item.answer["else"]);
+    if (node.node !== undefined) {
+      workedNode = node.node;
+      root?.appendChild(node.node);
+    }
+  } else  {
+    workedNode = document.createComment(" o-if ");
+    root?.appendChild(workedNode);
+  }
+
+  if (item.dep !== undefined) {
+    item.dep.forEach((e: any) => {
+      e.$sub.pipe(startWith(undefined)).subscribe(() => {
+        const currentRules = item.rules();
+        if (lastAnswer !== currentRules) {
+          if (item.answer[currentRules] !== undefined) {
+            const node = mounterInsance(item.answer[currentRules]);
+            if (node.node !== undefined) {
+              workedNode?.replaceWith(node.node);
+              workedNode = node.node;
+            }
+          } else if (item.answer.else !== undefined) {
+            const node = mounterInsance(item.answer["else"]);
+            if (node.node !== undefined) {
+              workedNode?.replaceWith(node.node);
+              workedNode = node.node;
+            }
+          } else  {
+            const comment = document.createComment(' oif ');
+            workedNode?.replaceWith(comment);
+            workedNode = comment;
+          }
+          lastAnswer = currentRules;
+        }
+      })
+    })
+  }
+}
+
+export { textNodeCreator, htmlNodeCreate, RefChildCreator, RefFormateChildCreator, RefArray, RefOWorker, OifWorker }

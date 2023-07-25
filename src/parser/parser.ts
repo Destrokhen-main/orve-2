@@ -5,6 +5,7 @@ import { parseChildren } from "./children";
 import { propsWorker } from "./props";
 import { TypeNode } from "./type";
 import { InvokeHook } from "../helper/hookHelper";
+import { REACTIVE_COMPONENT, reactiveWorkComponent } from "./reactiveComponentWorker";
 
 export interface NodeO extends NodeB {
   tag: string | ((props?: Record<string, any>) => unknown),
@@ -101,6 +102,10 @@ function parserNodeF(app: () => unknown, props: Props | null = null, parent : No
     componentO.keyNode = genUID(8);
   }
 
+  if (REACTIVE_COMPONENT.includes(String(componentO.tag))) {
+    return reactiveWorkComponent(componentO) as any
+  }
+
   //NOTE beforeCreate 
   if (componentO.hooks && !InvokeHook(componentO, "beforeCreate", null)) {
     console.error(`Error in hook "beforeCreate"`)
@@ -144,6 +149,10 @@ function parserNodeO(node: NodeO, parent : NodeOP | null = null): NodeOP | null 
 
   if (workNode.keyNode === undefined) {
     componentO.keyNode = genUID(8);
+  }
+
+  if (REACTIVE_COMPONENT.includes(String(componentO.tag))) {
+    return reactiveWorkComponent(componentO) as any;
   }
   
   if (componentO.hooks && !InvokeHook(componentO, "beforeCreate", null)) {

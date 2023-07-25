@@ -57,9 +57,11 @@ function ref(value: unknown) {
     return new Proxy(obj, {
       set(t: Ref, p:string, v: unknown) {
         if (p === "value") {
+          const s = Reflect.set(t,p,v);
           if (TYPE_REF.includes(typeof v)) {
             t.$sub.next(v)
-          }   
+          }
+          return s;
         }
         return Reflect.set(t,p,v);
       },
