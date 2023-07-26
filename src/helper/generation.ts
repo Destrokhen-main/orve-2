@@ -10,7 +10,6 @@ function genUID(len: number): string {
   }
 
   return key;
-} 
-
+}
 
 export { genUID };

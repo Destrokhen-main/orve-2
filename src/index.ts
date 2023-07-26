@@ -5,5 +5,6 @@ export * from "./reactive/index";
 export * from "./utils/index";
 
 export default {
-  Node, Fragment
+  Node,
+  Fragment,
 };

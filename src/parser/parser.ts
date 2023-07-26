@@ -5,31 +5,41 @@ import { parseChildren } from "./children";
 import { propsWorker } from "./props";
 import { TypeNode } from "./type";
 import { InvokeHook } from "../helper/hookHelper";
-import { REACTIVE_COMPONENT, reactiveWorkComponent } from "./reactiveComponentWorker";
+import {
+  REACTIVE_COMPONENT,
+  reactiveWorkComponent,
+} from "./reactiveComponentWorker";
 
 export interface NodeO extends NodeB {
-  tag: string | ((props?: Record<string, any>) => unknown),
-  props ?: Props,
-  children ?: Children 
+  tag: string | ((props?: Record<string, any>) => unknown);
+  props?: Props;
+  children?: Children;
 }
 
 export interface NodeOP extends NodeO {
-  keyNode?: string | number,
-  node: Element | null,
-  parent: NodeOP | null,
-  type: TypeNode
+  keyNode?: string | number;
+  node: Element | null;
+  parent: NodeOP | null;
+  type: TypeNode;
 }
 
-function prepareComponent(func: (props?: Props) => unknown, props: Props | null = null) : NodeO | null {
+function prepareComponent(
+  func: (props?: Props) => unknown,
+  props: Props | null = null,
+): NodeO | null {
   let component: unknown | null = null;
 
   try {
     component = func.call(this, props !== null ? props : {});
-  } catch(error) {
+  } catch (error) {
     console.error(`[Parser error]: ${error}`);
   }
 
-  if (component !== null && validationNode(component) === true && component !== undefined) {
+  if (
+    component !== null &&
+    validationNode(component) === true &&
+    component !== undefined
+  ) {
     return component as NodeO;
   }
 
@@ -37,7 +47,7 @@ function prepareComponent(func: (props?: Props) => unknown, props: Props | null 
 }
 
 function recursiveNode(node: NodeO): NodeO | null {
-  const quee: NodeO[] = [ node ];
+  const quee: NodeO[] = [node];
   let returnedNode: NodeO = node;
 
   while (quee.length > 0) {
@@ -50,21 +60,27 @@ function recursiveNode(node: NodeO): NodeO | null {
         object = { ...node.props };
       }
       if (node.children !== undefined) {
-        const ch =(node.children as any).flat(1);
+        const ch = (node.children as any).flat(1);
         object["children"] = ch;
       }
 
-      let component: unknown | null = null; 
+      let component: unknown | null = null;
       try {
         component = node.tag.call(this, object);
       } catch (error) {
         console.warn(`Recursive ${error}`);
       }
 
-      if (component !== null && validationNode(component) === true && component !== undefined) {
+      if (
+        component !== null &&
+        validationNode(component) === true &&
+        component !== undefined
+      ) {
         returnedNode = component as NodeO;
         quee.push(returnedNode);
-      } else if (component === null) { return null; }
+      } else if (component === null) {
+        return null;
+      }
     }
   }
 
@@ -73,11 +89,15 @@ function recursiveNode(node: NodeO): NodeO | null {
 
 /**
  * parse function component
- * @param app function 
- * @param props 
- * @returns 
+ * @param app function
+ * @param props
+ * @returns
  */
-function parserNodeF(app: () => unknown, props: Props | null = null, parent : NodeOP | null = null): NodeOP | null {
+function parserNodeF(
+  app: () => unknown,
+  props: Props | null = null,
+  parent: NodeOP | null = null,
+): NodeOP | null {
   let component = prepareComponent.call(this, app, props);
 
   if (component === null) {
@@ -96,7 +116,7 @@ function parserNodeF(app: () => unknown, props: Props | null = null, parent : No
     ...component,
     node: null,
     parent,
-    type: TypeNode.Component
+    type: TypeNode.Component,
   };
   if (component.keyNode === undefined) {
     componentO.keyNode = genUID(8);
@@ -106,9 +126,9 @@ function parserNodeF(app: () => unknown, props: Props | null = null, parent : No
     return reactiveWorkComponent(componentO) as any;
   }
 
-  //NOTE beforeCreate 
-  if (componentO.hooks && !InvokeHook(componentO, "beforeCreate", null)) {
-    console.error("Error in hook \"beforeCreate\"");
+  //NOTE beforeCreate
+  if (componentO.hooks && !InvokeHook(componentO, "beforeCreate")) {
+    console.error('Error in hook "beforeCreate"');
   }
 
   if (componentO.props !== undefined) {
@@ -116,11 +136,15 @@ function parserNodeF(app: () => unknown, props: Props | null = null, parent : No
   }
 
   if (componentO.children !== undefined) {
-    componentO.children = parseChildren.call(this, componentO.children, componentO);
+    componentO.children = parseChildren.call(
+      this,
+      componentO.children,
+      componentO,
+    );
   }
 
-  if (componentO.hooks && !InvokeHook(componentO, "created", null)) {
-    console.error("Error in hook \"created\"");
+  if (componentO.hooks && !InvokeHook(componentO, "created")) {
+    console.error('Error in hook "created"');
   }
 
   return componentO;
@@ -130,8 +154,8 @@ function parserNodeF(app: () => unknown, props: Props | null = null, parent : No
  * parsing object component
  * @param node
  */
-function parserNodeO(node: NodeO, parent : NodeOP | null = null): NodeOP | null {
-  let workNode : NodeO | null = node;
+function parserNodeO(node: NodeO, parent: NodeOP | null = null): NodeOP | null {
+  let workNode: NodeO | null = node;
   if (typeof workNode.tag === "function") {
     workNode = recursiveNode.call(this, workNode);
   }
@@ -144,7 +168,7 @@ function parserNodeO(node: NodeO, parent : NodeOP | null = null): NodeOP | null 
     ...workNode,
     node: null,
     parent,
-    type: TypeNode.Component
+    type: TypeNode.Component,
   };
 
   if (workNode.keyNode === undefined) {
@@ -154,9 +178,9 @@ function parserNodeO(node: NodeO, parent : NodeOP | null = null): NodeOP | null 
   if (REACTIVE_COMPONENT.includes(String(componentO.tag))) {
     return reactiveWorkComponent(componentO) as any;
   }
-  
-  if (componentO.hooks && !InvokeHook(componentO, "beforeCreate", null)) {
-    console.warn("Error in hook \"beforeCreate\"");
+
+  if (componentO.hooks && !InvokeHook(componentO, "beforeCreate")) {
+    console.warn('Error in hook "beforeCreate"');
   }
 
   if (componentO.props !== undefined) {
@@ -164,11 +188,15 @@ function parserNodeO(node: NodeO, parent : NodeOP | null = null): NodeOP | null 
   }
 
   if (componentO.children !== undefined) {
-    componentO.children = parseChildren.call(this, componentO.children, componentO);
+    componentO.children = parseChildren.call(
+      this,
+      componentO.children,
+      componentO,
+    );
   }
 
-  if (componentO.hooks && !InvokeHook(componentO, "created", null)) {
-    console.error("Error in hook \"beforeCreate\"");
+  if (componentO.hooks && !InvokeHook(componentO, "created")) {
+    console.error('Error in hook "beforeCreate"');
   }
   return componentO;
 }

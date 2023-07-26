@@ -14,7 +14,7 @@ function mounterNode(root: Element | null, tree: NodeOP) {
   }
 
   // before mount
-  if (tree.hooks && !InvokeHook(tree, "beforeMount", null)) {
+  if (tree.hooks && !InvokeHook(tree, "beforeMount")) {
     console.warn("Before mount hook error");
   }
 
@@ -38,7 +38,7 @@ function mounterNode(root: Element | null, tree: NodeOP) {
     tree.ref.value = elem;
   }
 
-  if (tree.hooks && !InvokeHook(tree, "mounted", null)) {
+  if (tree.hooks && !InvokeHook(tree, "mounted")) {
     console.warn("Before mount hook error");
   }
 

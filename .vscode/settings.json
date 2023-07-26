@@ -1,0 +1,9 @@
+{
+  "eslint.lintTask.enable": true,
+  "editor.formatOnPaste": true,
+  "editor.formatOnSave": true,
+  "[typescript]": {
+    "editor.formatOnPaste": false,
+    "editor.formatOnSave": false,
+  },
+}

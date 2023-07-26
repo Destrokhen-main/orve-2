@@ -11,7 +11,7 @@ function validationNode(node: unknown): boolean {
 
   const keys = Object.keys(node);
 
-  for(let i = 0; i !== keys.length; i++) {
+  for (let i = 0; i !== keys.length; i++) {
     if (!ACCESS_KEY.includes(keys[i])) {
       return false;
     }
@@ -29,7 +29,7 @@ function validationNode(node: unknown): boolean {
     const keys = Object.keys(hooks);
 
     for (let i = 0; i !== keys.length; i++) {
-      if(!HOOKS_STRING_NAME.includes(keys[i])) {
+      if (!HOOKS_STRING_NAME.includes(keys[i])) {
         console.error(`o-hook - "${keys[i]}" - not supported`);
         return false;
       }

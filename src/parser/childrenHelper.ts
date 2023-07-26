@@ -28,7 +28,10 @@ function isReactiveObject(item: unknown): boolean {
 
   const workObject = item as Record<string, any>;
 
-  if (workObject.type !== undefined && Object.keys(ReactiveType).includes(workObject.type)) {
+  if (
+    workObject.type !== undefined &&
+    Object.keys(ReactiveType).includes(workObject.type)
+  ) {
     return true;
   }
 
@@ -46,7 +49,10 @@ function isFormater(item: unknown): boolean {
 
   const workObject = item as Record<string, any>;
 
-  if (workObject.type !== undefined && workObject.type === ReactiveType.RefFormater) {
+  if (
+    workObject.type !== undefined &&
+    workObject.type === ReactiveType.RefFormater
+  ) {
     return true;
   }
 

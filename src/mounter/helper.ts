@@ -4,26 +4,44 @@ import { Ref, RefA, RefFormater } from "../reactive/ref";
 import { pairwise, startWith } from "rxjs";
 import { InsertType, singelMounterChildren } from "./children";
 import { Dir, EtypeRefRequest } from "../reactive/refHelper";
-import { EtypeComment, SettingNode, refaSubscribe, RefAInsert, RefAEdit, RefADelete, RefAInsertByIndex } from "./helperType";
+import {
+  EtypeComment,
+  SettingNode,
+  refaSubscribe,
+  RefAInsert,
+  RefAEdit,
+  RefADelete,
+  RefAInsertByIndex,
+} from "./helperType";
 import { ReactiveType } from "../reactive/type";
 import { NodeOP, parserNodeF } from "../parser/parser";
 
 const compareObjects = (a: any, b: any) => {
   if (a === b) return true;
 
-  if (typeof a != "object" || typeof b != "object" || a == null || b == null) return false;
+  if (typeof a != "object" || typeof b != "object" || a == null || b == null)
+    return false;
 
-  const keysA = Object.keys(a), keysB = Object.keys(b);
+  const keysA = Object.keys(a),
+    keysB = Object.keys(b);
 
-  if (keysA.length != keysB.length) { return false; }
+  if (keysA.length != keysB.length) {
+    return false;
+  }
 
   for (const key of keysA) {
-    if (!keysB.includes(key)) { return false; }
+    if (!keysB.includes(key)) {
+      return false;
+    }
 
     if (typeof a[key] === "function" || typeof b[key] === "function") {
-      if (a[key].toString() != b[key].toString()) { return false; }
+      if (a[key].toString() != b[key].toString()) {
+        return false;
+      }
     } else {
-      if (!compareObjects(a[key], b[key])) { return false; }
+      if (!compareObjects(a[key], b[key])) {
+        return false;
+      }
     }
   }
 
@@ -54,7 +72,7 @@ function RefChildCreator(root: Element | null, item: Ref) {
       if (after !== undefined && before !== after) {
         textNode.textContent = String(after);
       }
-    }
+    },
   } as any);
 
   if (root !== null) {
@@ -71,7 +89,7 @@ function RefFormateChildCreator(root: Element | null, item: RefFormater) {
     next(after: string | number) {
       const formatedItem = item.value(after);
       textNode.textContent = String(formatedItem);
-    }
+    },
   });
 
   if (root !== null) {
@@ -95,7 +113,11 @@ function RefFormateChildCreator(root: Element | null, item: RefFormater) {
 //   return newMounted;
 // }
 
-function createCommentAndInsert(root: Element, text: string, type: EtypeComment = EtypeComment.append) {
+function createCommentAndInsert(
+  root: Element,
+  text: string,
+  type: EtypeComment = EtypeComment.append,
+) {
   const comment = document.createComment(` refA - ${text} `);
 
   switch (type) {
@@ -115,39 +137,41 @@ function createCommentAndInsert(root: Element, text: string, type: EtypeComment 
 [ ] - По условию может приходить null и надо не отрисовывать ничего - [ ]
 */
 function RefArray(
-    root: Element | null,
-    item: RefA,
-    parent: any = null,
-    callback: ((a: any, b: number) => any) | null = null
-  ) {
+  root: Element | null,
+  item: RefA,
+  parent: any = null,
+  callback: ((a: any, b: number) => any) | null = null,
+) {
   let allInstruction: Comment | SettingNode[] | null = null;
 
   // Есть что отрисовывать
   if (item.value.length > 0) {
-    const prepaireNodes: any[] = callback !== null ? item.value.map(callback) : item.value;
+    const prepaireNodes: any[] =
+      callback !== null ? item.value.map(callback) : item.value;
 
     const parserInstance = parseSingleChildren.call(null, null);
     const mounterInsance = singelMounterChildren(null);
 
     let startNode = root;
 
-    allInstruction = prepaireNodes.map((e: Record<string, any>, index: number): SettingNode => {
-      const m = {
-        prepaire: e,
-        mount: mounterInsance(parserInstance(e) as InsertType)
-      };
+    allInstruction = prepaireNodes.map(
+      (e: Record<string, any>, index: number): SettingNode => {
+        const m = {
+          prepaire: e,
+          mount: mounterInsance(parserInstance(e) as InsertType),
+        };
 
-      const insertNode = m.mount.node;
+        const insertNode = m.mount.node;
 
-      if (startNode !== null) {
-        startNode[ index === 0 ? "appendChild" : "after" ](insertNode);
-        startNode = insertNode;
-      } 
-      return m;
-    });
+        if (startNode !== null) {
+          startNode[index === 0 ? "appendChild" : "after"](insertNode);
+          startNode = insertNode;
+        }
+        return m;
+      },
+    );
 
     if (allInstruction === null) return;
-
   } else if (item.value.length === 0) {
     const comment = document.createComment(` - refA - ${parent.keyNode} - `);
 
@@ -162,7 +186,7 @@ function RefArray(
 
     // NOTE
     // Если было уже что-то отрисовано - [x]
-    // Если до этого не было ничего отрисовано - [x] 
+    // Если до этого не было ничего отрисовано - [x]
     if (next.type === EtypeRefRequest.insert) {
       const workObject = next as RefAInsert;
       // индекс которые будет отправлен в индекс.
@@ -171,30 +195,40 @@ function RefArray(
       if (Array.isArray(allInstruction)) {
         startIndex = workObject.dir === Dir.right ? allInstruction.length : 0;
 
-        const prepaire = callback !== null 
-          ? workObject.value.map((item: any, i: number) => callback(item, startIndex + i)) 
-          : workObject.value;
+        const prepaire =
+          callback !== null
+            ? workObject.value.map((item: any, i: number) =>
+                callback(item, startIndex + i),
+              )
+            : workObject.value;
 
         const parserInstance = parseSingleChildren.call(null, null);
         const mounterInsance = singelMounterChildren(null);
 
-        const instractionPrepaire: SettingNode[] = prepaire.map((item: Record<string, any>): SettingNode => {
-          return {
-            prepaire: item,
-            mount: mounterInsance(parserInstance(item) as InsertType)
-          };
-        });
+        const instractionPrepaire: SettingNode[] = prepaire.map(
+          (item: Record<string, any>): SettingNode => {
+            return {
+              prepaire: item,
+              mount: mounterInsance(parserInstance(item) as InsertType),
+            };
+          },
+        );
 
         // добавим все ноды которые получили сначала в DOM потом в массив всех инструкций.
         // Получим для начала ноду с которой изначально будем работать
 
-        const startInstraction = workObject.dir === Dir.right ? allInstruction[allInstruction.length - 1] : allInstruction[0];
+        const startInstraction =
+          workObject.dir === Dir.right
+            ? allInstruction[allInstruction.length - 1]
+            : allInstruction[0];
 
         if (startInstraction.mount !== null) {
           let startNode = startInstraction.mount.node;
           instractionPrepaire.forEach((newNode: SettingNode) => {
             if (newNode.mount !== null) {
-              startNode[workObject.dir === Dir.right ? "after" : "before"](newNode.mount.node);
+              startNode[workObject.dir === Dir.right ? "after" : "before"](
+                newNode.mount.node,
+              );
               startNode = newNode.mount.node;
             }
           });
@@ -207,33 +241,42 @@ function RefArray(
         // смотрю на элементы и проверяю схожи ли они с предыдущими элементами.
 
         // Если элементы были добавлены в начало, значит, надо индексы поменять в остальных элементах.
-        const admixture = workObject.dir === Dir.left ? workObject.value.length : 0;
+        const admixture =
+          workObject.dir === Dir.left ? workObject.value.length : 0;
 
-        const rebuildAllNode = callback !== null 
-          ? item.value.map((e: any, i: number) => callback(e, admixture + i)) 
-          : item.value;
-        
-        
+        const rebuildAllNode =
+          callback !== null
+            ? item.value.map((e: any, i: number) => callback(e, admixture + i))
+            : item.value;
+
         rebuildAllNode.forEach((item: Record<string, any>, index: number) => {
-          if (!compareObjects(item, (allInstruction as SettingNode[])[index].prepaire)){
+          if (
+            !compareObjects(
+              item,
+              (allInstruction as SettingNode[])[index].prepaire,
+            )
+          ) {
             const newItem = {
               prepaire: item,
-              mount: mounterInsance(parserInstance(item) as InsertType)
+              mount: mounterInsance(parserInstance(item) as InsertType),
             };
 
             if (allInstruction !== null && Array.isArray(allInstruction)) {
               allInstruction[index].mount!.node.replaceWith(newItem.mount.node);
               allInstruction[index] = newItem;
-            }            
+            }
           }
         });
 
         // Необходимо после перерисовок, дополнить массив новыми данными.
-        allInstruction[workObject.dir === Dir.right ? "push" : "unshift"](...instractionPrepaire);
+        allInstruction[workObject.dir === Dir.right ? "push" : "unshift"](
+          ...instractionPrepaire,
+        );
       } else if (allInstruction !== null) {
         // Значит до этого ничего не было отображено.
-        const prepaire = callback !== null ? workObject.value.map(callback) : workObject.value;
-        
+        const prepaire =
+          callback !== null ? workObject.value.map(callback) : workObject.value;
+
         const parserInstance = parseSingleChildren.call(null, null);
         const mounterInsance = singelMounterChildren(null);
 
@@ -242,10 +285,10 @@ function RefArray(
         allInstruction = prepaire.map((item: any, index: number) => {
           const m = {
             prepaire: item,
-            mount: mounterInsance(parserInstance(item) as InsertType)
+            mount: mounterInsance(parserInstance(item) as InsertType),
           };
 
-          startNode[index === 0 ? "replaceWith": "after"](m.mount.node);
+          startNode[index === 0 ? "replaceWith" : "after"](m.mount.node);
           startNode = m.mount.node;
           return m;
         });
@@ -263,15 +306,18 @@ function RefArray(
         const beforeInstriction = allInstruction[key];
 
         // подготовим будущую Node чтобы с ней работать.
-        const prepaire = callback !== null ? callback(workObject.value, key) : workObject.value;
+        const prepaire =
+          callback !== null
+            ? callback(workObject.value, key)
+            : workObject.value;
 
         if (!compareObjects(prepaire, beforeInstriction.prepaire)) {
           const parserInstance = parseSingleChildren.call(null, null);
           const mounterInsance = singelMounterChildren(null);
 
           const m = {
-            prepaire: prepaire, 
-            mount: mounterInsance(parserInstance(prepaire) as InsertType) 
+            prepaire: prepaire,
+            mount: mounterInsance(parserInstance(prepaire) as InsertType),
           };
 
           allInstruction[key].mount!.node.replaceWith(m.mount.node);
@@ -289,21 +335,27 @@ function RefArray(
     if (next.type === EtypeRefRequest.delete) {
       const workObject = next as RefADelete;
 
-      if (workObject.needCheck === undefined) { workObject.needCheck = true; }
+      if (workObject.needCheck === undefined) {
+        workObject.needCheck = true;
+      }
 
       // Это значит тут или shift или pop был.
       if (workObject.dir !== undefined) {
         // в таком случаи мы должны удалить первый или последйни элемент.
         if (allInstruction !== null && Array.isArray(allInstruction)) {
-
           // Если список инструкций на момент работы больше чем 1 элемент, значит
           // нам не надо менять инструмент на комент.
           const countArrayBefore = allInstruction.length;
-          const item = allInstruction[workObject.dir === Dir.right ? "pop" : "shift"]();
+          const item =
+            allInstruction[workObject.dir === Dir.right ? "pop" : "shift"]();
           if (countArrayBefore > 1) {
             item?.mount?.node.remove();
           } else {
-            const comment = createCommentAndInsert(item?.mount?.node, parent.keyNode, EtypeComment.replace);
+            const comment = createCommentAndInsert(
+              item?.mount?.node,
+              parent.keyNode,
+              EtypeComment.replace,
+            );
             allInstruction = comment;
           }
         }
@@ -312,13 +364,21 @@ function RefArray(
       // Если нет dir, значит там есть start и count
       if (workObject.start !== undefined && workObject.count !== undefined) {
         // если мы сюда попали, значит в count точно нет 0.
-        if (Array.isArray(allInstruction) && (workObject.start > allInstruction?.length || workObject.count > allInstruction?.length)) {
+        if (
+          Array.isArray(allInstruction) &&
+          (workObject.start > allInstruction?.length ||
+            workObject.count > allInstruction?.length)
+        ) {
           return;
         }
 
         let removeAll = false;
 
-        if (workObject.start === 0 && Array.isArray(allInstruction) && workObject.count >= allInstruction.length) {
+        if (
+          workObject.start === 0 &&
+          Array.isArray(allInstruction) &&
+          workObject.count >= allInstruction.length
+        ) {
           removeAll = true;
         }
 
@@ -326,11 +386,15 @@ function RefArray(
           // Тут удаляют не всё.
           // для начала удалю все node
           if (Array.isArray(allInstruction)) {
-            for(let i = workObject.start; i !== workObject.start + workObject.count; i++) {
+            for (
+              let i = workObject.start;
+              i !== workObject.start + workObject.count;
+              i++
+            ) {
               allInstruction[i].mount?.node.remove();
             }
             // Теперь почистим сам массив
-            allInstruction.splice(workObject.start, workObject.count); 
+            allInstruction.splice(workObject.start, workObject.count);
           }
         } else {
           // тут значит, что выписали слишком много элементов, и надо удалить все и оставить комент.
@@ -342,7 +406,11 @@ function RefArray(
               item.mount?.node.remove();
             });
 
-            const comment = createCommentAndInsert(replacedIntruction?.mount!.node, parent.keyNode, EtypeComment.replace);
+            const comment = createCommentAndInsert(
+              replacedIntruction?.mount!.node,
+              parent.keyNode,
+              EtypeComment.replace,
+            );
             allInstruction = comment;
           }
         }
@@ -351,18 +419,22 @@ function RefArray(
       // Теперь нужно проверить есть ли что-то для перерисовок.
       // Если там комент или null то смысла в этом нет)
       if (workObject.needCheck && Array.isArray(allInstruction)) {
-        const prepaire = callback !== null 
-        ? item.value.map(callback) 
-        : item.value;
+        const prepaire =
+          callback !== null ? item.value.map(callback) : item.value;
 
         const parserInstance = parseSingleChildren.call(null, null);
         const mounterInsance = singelMounterChildren(null);
 
-        prepaire.forEach((e:Record<string, any>, index: number) => {
-          if (!compareObjects(e, (allInstruction as SettingNode[])[index].prepaire)) {
+        prepaire.forEach((e: Record<string, any>, index: number) => {
+          if (
+            !compareObjects(
+              e,
+              (allInstruction as SettingNode[])[index].prepaire,
+            )
+          ) {
             const newItem = {
               prepaire: e,
-              mount: mounterInsance(parserInstance(e) as InsertType)
+              mount: mounterInsance(parserInstance(e) as InsertType),
             };
 
             if (allInstruction !== null && Array.isArray(allInstruction)) {
@@ -382,9 +454,10 @@ function RefArray(
       // Тут если элементы есть, значит ищем элемент
       // и дополняем его нодами новыми.
       if (Array.isArray(allInstruction)) {
-        const prepaire = callback !== null 
-          ? workObject.value.map((e, i) => callback(e, workObject.start + i)) 
-          : workObject.value;
+        const prepaire =
+          callback !== null
+            ? workObject.value.map((e, i) => callback(e, workObject.start + i))
+            : workObject.value;
 
         const parserInstance = parseSingleChildren.call(null, null);
         const mounterInsance = singelMounterChildren(null);
@@ -402,7 +475,7 @@ function RefArray(
         const newInstruction = prepaire.map((e, index) => {
           const m = {
             prepaire: e,
-            mount: mounterInsance(parserInstance(e) as InsertType)
+            mount: mounterInsance(parserInstance(e) as InsertType),
           };
 
           if (index === 0 && isThisLastItem) {
@@ -416,25 +489,30 @@ function RefArray(
         });
 
         allInstruction.splice(workObject.start, 0, ...newInstruction);
-        
 
         if (Array.isArray(allInstruction)) {
-          const prepaire = callback !== null 
-          ? item.value.map(callback) 
-          : item.value;
-  
+          const prepaire =
+            callback !== null ? item.value.map(callback) : item.value;
+
           const parserInstance = parseSingleChildren.call(null, null);
           const mounterInsance = singelMounterChildren(null);
-  
-          prepaire.forEach((e:Record<string, any>, index: number) => {
-            if (!compareObjects(e, (allInstruction as SettingNode[])[index].prepaire)) {
+
+          prepaire.forEach((e: Record<string, any>, index: number) => {
+            if (
+              !compareObjects(
+                e,
+                (allInstruction as SettingNode[])[index].prepaire,
+              )
+            ) {
               const newItem = {
                 prepaire: e,
-                mount: mounterInsance(parserInstance(e) as InsertType)
+                mount: mounterInsance(parserInstance(e) as InsertType),
               };
-  
+
               if (allInstruction !== null && Array.isArray(allInstruction)) {
-                allInstruction[index].mount!.node.replaceWith(newItem.mount.node);
+                allInstruction[index].mount!.node.replaceWith(
+                  newItem.mount.node,
+                );
                 allInstruction[index] = newItem;
               }
             }
@@ -449,16 +527,19 @@ function RefOWorker(root: Element | null, item: Record<string, any>) {
   console.log(root, item);
 }
 
-
 // TODO
-// [ ] - o-fragment attribute 
+// [ ] - o-fragment attribute
 // [x] - o-if in o-if
-function OifWorker(root: Element | null, item: Record<string, any>, needReturnRoot: boolean = false) {
+function OifWorker(
+  root: Element | null,
+  item: Record<string, any>,
+  needReturnRoot: boolean = false,
+) {
   let workedNode: Comment | HTMLElement | null | Element = null;
   let lastAnswer: any = null;
 
   const mounterInsance = singelMounterChildren(null);
-  
+
   const currentRules = item.rules();
   lastAnswer = currentRules;
   if (item.answer[currentRules] !== undefined) {
@@ -479,7 +560,7 @@ function OifWorker(root: Element | null, item: Record<string, any>, needReturnRo
       workedNode = node.node;
       root?.appendChild(node.node);
     }
-  } else  {
+  } else {
     workedNode = document.createComment(" o-if ");
     root?.appendChild(workedNode);
   }
@@ -507,7 +588,7 @@ function OifWorker(root: Element | null, item: Record<string, any>, needReturnRo
               workedNode?.replaceWith(node.node);
               workedNode = node.node;
             }
-          } else  {
+          } else {
             const comment = document.createComment(" oif ");
             workedNode?.replaceWith(comment);
             workedNode = comment;
@@ -552,4 +633,13 @@ function RefCWorker(root: Element | null, item: Record<string, any>) {
   });
 }
 
-export { textNodeCreator, htmlNodeCreate, RefChildCreator, RefFormateChildCreator, RefArray, RefOWorker, OifWorker, RefCWorker };
+export {
+  textNodeCreator,
+  htmlNodeCreate,
+  RefChildCreator,
+  RefFormateChildCreator,
+  RefArray,
+  RefOWorker,
+  OifWorker,
+  RefCWorker,
+};

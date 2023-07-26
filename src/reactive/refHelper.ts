@@ -4,12 +4,12 @@ export enum EtypeRefRequest {
   insert = "Insert",
   delete = "Delete",
   insertByIndex = "InsertByIndex",
-  edit = "Edit"
+  edit = "Edit",
 }
 
 export enum Dir {
   right = "Right",
-  left = "Left"
+  left = "Left",
 }
 
 export function refArrayBuilder(arr: any[], obj: RefA) {
@@ -19,7 +19,7 @@ export function refArrayBuilder(arr: any[], obj: RefA) {
       if (typeof val === "function") {
         if (["push", "unshift"].includes(p)) {
           if (p === "push") {
-            return function(...args: any[]) {
+            return function (...args: any[]) {
               if (args.length > 0) {
                 obj.$sub.next({
                   type: EtypeRefRequest.insert,
@@ -32,12 +32,12 @@ export function refArrayBuilder(arr: any[], obj: RefA) {
             };
           } else {
             // unshift
-            return function(...args: any[]) {
+            return function (...args: any[]) {
               if (args.length > 0) {
                 obj.$sub.next({
                   type: EtypeRefRequest.insert,
                   dir: Dir.left,
-                  value: args
+                  value: args,
                 });
               }
 
@@ -46,14 +46,14 @@ export function refArrayBuilder(arr: any[], obj: RefA) {
           }
         }
         if (["shift"].includes(p)) {
-          return function() {
+          return function () {
             const before = t.length;
             const s = Array.prototype[p].apply(t);
 
             if (before > 0) {
               obj.$sub.next({
                 type: EtypeRefRequest.delete,
-                dir: Dir.left
+                dir: Dir.left,
               });
             }
 
@@ -61,7 +61,7 @@ export function refArrayBuilder(arr: any[], obj: RefA) {
           };
         }
         if (["pop"].includes(p)) {
-          return function() {
+          return function () {
             const before = t.length;
             const s = Array.prototype[p].apply(t);
 
@@ -69,16 +69,16 @@ export function refArrayBuilder(arr: any[], obj: RefA) {
               obj.$sub.next({
                 type: EtypeRefRequest.delete,
                 dir: Dir.right,
-                needCheck: false
+                needCheck: false,
               });
             }
             return s;
           };
         }
         if (["splice"].includes(p)) {
-          return function(A: string, B: string, ...args: any[]) {
+          return function (A: string, B: string, ...args: any[]) {
             const before = t.length;
-            const s = Array.prototype[p].apply(t, [A,B, ...args]);
+            const s = Array.prototype[p].apply(t, [A, B, ...args]);
 
             const a = parseInt(A, 10);
             const b = parseInt(B, 10);
@@ -89,24 +89,24 @@ export function refArrayBuilder(arr: any[], obj: RefA) {
                   type: EtypeRefRequest.delete,
                   start: a,
                   count: b,
-                  ...(args.length > 0 ? { needCheck : false } : {})
+                  ...(args.length > 0 ? { needCheck: false } : {}),
                 });
 
                 if (args.length > 0) {
                   obj.$sub.next({
                     type: EtypeRefRequest.insertByIndex,
                     start: a,
-                    value: args
+                    value: args,
                   });
                 }
                 return;
               }
-              
-              if(b === 0 && args.length > 0) {
+
+              if (b === 0 && args.length > 0) {
                 obj.$sub.next({
                   type: EtypeRefRequest.insertByIndex,
                   start: a,
-                  value: args
+                  value: args,
                 });
                 return;
               }
@@ -116,10 +116,10 @@ export function refArrayBuilder(arr: any[], obj: RefA) {
               obj.$sub.next({
                 type: EtypeRefRequest.insert,
                 dir: Dir.right,
-                value: args
+                value: args,
               });
             }
-            
+
             return s;
           };
         }
@@ -135,13 +135,13 @@ export function refArrayBuilder(arr: any[], obj: RefA) {
         obj.$sub.next({
           type: EtypeRefRequest.edit,
           key: p,
-          value: v
+          value: v,
         });
       } else {
         // addNew item;
       }
 
       return s;
-    }
+    },
   });
 }

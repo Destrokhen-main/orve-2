@@ -7,8 +7,8 @@ import { genUID } from "../helper/generation";
 let StyleTag: HTMLElement | null = null;
 
 interface IOptions {
-  scoped?: boolean,
-  single?: boolean
+  scoped?: boolean;
+  single?: boolean;
 }
 
 /* TODO 
@@ -24,14 +24,17 @@ function scopedStyle(styles: Record<string, string>, options: IOptions) {
   let finalStyle = "";
   const obj: Record<string, string> = {};
 
-  Object.keys(styles).forEach(
-    (key: string) => {
-      const prKey = options?.scoped === false ? key.replace("#", "") : `${key.replace("#", "")}__${genUID(8)}`;
-      obj[key] = prKey;
-      finalStyle += `${key.startsWith("#") ? "#" : "."}${prKey} {${styles[key]}}\n`;
-    }
-  );
-  
+  Object.keys(styles).forEach((key: string) => {
+    const prKey =
+      options?.scoped === false
+        ? key.replace("#", "")
+        : `${key.replace("#", "")}__${genUID(8)}`;
+    obj[key] = prKey;
+    finalStyle += `${key.startsWith("#") ? "#" : "."}${prKey} {${
+      styles[key]
+    }}\n`;
+  });
+
   if (options?.single === true) {
     const style = document.createElement("style");
     style.setAttribute("orve", "");
@@ -48,7 +51,7 @@ function scopedStyle(styles: Record<string, string>, options: IOptions) {
     StyleTag.setAttribute("orve", "");
     if (document.querySelector("head")?.appendChild(StyleTag) === undefined) {
       console.warn("scopedStyle - Ошибка в построение scoped styles");
-    };
+    }
   }
   StyleTag.innerHTML += finalStyle;
   return obj;

@@ -4,7 +4,7 @@ export enum TypeNode {
   Static = "Static",
   HTML = "HTML",
   Component = "Component",
-  Reactive = "Reactive"
+  Reactive = "Reactive",
 }
 
 export enum TypeProps {
@@ -13,24 +13,24 @@ export enum TypeProps {
   EventReactive = "EventReactive",
   EventReactiveF = "EventReactiveF",
   StaticReactive = "StaticReactive",
-  StaticReactiveF = "StaticReactiveF"
+  StaticReactiveF = "StaticReactiveF",
 }
 
 // Static Child Node
 export interface NodeChild {
-  type: TypeNode,
-  value: string | number,
-  node: Element | null | Text
+  type: TypeNode;
+  value: string | number;
+  node: Element | null | Text;
 }
 
 export interface NodeHtml {
-  type: TypeNode,
-  value: string,
-  node: HTMLElement | null
+  type: TypeNode;
+  value: string;
+  node: HTMLElement | null;
 }
 
 export interface ReactiveNode {
-  type: TypeNode,
-  value: Ref,
-  node: HTMLElement | null
+  type: TypeNode;
+  value: Ref;
+  node: HTMLElement | null;
 }

@@ -1,8 +1,8 @@
 import { Subject, share, startWith } from "rxjs";
 
 interface refL {
-  value: any,
-  $sub: any
+  value: any;
+  $sub: any;
 }
 
 function refL() {
@@ -10,7 +10,7 @@ function refL() {
 
   const obj = {
     value: undefined,
-    $sub: subject.pipe(startWith(undefined), share())
+    $sub: subject.pipe(startWith(undefined), share()),
   };
 
   const proxy = new Proxy(obj, {
@@ -21,7 +21,7 @@ function refL() {
         return true;
       }
       return false;
-    }
+    },
   });
 
   return proxy;

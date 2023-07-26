@@ -9,7 +9,7 @@ function compareStatic(item: string | number): NodeChild {
   return {
     type: TypeNode.Static,
     value: item,
-    node: null
+    node: null,
   };
 }
 
@@ -17,27 +17,31 @@ function compareHTML(item: string): NodeHtml {
   return {
     type: TypeNode.HTML,
     value: item,
-    node: null
+    node: null,
   };
 }
-
 
 /**
  * if you wanna use this function u need do .call(context);
  * @param parent NodeOP | null - node
- * @returns 
+ * @returns
  */
-const parseSingleChildren = function(parent: NodeOP | null) {
-  return (function (item: unknown) {
+const parseSingleChildren = function (parent: NodeOP | null) {
+  return function (item: unknown) {
     if (typeof item === "object" && item !== null && isReactiveObject(item)) {
       return {
         type: TypeNode.Reactive,
         keyNode: genUID(8),
-        value: item
+        value: item,
       };
     }
 
-    if (typeof item === "object" && item !== null && isComponent(item) && validationNode(item)) {
+    if (
+      typeof item === "object" &&
+      item !== null &&
+      isComponent(item) &&
+      validationNode(item)
+    ) {
       const component = item as NodeO;
       const parse = parserNodeO.call(this, component, parent);
       return parse !== null ? parse : null;
@@ -52,7 +56,7 @@ const parseSingleChildren = function(parent: NodeOP | null) {
     }
 
     return item;
-  }).bind(this);
+  }.bind(this);
 };
 
 function parseChildren(arrayNode: unknown[], parent: NodeOP | null) {

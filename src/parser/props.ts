@@ -3,8 +3,8 @@ import { ReactiveType } from "../reactive/type";
 import { TypeProps } from "./type";
 
 export interface PropsItem {
-  type: TypeProps,
-  value: any
+  type: TypeProps;
+  value: any;
 }
 
 function workWithEvent(obj: any, key: string) {
@@ -12,23 +12,32 @@ function workWithEvent(obj: any, key: string) {
   const pKey = key.replace("on", "").toLowerCase().trim();
 
   delete obj[key];
-  if (typeof func === "object" && func.type !== undefined && (func.type === TypeProps.EventReactiveF || func.type === TypeProps.EventReactive )) {
+  if (
+    typeof func === "object" &&
+    func.type !== undefined &&
+    (func.type === TypeProps.EventReactiveF ||
+      func.type === TypeProps.EventReactive)
+  ) {
     obj[pKey] = {
-      type: func.type === ReactiveType.RefFormater ? TypeProps.EventReactiveF : TypeProps.EventReactive,
-      value: func 
+      type:
+        func.type === ReactiveType.RefFormater
+          ? TypeProps.EventReactiveF
+          : TypeProps.EventReactive,
+      value: func,
     };
     return obj;
   }
 
   obj[pKey] = {
     type: TypeProps.Event,
-    value: func.bind(this)
+    value: func.bind(this),
   };
 
   return obj;
 }
 
-const camelToSnakeCase = (str: string) => str.replace(/[A-Z]/g, letter => `-${letter.toLowerCase()}`);
+const camelToSnakeCase = (str: string) =>
+  str.replace(/[A-Z]/g, (letter) => `-${letter.toLowerCase()}`);
 
 export function objectToCss(obj: Record<string, any>): string {
   let o = "";
@@ -41,29 +50,32 @@ export function objectToCss(obj: Record<string, any>): string {
   return o;
 }
 
-function specificProps(obj: any, key: string): [Record<string, any> , boolean] {
+function specificProps(obj: any, key: string): [Record<string, any>, boolean] {
   const value = obj[key];
 
   if (key === "style") {
     if (typeof value === "object" && value.type === undefined) {
       obj[key] = {
         type: TypeProps.Static,
-        value: objectToCss(value)
+        value: objectToCss(value),
       };
 
       return [obj, true];
     } else if (typeof value === "string") {
       obj[key] = {
         type: TypeProps.Static,
-        value: value
+        value: value,
       };
       return [obj, true];
-    } else if (typeof value === "object" && value.type === ReactiveType.RefFormater) {
+    } else if (
+      typeof value === "object" &&
+      value.type === ReactiveType.RefFormater
+    ) {
       obj[key] = {
         type: TypeProps.StaticReactiveF,
-        value: value
+        value: value,
       };
-      return [ obj, true ];
+      return [obj, true];
     }
   }
 
@@ -71,12 +83,12 @@ function specificProps(obj: any, key: string): [Record<string, any> , boolean] {
     if (typeof value === "object" && value.default !== undefined) {
       obj[key] = {
         type: TypeProps.Static,
-        value: value.default
+        value: value.default,
       };
     } else if (typeof value === "string") {
       obj[key] = {
         type: TypeProps.Static,
-        value: value
+        value: value,
       };
     }
     return [obj, true];
@@ -94,37 +106,43 @@ function workWithStaticProps(obj: any, key: string) {
     return specificProps(obj, key);
   }
 
-  
   if (typeof value === "string" || typeof value === "number") {
     obj[key] = {
       type: TypeProps.Static,
-      value: obj[key]
+      value: obj[key],
     };
 
     return [obj, true];
   }
 
-  if (typeof value === "object" && value.type !== undefined && value.type === ReactiveType.Ref) {
+  if (
+    typeof value === "object" &&
+    value.type !== undefined &&
+    value.type === ReactiveType.Ref
+  ) {
     obj[key] = {
       type: TypeProps.StaticReactive,
-      value: value
+      value: value,
     };
 
-    return [ obj, true ];
+    return [obj, true];
   }
 
-  if (typeof value === "object" && value.type !== undefined && value.type === ReactiveType.RefFormater) {
+  if (
+    typeof value === "object" &&
+    value.type !== undefined &&
+    value.type === ReactiveType.RefFormater
+  ) {
     obj[key] = {
       type: TypeProps.StaticReactiveF,
-      value: value
+      value: value,
     };
 
-    return [ obj, true ];
+    return [obj, true];
   }
 
   return [obj, false];
 }
-
 
 function propsWorker(insertoObj: Props): Props {
   let obj: any = { ...insertoObj };

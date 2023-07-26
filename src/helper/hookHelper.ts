@@ -1,11 +1,17 @@
 import { NodeHooks } from "../jsx";
 import { NodeOP } from "../parser/parser";
 
-export function InvokeHook(obj: NodeOP, nameHook: string | keyof NodeHooks): boolean {
-  if (obj.hooks === undefined) { 
+/* TODO
+[ ] - Передавать что-то в хуки
+*/
+export function InvokeHook(
+  obj: NodeOP,
+  nameHook: string | keyof NodeHooks,
+): boolean {
+  if (obj.hooks === undefined) {
     return false;
   }
-  
+
   const h = obj.hooks;
   if (Object.keys(h).includes(nameHook)) {
     try {
@@ -21,16 +27,20 @@ export function InvokeHook(obj: NodeOP, nameHook: string | keyof NodeHooks): boo
 }
 
 export function InvokeAllNodeHook(obj: NodeOP, hook: keyof NodeHooks): void {
-  let quee = [ obj ];
+  let quee = [obj];
 
   while (quee.length > 0) {
     const item = quee.shift();
 
-    if (item !== undefined && item.hooks !== undefined && item.hooks[hook] !== undefined) {
+    if (
+      item !== undefined &&
+      item.hooks !== undefined &&
+      item.hooks[hook] !== undefined
+    ) {
       item.hooks[hook]({});
 
       if (item.children !== undefined && item.children.length > 0) {
-        quee = [ ...quee, ...item.children];
+        quee = [...quee, ...item.children];
       }
     }
   }

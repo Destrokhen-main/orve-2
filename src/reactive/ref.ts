@@ -5,31 +5,31 @@ import { refArrayBuilder } from "./refHelper";
 type refInput = string | number | (() => any);
 
 interface Ref extends Reactive {
-  value: refInput,
-  $sub: any,
-  formate: (func: (e: any) => any) => any,
-  node?: any,
+  value: refInput;
+  $sub: any;
+  formate: (func: (e: any) => any) => any;
+  node?: any;
 }
 
 export interface RefA extends Reactive {
-  value: any,
-  $sub: any,
-  for: (item: any, index: number) => any 
+  value: any;
+  $sub: any;
+  for: (item: any, index: number) => any;
 }
 
 export interface RefO extends Reactive {
-  $sub: Subject<any>,
+  $sub: Subject<any>;
 }
 
 export interface RefOF extends Reactive {
-  key: string,
-  value: RefO
+  key: string;
+  value: RefO;
 }
 
 export interface RefFormater {
-  type: ReactiveType,
-  value: (e: any) => any,
-  parent: any
+  type: ReactiveType;
+  value: (e: any) => any;
+  parent: any;
 }
 
 const TYPE_REF = ["string", "number", "function", "undefined", "boolean"];
@@ -45,32 +45,32 @@ function ref(value: unknown) {
       type: ReactiveType.Ref,
       value: val,
       $sub: subject.pipe(startWith(val), share()),
-      formate: function(func): RefFormater {
+      formate: function (func): RefFormater {
         return {
           type: ReactiveType.RefFormater,
           value: func,
-          parent: this
+          parent: this,
         };
-      }
+      },
     };
 
     return new Proxy(obj, {
-      set(t: Ref, p:string, v: unknown) {
+      set(t: Ref, p: string, v: unknown) {
         if (p === "value") {
-          const s = Reflect.set(t,p,v);
+          const s = Reflect.set(t, p, v);
           if (TYPE_REF.includes(typeof v)) {
             t.$sub.next(v);
           }
           return s;
         }
-        return Reflect.set(t,p,v);
+        return Reflect.set(t, p, v);
       },
       deleteProperty(t: Ref, p: string) {
         if (["value", "$sub"].includes(p)) {
           return false;
         }
         return true;
-      }
+      },
     });
   }
 
@@ -81,13 +81,13 @@ function ref(value: unknown) {
       type: ReactiveType.RefA,
       value: null,
       $sub: subject.pipe(startWith(value), share()),
-      for: function(func) {
+      for: function (func) {
         return {
           type: ReactiveType.RefArrFor,
           value: func,
-          parent: this
+          parent: this,
         };
-      }
+      },
     };
 
     const arr = refArrayBuilder(value, obj);
@@ -101,13 +101,13 @@ function ref(value: unknown) {
           obj.$sub.next({
             type: "delete",
             start: 0,
-            count: t.value.length
+            count: t.value.length,
           });
 
           obj.$sub.next({
             type: "insert",
             dir: "right",
-            value: v
+            value: v,
           });
 
           t.value = newAr;
@@ -116,7 +116,7 @@ function ref(value: unknown) {
       },
       deleteProperty() {
         return false;
-      }
+      },
     });
 
     return refProxy;

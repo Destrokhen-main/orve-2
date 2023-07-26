@@ -4,16 +4,22 @@ import { parseSingleChildren } from "../children";
 import { NodeOP } from "../parser";
 import { TypeNode } from "../type";
 
-function validationPropsParent(props: Record<string, any>): Record<string, any> | null {
+function validationPropsParent(
+  props: Record<string, any>,
+): Record<string, any> | null {
   if (props["rules"] === undefined) {
-    console.warn("o-if: \"rules\" Не указано");
+    console.warn('o-if: "rules" Не указано');
     return null;
   } else if (typeof props["rules"] !== "function") {
-    console.warn("o-if: Для правильной работы необходимо передавать в \"rules\" функцию");
+    console.warn(
+      'o-if: Для правильной работы необходимо передавать в "rules" функцию',
+    );
   }
 
   if (props["dep"] === undefined) {
-    console.warn("o-if: \"dep\" - Чтобы реактивно следить за изменения в функции. Необходимо передать dep");
+    console.warn(
+      'o-if: "dep" - Чтобы реактивно следить за изменения в функции. Необходимо передать dep',
+    );
   } else {
     const check = (req: any) => {
       if (req.$sub !== undefined) return true;
@@ -25,14 +31,22 @@ function validationPropsParent(props: Record<string, any>): Record<string, any> 
         if (check(e)) {
           workerDep.push(e);
         } else {
-          console.warn(`o-if: "dep" - ${JSON.stringify(e)} - не могу работать с такой зависимостью`);
+          console.warn(
+            `o-if: "dep" - ${JSON.stringify(
+              e,
+            )} - не могу работать с такой зависимостью`,
+          );
         }
       });
     } else {
       if (check(props["dep"])) {
         workerDep.push(props["dep"]);
       } else {
-        console.warn(`o-if: "dep" - ${JSON.stringify(props["dep"])} - не могу работать с такой зависимостью`);
+        console.warn(
+          `o-if: "dep" - ${JSON.stringify(
+            props["dep"],
+          )} - не могу работать с такой зависимостью`,
+        );
       }
     }
 
@@ -43,27 +57,27 @@ function validationPropsParent(props: Record<string, any>): Record<string, any> 
 }
 
 interface IChildrenOif {
-  ans: any,
-  fragment?: boolean, 
-  component: any,
-  else?: boolean
+  ans: any;
+  fragment?: boolean;
+  component: any;
+  else?: boolean;
 }
 
 function validationChildren(children: Array<any>) {
   const parserInstance = parseSingleChildren.call(null, null);
 
   if (children.length === 0) return null;
-  
-  const newChildren : IChildrenOif[] = [];
+
+  const newChildren: IChildrenOif[] = [];
   children.forEach((e) => {
     if (e.props !== undefined) {
-      const ChildNode  = {
-        ans: null
+      const ChildNode = {
+        ans: null,
       } as IChildrenOif;
 
       const parsedProps: Record<string, any> = {};
       let isLegal = false;
-      const newNode = { ...e }; 
+      const newNode = { ...e };
 
       Object.keys(e.props).forEach((key) => {
         if (key === "o-else") {
@@ -94,7 +108,7 @@ function validationChildren(children: Array<any>) {
         if (ChildNode.else === true) {
           delete ChildNode.ans;
         }
-        
+
         const comp = parserInstance(newNode);
 
         ChildNode.component = comp;
@@ -109,7 +123,7 @@ function validationChildren(children: Array<any>) {
 }
 
 function oifParsing(component: NodeOP) {
-  let newProps = null; 
+  let newProps = null;
   let newChildren = null;
 
   if (component.props !== undefined) {
@@ -135,8 +149,8 @@ function oifParsing(component: NodeOP) {
     value: {
       type: ReactiveType.Oif,
       answer: answerSettings,
-      ...newProps
-    }
+      ...newProps,
+    },
   };
 }
 

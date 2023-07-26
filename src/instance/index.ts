@@ -4,16 +4,19 @@ import { CreateApp, OptionsInstance, createApp } from "../parser";
 import { NodeOP } from "../parser/parser";
 
 export interface OrveInstance {
-  tree: NodeOP | null,
-  context: Record<string, any>, // TODO поменять тип
-  use: (obj?: unknown) => boolean | OrveInstance,
-  createApp: (entry: unknown, options: OptionsInstance | null) => CreateApp | null,
+  tree: NodeOP | null;
+  context: Record<string, any>; // TODO поменять тип
+  use: (obj?: unknown) => boolean | OrveInstance;
+  createApp: (
+    entry: unknown,
+    options: OptionsInstance | null,
+  ) => CreateApp | null;
 }
 
 declare global {
   interface Window {
-    Orve: Record<string, OrveInstance>,
-    orve: JSX
+    Orve: Record<string, OrveInstance>;
+    orve: JSX;
   }
 }
 
@@ -25,7 +28,7 @@ declare global {
 function use(obj: unknown = null) {
   if (obj === null) {
     console.warn("obj is null");
-    return false; 
+    return false;
   }
 
   if (typeof obj !== "object" && obj !== null) {
@@ -33,10 +36,13 @@ function use(obj: unknown = null) {
     return false;
   }
 
-  const workObject : Record<string, any> = obj;
+  const workObject: Record<string, any> = obj;
   const context: OrveInstance = this;
 
-  if (workObject.setup !== undefined && typeof workObject.setup === "function") {
+  if (
+    workObject.setup !== undefined &&
+    typeof workObject.setup === "function"
+  ) {
     workObject.setup(context.context);
     return context;
   }
@@ -68,7 +74,7 @@ function orveCreate() {
     tree: null,
     context: {},
     use: use,
-    createApp: createApp
+    createApp: createApp,
   };
 
   window.Orve[keyInstance] = instance;

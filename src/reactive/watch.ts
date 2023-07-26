@@ -1,8 +1,8 @@
 import { Subject, pairwise } from "rxjs";
 
 interface Dep {
-  [T: string] : any,
-  $sub: Subject<any>
+  [T: string]: any;
+  $sub: Subject<any>;
 }
 
 function watch(func: (n: any, o: any) => void, dep: Dep | Dep[]) {
@@ -18,7 +18,9 @@ function watch(func: (n: any, o: any) => void, dep: Dep | Dep[]) {
 
     for (let i = 0; i !== dep.length; i++) {
       if (dep[i].$sub !== undefined) {
-        const cur: any = dep[i].$sub.pipe(pairwise()).subscribe(([b, c] : any) => func(c, b));
+        const cur: any = dep[i].$sub
+          .pipe(pairwise())
+          .subscribe(([b, c]: any) => func(c, b));
         depArrayDisconnect.push(() => cur.complete());
       } else {
         showD = true;
@@ -37,7 +39,9 @@ function watch(func: (n: any, o: any) => void, dep: Dep | Dep[]) {
       return false;
     }
 
-    const cur: any = d.$sub.pipe(pairwise()).subscribe(([b, c] : any) => func(c, b));
+    const cur: any = d.$sub
+      .pipe(pairwise())
+      .subscribe(([b, c]: any) => func(c, b));
     return () => cur.complete();
   }
 }

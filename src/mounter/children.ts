@@ -4,11 +4,20 @@ import { NodeHtml, NodeChild } from "../parser/type";
 import { TypeNode } from "../parser/type";
 import { Ref } from "../reactive/ref";
 import { ReactiveType } from "../reactive/type";
-import { textNodeCreator, htmlNodeCreate, RefChildCreator, RefFormateChildCreator, RefArray, RefOWorker, OifWorker, RefCWorker } from "./helper";
+import {
+  textNodeCreator,
+  htmlNodeCreate,
+  RefChildCreator,
+  RefFormateChildCreator,
+  RefArray,
+  RefOWorker,
+  OifWorker,
+  RefCWorker,
+} from "./helper";
 
 import { mounterNode } from "./index";
 
-export type InsertType = NodeOP | NodeChild | NodeHtml 
+export type InsertType = NodeOP | NodeChild | NodeHtml;
 
 function singelMounterChildren(root: Element | null) {
   return (item: InsertType) => {
@@ -60,12 +69,19 @@ function singelMounterChildren(root: Element | null) {
       }
 
       if (reactiveObject.type === ReactiveType.RefA) {
-        console.warn("Пожалуйста, используйте \"for\" для отображения массива правильно");
+        console.warn(
+          'Пожалуйста, используйте "for" для отображения массива правильно',
+        );
         return item;
       }
 
       if (reactiveObject.type === ReactiveType.RefArrFor) {
-        RefArray(root, (reactiveObject as any).parent, item, reactiveObject.value as () => any);
+        RefArray(
+          root,
+          (reactiveObject as any).parent,
+          item,
+          reactiveObject.value as () => any,
+        );
         return item;
       }
 

@@ -5,11 +5,11 @@ import { mounterNode } from "../mounter";
 import { InvokeAllNodeHook } from "../helper/hookHelper";
 
 export interface OptionsInstance {
-  root: boolean
+  root: boolean;
 }
 
 export interface CreateApp {
-  mount: (root: string | HTMLElement) => OrveInstance | false
+  mount: (root: string | HTMLElement) => OrveInstance | false;
 }
 
 function isValidEntry(entry: unknown): boolean {
@@ -30,7 +30,7 @@ function optionsInstace(options: OptionsInstance) {
     } else {
       window.orve = {
         Node,
-        Fragment
+        Fragment,
       };
     }
   }
@@ -40,9 +40,12 @@ function optionsInstace(options: OptionsInstance) {
  * Create App orve
  * @param entry - Component Orve
  * @param options - Object settings { root: boolean }
- * @returns 
+ * @returns
  */
-function createApp(entry: unknown = null, options: OptionsInstance | null = null): CreateApp | null {
+function createApp(
+  entry: unknown = null,
+  options: OptionsInstance | null = null,
+): CreateApp | null {
   if (options !== null) {
     optionsInstace(options);
   }
@@ -58,19 +61,17 @@ function createApp(entry: unknown = null, options: OptionsInstance | null = null
   allContext.tree = parserNodeF.call(allContext.context, workFunction);
 
   if (allContext.tree !== null && window !== undefined) {
-    const beforeUnmounter = function() {
+    const beforeUnmounter = function () {
       if (allContext.tree) {
         InvokeAllNodeHook(allContext.tree, "beforeUnmount");
       }
     };
 
-    const unmounter = function() {
+    const unmounter = function () {
       if (allContext.tree) {
         InvokeAllNodeHook(allContext.tree, "unmounted");
       }
     };
-    
-
 
     window.addEventListener("beforeunload", beforeUnmounter);
 
@@ -85,12 +86,12 @@ function createApp(entry: unknown = null, options: OptionsInstance | null = null
     mount: (root: string | Element) => {
       let rootElement: Element | null = null;
       if (typeof root === "string") {
-       const item = document.querySelector(root);
-       if (item === null) {
-        console.warn(`"${root}" not founted`);
-        return false;
-       }
-       rootElement = item;
+        const item = document.querySelector(root);
+        if (item === null) {
+          console.warn(`"${root}" not founted`);
+          return false;
+        }
+        rootElement = item;
       } else if (typeof root === "object" && root.nodeType === 1) {
         rootElement = root;
       }
@@ -103,7 +104,7 @@ function createApp(entry: unknown = null, options: OptionsInstance | null = null
       }
 
       return allContext;
-    }
+    },
   };
 }
 
