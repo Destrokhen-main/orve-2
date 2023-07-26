@@ -770,6 +770,8 @@ function OifWorker(root: Element | null, item: Record<string, any>, needReturnRo
 
 /* TODO
 [ ] - Дать возможность передавать () => import("...") и обычные компоненты <Component />
+[ ] - Комент если value undefined
+[ ] - Компоненты могут быть fragment
 */
 function RefCWorker(root: Element | null, item: Record<string, any>) {
   const component = parserNodeF.call(null, item.value);
