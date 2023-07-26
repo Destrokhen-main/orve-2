@@ -4,6 +4,6 @@
   "editor.formatOnSave": true,
   "[typescript]": {
     "editor.formatOnPaste": false,
-    "editor.formatOnSave": false,
+    "editor.formatOnSave": true,
   },
 }
