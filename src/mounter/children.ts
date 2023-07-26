@@ -4,7 +4,7 @@ import { NodeHtml, NodeChild } from "../parser/type"
 import { TypeNode } from "../parser/type"
 import { Ref } from "../reactive/ref";
 import { ReactiveType } from "../reactive/type";
-import { textNodeCreator, htmlNodeCreate, RefChildCreator, RefFormateChildCreator, RefArray, RefOWorker, OifWorker } from "./helper";
+import { textNodeCreator, htmlNodeCreate, RefChildCreator, RefFormateChildCreator, RefArray, RefOWorker, OifWorker, RefCWorker } from "./helper";
 
 import { mounterNode } from "./index";
 
@@ -77,6 +77,11 @@ function singelMounterChildren(root: Element | null) {
       if (reactiveObject.type === ReactiveType.Oif) {
         OifWorker(root, reactiveObject)
         return item;
+      }
+
+      if (reactiveObject.type === ReactiveType.RefC) {
+        RefCWorker(root, reactiveObject);
+        return item
       }
     }
   }

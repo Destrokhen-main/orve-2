@@ -6,6 +6,7 @@ import { InsertType, mounterChildren, singelMounterChildren } from "./children";
 import { Dir, EtypeRefRequest } from "../reactive/refHelper"
 import { EtypeComment, SettingNode, refaSubscribe, RefAInsert, RefAEdit, RefADelete, RefAInsertByIndex } from "./helperType";
 import { ReactiveType } from "../reactive/type";
+import { NodeOP, parserNodeF } from "../parser/parser";
 
 const compareObjects = (a: any, b: any) => {
   if (a === b) return true;
@@ -767,4 +768,28 @@ function OifWorker(root: Element | null, item: Record<string, any>, needReturnRo
   }
 }
 
-export { textNodeCreator, htmlNodeCreate, RefChildCreator, RefFormateChildCreator, RefArray, RefOWorker, OifWorker }
+/* TODO
+[ ] - Дать возможность передавать () => import("...") и обычные компоненты <Component />
+*/
+function RefCWorker(root: Element | null, item: Record<string, any>) {
+  const component = parserNodeF.call(null, item.value);
+  const mounterInsance = singelMounterChildren(null);
+
+  let mountedNode: NodeOP | null = null
+
+  if (component === null) {
+    return;
+  }
+
+  const mount = mounterInsance(component);
+
+  if (mount.node !== undefined) {
+    mountedNode = mount;
+    root?.appendChild(mount.node);
+  }
+
+  item.$sub.subscribe(async (next: any) => {
+  })
+}
+
+export { textNodeCreator, htmlNodeCreate, RefChildCreator, RefFormateChildCreator, RefArray, RefOWorker, OifWorker, RefCWorker }

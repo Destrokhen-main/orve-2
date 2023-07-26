@@ -7,7 +7,6 @@ function reactiveWorkComponent(componentO: NodeOP) {
   if (componentO.tag === "o-if") {
     return oifParsing(componentO);
   }
-
   return null;
 }
 
