@@ -1,7 +1,7 @@
 import { NodeHooks } from "../jsx";
 import { NodeOP } from "../parser/parser";
 
-export function InvokeHook(obj: NodeOP, nameHook: string | keyof NodeHooks, value: any = null): boolean {
+export function InvokeHook(obj: NodeOP, nameHook: string | keyof NodeHooks): boolean {
   if (obj.hooks === undefined) { 
     return false;
   }

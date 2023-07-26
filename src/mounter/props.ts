@@ -5,7 +5,7 @@ import { TypeProps } from "../parser/type";
 import { changerAttributes } from "./propHelper";
 
 function prepaireStaticRectF(item: any, key: string, val: any = null) {
-  let value = null
+  let value = null;
 
   try {
     value = item.value(val === null ? item.parent.value : val);
@@ -13,7 +13,7 @@ function prepaireStaticRectF(item: any, key: string, val: any = null) {
     console.error(` "${key}" - ${err}`);
   }
 
-  return value
+  return value;
 }
 
 function prepaireClass(insertValue: any) {
@@ -30,11 +30,11 @@ function propsWorker(root: HTMLElement, item: Props) {
     const obj: PropsItem = item[key];
 
     if (obj.type === TypeProps.Static) {
-      changerAttributes(root, key, obj.value)
+      changerAttributes(root, key, obj.value);
     }
 
     if (obj.type === TypeProps.Event) {
-      fromEvent(root, key).subscribe(obj.value)
+      fromEvent(root, key).subscribe(obj.value);
     }
 
     if (obj.type === TypeProps.EventReactive) {
@@ -43,9 +43,9 @@ function propsWorker(root: HTMLElement, item: Props) {
       obj.value.$sub.pipe(startWith(obj.value.value), pairwise()).subscribe(([before, after]: [() => any, () => any]) => {
         if (String(before || "") !== String(after || "")) {
           event.unsubscribe();
-          event = fromEvent(root, key).subscribe(after)
+          event = fromEvent(root, key).subscribe(after);
         }
-      })
+      });
     }
     if (obj.type === TypeProps.EventReactiveF) {
       const item = obj.value;
@@ -70,13 +70,13 @@ function propsWorker(root: HTMLElement, item: Props) {
     }
 
     if (obj.type === TypeProps.StaticReactive) {
-      changerAttributes(root, key, obj.value.value)
+      changerAttributes(root, key, obj.value.value);
 
       obj.value.$sub.pipe(startWith(obj.value.value), pairwise()).subscribe(([before, after]: [string | number, string | number]) => {
         if (before !== after) {
-          changerAttributes(root, key, after)
+          changerAttributes(root, key, after);
         }
-      })
+      });
     }
 
     if (obj.type === TypeProps.StaticReactiveF) {
@@ -85,7 +85,7 @@ function propsWorker(root: HTMLElement, item: Props) {
 
       if (value !== null && value !== "") {
 
-        let insertValue = value;
+        const insertValue = value;
         
         if (SPECIFIC_KEYS.includes(key)) {
           if (key === "style") {
@@ -103,7 +103,7 @@ function propsWorker(root: HTMLElement, item: Props) {
               if (st !== null && before !== st) {
                 root.setAttribute(key, st);
               }
-            })
+            });
           }
         } else {
           root.setAttribute(key, insertValue);
@@ -114,11 +114,11 @@ function propsWorker(root: HTMLElement, item: Props) {
             if (newKey !== null && before !== newKey) {
               root.setAttribute(key, String(newKey));
             }
-          })
+          });
         }
       }
     }
-  })
+  });
 }
 
-export { propsWorker }
+export { propsWorker };

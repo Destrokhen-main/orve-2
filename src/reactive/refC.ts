@@ -1,5 +1,5 @@
 import { Subject, share, startWith } from "rxjs";
-import { Reactive, ReactiveType } from "./type"
+import { Reactive, ReactiveType } from "./type";
 
 interface IRefC extends Reactive {
   $sub: any,
@@ -13,7 +13,7 @@ function refC(startComponent: any) {
     type: ReactiveType.RefC,
     $sub: subject.pipe(startWith(startComponent), share()),
     value: startComponent
-  }
+  };
 
   return new Proxy(component, {
     set(t: IRefC, p: keyof IRefC | string, v) {
@@ -23,7 +23,7 @@ function refC(startComponent: any) {
       }
       return s;
     }
-  })
+  });
 }
 
-export { refC }
+export { refC };

@@ -6,16 +6,16 @@ import { propsWorker } from "./props";
 
 function mounterNode(root: Element | null, tree: NodeOP) {
   if (typeof tree.tag !== "string") {
-    return null
+    return null;
   }
 
   if (tree.tag === FRAGMENT) {
-    return mounterChildren(root, tree.children)
+    return mounterChildren(root, tree.children);
   }
 
   // before mount
   if (tree.hooks && !InvokeHook(tree, "beforeMount", null)) {
-    console.warn("Before mount hook error")
+    console.warn("Before mount hook error");
   }
 
   const elem = document.createElement(tree.tag);
@@ -25,7 +25,7 @@ function mounterNode(root: Element | null, tree: NodeOP) {
   }
 
   if (tree.children !== undefined) {
-    tree.children = mounterChildren(elem, tree.children)
+    tree.children = mounterChildren(elem, tree.children);
   }
 
   tree.node = elem;
@@ -39,10 +39,10 @@ function mounterNode(root: Element | null, tree: NodeOP) {
   }
 
   if (tree.hooks && !InvokeHook(tree, "mounted", null)) {
-    console.warn("Before mount hook error")
+    console.warn("Before mount hook error");
   }
 
   return tree;
 }
 
-export { mounterNode }
+export { mounterNode };

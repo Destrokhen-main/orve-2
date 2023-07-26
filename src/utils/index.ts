@@ -1,1 +1,1 @@
-export * from "./scopedStyle"
+export * from "./scopedStyle";

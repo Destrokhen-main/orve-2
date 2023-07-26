@@ -1,1 +1,1 @@
-export const FRAGMENT = "Fragment"
+export const FRAGMENT = "Fragment";

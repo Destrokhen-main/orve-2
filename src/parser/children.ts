@@ -1,7 +1,7 @@
 import { validationNode } from "./helper";
-import { NodeO, NodeOP } from "./parser"
+import { NodeO, NodeOP } from "./parser";
 import { parserNodeO } from "./parser";
-import { TypeNode, NodeChild, NodeHtml } from "./type"
+import { TypeNode, NodeChild, NodeHtml } from "./type";
 import { isComponent, isHtmlNode, isReactiveObject } from "./childrenHelper";
 import { genUID } from "../helper/generation";
 
@@ -10,7 +10,7 @@ function compareStatic(item: string | number): NodeChild {
     type: TypeNode.Static,
     value: item,
     node: null
-  }
+  };
 }
 
 function compareHTML(item: string): NodeHtml {
@@ -18,7 +18,7 @@ function compareHTML(item: string): NodeHtml {
     type: TypeNode.HTML,
     value: item,
     node: null
-  }
+  };
 }
 
 
@@ -53,7 +53,7 @@ const parseSingleChildren = function(parent: NodeOP | null) {
 
     return item;
   }).bind(this);
-}
+};
 
 function parseChildren(arrayNode: unknown[], parent: NodeOP | null) {
   const singleChildParser = parseSingleChildren.call(this, parent);
@@ -61,4 +61,4 @@ function parseChildren(arrayNode: unknown[], parent: NodeOP | null) {
   return arrayNode.map(singleChildParser);
 }
 
-export { parseChildren, parseSingleChildren }
+export { parseChildren, parseSingleChildren };

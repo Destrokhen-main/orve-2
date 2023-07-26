@@ -2,8 +2,8 @@ import { parseSingleChildren } from "../parser/children";
 import { NodeChild, NodeHtml, TypeNode } from "../parser/type";
 import { Ref, RefA, RefFormater } from "../reactive/ref";
 import { pairwise, startWith } from "rxjs";
-import { InsertType, mounterChildren, singelMounterChildren } from "./children";
-import { Dir, EtypeRefRequest } from "../reactive/refHelper"
+import { InsertType, singelMounterChildren } from "./children";
+import { Dir, EtypeRefRequest } from "../reactive/refHelper";
 import { EtypeComment, SettingNode, refaSubscribe, RefAInsert, RefAEdit, RefADelete, RefAInsertByIndex } from "./helperType";
 import { ReactiveType } from "../reactive/type";
 import { NodeOP, parserNodeF } from "../parser/parser";
@@ -11,16 +11,16 @@ import { NodeOP, parserNodeF } from "../parser/parser";
 const compareObjects = (a: any, b: any) => {
   if (a === b) return true;
 
-  if (typeof a != 'object' || typeof b != 'object' || a == null || b == null) return false;
+  if (typeof a != "object" || typeof b != "object" || a == null || b == null) return false;
 
-  let keysA = Object.keys(a), keysB = Object.keys(b);
+  const keysA = Object.keys(a), keysB = Object.keys(b);
 
   if (keysA.length != keysB.length) { return false; }
 
-  for (let key of keysA) {
+  for (const key of keysA) {
     if (!keysB.includes(key)) { return false; }
 
-    if (typeof a[key] === 'function' || typeof b[key] === 'function') {
+    if (typeof a[key] === "function" || typeof b[key] === "function") {
       if (a[key].toString() != b[key].toString()) { return false; }
     } else {
       if (!compareObjects(a[key], b[key])) { return false; }
@@ -28,7 +28,7 @@ const compareObjects = (a: any, b: any) => {
   }
 
   return true;
-}
+};
 
 function textNodeCreator(item: NodeChild) {
   const textNode = document.createTextNode(String(item.value));
@@ -55,7 +55,7 @@ function RefChildCreator(root: Element | null, item: Ref) {
         textNode.textContent = String(after);
       }
     }
-  } as any)
+  } as any);
 
   if (root !== null) {
     root.appendChild(textNode);
@@ -72,28 +72,28 @@ function RefFormateChildCreator(root: Element | null, item: RefFormater) {
       const formatedItem = item.value(after);
       textNode.textContent = String(formatedItem);
     }
-  })
+  });
 
   if (root !== null) {
     root.appendChild(textNode);
   }
 }
 
-function fragmentWorker(mountedNode: any[]): any[] {
-  let newMounted: any = [];
+// function fragmentWorker(mountedNode: any[]): any[] {
+//   const newMounted: any = [];
 
-  while(mountedNode.length > 0) {
-    const item = mountedNode.shift();
+//   while(mountedNode.length > 0) {
+//     const item = mountedNode.shift();
 
-    if (Array.isArray(item)) {
-      mountedNode.unshift(...item);
-    } else {
-      newMounted.push(item);
-    }
-  }
+//     if (Array.isArray(item)) {
+//       mountedNode.unshift(...item);
+//     } else {
+//       newMounted.push(item);
+//     }
+//   }
 
-  return newMounted
-}
+//   return newMounted;
+// }
 
 function createCommentAndInsert(root: Element, text: string, type: EtypeComment = EtypeComment.append) {
   const comment = document.createComment(` refA - ${text} `);
@@ -135,7 +135,7 @@ function RefArray(
       const m = {
         prepaire: e,
         mount: mounterInsance(parserInstance(e) as InsertType)
-      }
+      };
 
       const insertNode = m.mount.node;
 
@@ -182,7 +182,7 @@ function RefArray(
           return {
             prepaire: item,
             mount: mounterInsance(parserInstance(item) as InsertType)
-          }
+          };
         });
 
         // добавим все ноды которые получили сначала в DOM потом в массив всех инструкций.
@@ -194,10 +194,10 @@ function RefArray(
           let startNode = startInstraction.mount.node;
           instractionPrepaire.forEach((newNode: SettingNode) => {
             if (newNode.mount !== null) {
-              startNode[workObject.dir === Dir.right ? "after" : "before"](newNode.mount.node)
+              startNode[workObject.dir === Dir.right ? "after" : "before"](newNode.mount.node);
               startNode = newNode.mount.node;
             }
-          })
+          });
         }
 
         // Заполнили DOM новыми нодами, теперь нужно проверить остальные ноды, на изменения.
@@ -226,7 +226,7 @@ function RefArray(
               allInstruction[index] = newItem;
             }            
           }
-        })
+        });
 
         // Необходимо после перерисовок, дополнить массив новыми данными.
         allInstruction[workObject.dir === Dir.right ? "push" : "unshift"](...instractionPrepaire);
@@ -243,12 +243,12 @@ function RefArray(
           const m = {
             prepaire: item,
             mount: mounterInsance(parserInstance(item) as InsertType)
-          }
+          };
 
           startNode[index === 0 ? "replaceWith": "after"](m.mount.node);
           startNode = m.mount.node;
           return m;
-        })
+        });
       }
     }
 
@@ -272,7 +272,7 @@ function RefArray(
           const m = {
             prepaire: prepaire, 
             mount: mounterInsance(parserInstance(prepaire) as InsertType) 
-          }
+          };
 
           allInstruction[key].mount!.node.replaceWith(m.mount.node);
           allInstruction[key] = m;
@@ -370,7 +370,7 @@ function RefArray(
               allInstruction[index] = newItem;
             }
           }
-        })
+        });
       }
     }
 
@@ -403,19 +403,19 @@ function RefArray(
           const m = {
             prepaire: e,
             mount: mounterInsance(parserInstance(e) as InsertType)
-          }
+          };
 
           if (index === 0 && isThisLastItem) {
             startNode.after(m.mount.node);
           } else {
             startNode[index === 0 ? "before" : "after"](m.mount.node);
           }
-          startNode = m.mount.node
+          startNode = m.mount.node;
 
           return m;
         });
 
-        allInstruction.splice(workObject.start, 0, ...newInstruction)
+        allInstruction.splice(workObject.start, 0, ...newInstruction);
         
 
         if (Array.isArray(allInstruction)) {
@@ -438,14 +438,15 @@ function RefArray(
                 allInstruction[index] = newItem;
               }
             }
-          })
+          });
         }
       }
     }
-  })
+  });
 }
 
 function RefOWorker(root: Element | null, item: Record<string, any>) {
+  console.log(root, item);
 }
 
 
@@ -507,14 +508,14 @@ function OifWorker(root: Element | null, item: Record<string, any>, needReturnRo
               workedNode = node.node;
             }
           } else  {
-            const comment = document.createComment(' oif ');
+            const comment = document.createComment(" oif ");
             workedNode?.replaceWith(comment);
             workedNode = comment;
           }
           lastAnswer = currentRules;
         }
-      })
-    })
+      });
+    });
   }
 
   if (needReturnRoot) {
@@ -531,7 +532,7 @@ function RefCWorker(root: Element | null, item: Record<string, any>) {
   const component = parserNodeF.call(null, item.value);
   const mounterInsance = singelMounterChildren(null);
 
-  let mountedNode: NodeOP | null = null
+  let mountedNode: NodeOP | null = null;
 
   if (component === null) {
     return;
@@ -544,8 +545,11 @@ function RefCWorker(root: Element | null, item: Record<string, any>) {
     root?.appendChild(mount.node);
   }
 
+  console.log(mountedNode);
+
   item.$sub.subscribe(async (next: any) => {
-  })
+    console.log(next);
+  });
 }
 
-export { textNodeCreator, htmlNodeCreate, RefChildCreator, RefFormateChildCreator, RefArray, RefOWorker, OifWorker, RefCWorker }
+export { textNodeCreator, htmlNodeCreate, RefChildCreator, RefFormateChildCreator, RefArray, RefOWorker, OifWorker, RefCWorker };

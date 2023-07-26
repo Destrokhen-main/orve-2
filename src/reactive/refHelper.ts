@@ -17,7 +17,7 @@ export function refArrayBuilder(arr: any[], obj: RefA) {
     get(t: any[], p: any) {
       const val = t[p];
       if (typeof val === "function") {
-        if (['push', 'unshift'].includes(p)) {
+        if (["push", "unshift"].includes(p)) {
           if (p === "push") {
             return function(...args: any[]) {
               if (args.length > 0) {
@@ -29,7 +29,7 @@ export function refArrayBuilder(arr: any[], obj: RefA) {
               }
 
               return Array.prototype[p].apply(t, args);
-            }
+            };
           } else {
             // unshift
             return function(...args: any[]) {
@@ -42,10 +42,10 @@ export function refArrayBuilder(arr: any[], obj: RefA) {
               }
 
               return Array.prototype[p].apply(t, args);
-            }
+            };
           }
         }
-        if (['shift'].includes(p)) {
+        if (["shift"].includes(p)) {
           return function() {
             const before = t.length;
             const s = Array.prototype[p].apply(t);
@@ -54,13 +54,13 @@ export function refArrayBuilder(arr: any[], obj: RefA) {
               obj.$sub.next({
                 type: EtypeRefRequest.delete,
                 dir: Dir.left
-              })
+              });
             }
 
             return s;
-          }
+          };
         }
-        if (['pop'].includes(p)) {
+        if (["pop"].includes(p)) {
           return function() {
             const before = t.length;
             const s = Array.prototype[p].apply(t);
@@ -70,12 +70,12 @@ export function refArrayBuilder(arr: any[], obj: RefA) {
                 type: EtypeRefRequest.delete,
                 dir: Dir.right,
                 needCheck: false
-              })
+              });
             }
             return s;
-          }
+          };
         }
-        if (['splice'].includes(p)) {
+        if (["splice"].includes(p)) {
           return function(A: string, B: string, ...args: any[]) {
             const before = t.length;
             const s = Array.prototype[p].apply(t, [A,B, ...args]);
@@ -90,14 +90,14 @@ export function refArrayBuilder(arr: any[], obj: RefA) {
                   start: a,
                   count: b,
                   ...(args.length > 0 ? { needCheck : false } : {})
-                })
+                });
 
                 if (args.length > 0) {
                   obj.$sub.next({
                     type: EtypeRefRequest.insertByIndex,
                     start: a,
                     value: args
-                  })
+                  });
                 }
                 return;
               }
@@ -121,7 +121,7 @@ export function refArrayBuilder(arr: any[], obj: RefA) {
             }
             
             return s;
-          }
+          };
         }
         return val.bind(t);
       }
@@ -136,7 +136,7 @@ export function refArrayBuilder(arr: any[], obj: RefA) {
           type: EtypeRefRequest.edit,
           key: p,
           value: v
-        })
+        });
       } else {
         // addNew item;
       }

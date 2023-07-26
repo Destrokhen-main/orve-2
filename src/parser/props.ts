@@ -16,14 +16,14 @@ function workWithEvent(obj: any, key: string) {
     obj[pKey] = {
       type: func.type === ReactiveType.RefFormater ? TypeProps.EventReactiveF : TypeProps.EventReactive,
       value: func 
-    }
+    };
     return obj;
   }
 
   obj[pKey] = {
     type: TypeProps.Event,
     value: func.bind(this)
-  }
+  };
 
   return obj;
 }
@@ -36,7 +36,7 @@ export function objectToCss(obj: Record<string, any>): string {
   Object.keys(obj).forEach((k) => {
     const nk = camelToSnakeCase(k);
     o += `${nk}:${obj[k]};`;
-  })
+  });
 
   return o;
 }
@@ -49,20 +49,20 @@ function specificProps(obj: any, key: string): [Record<string, any> , boolean] {
       obj[key] = {
         type: TypeProps.Static,
         value: objectToCss(value)
-      }
+      };
 
       return [obj, true];
     } else if (typeof value === "string") {
       obj[key] = {
         type: TypeProps.Static,
         value: value
-      }
+      };
       return [obj, true];
     } else if (typeof value === "object" && value.type === ReactiveType.RefFormater) {
       obj[key] = {
         type: TypeProps.StaticReactiveF,
         value: value
-      }
+      };
       return [ obj, true ];
     }
   }
@@ -72,17 +72,17 @@ function specificProps(obj: any, key: string): [Record<string, any> , boolean] {
       obj[key] = {
         type: TypeProps.Static,
         value: value.default
-      }
+      };
     } else if (typeof value === "string") {
       obj[key] = {
         type: TypeProps.Static,
         value: value
-      }
+      };
     }
     return [obj, true];
   }
 
-  return [obj, false]
+  return [obj, false];
 }
 
 export const SPECIFIC_KEYS = ["style"];
@@ -99,7 +99,7 @@ function workWithStaticProps(obj: any, key: string) {
     obj[key] = {
       type: TypeProps.Static,
       value: obj[key]
-    }
+    };
 
     return [obj, true];
   }
@@ -108,7 +108,7 @@ function workWithStaticProps(obj: any, key: string) {
     obj[key] = {
       type: TypeProps.StaticReactive,
       value: value
-    }
+    };
 
     return [ obj, true ];
   }
@@ -117,7 +117,7 @@ function workWithStaticProps(obj: any, key: string) {
     obj[key] = {
       type: TypeProps.StaticReactiveF,
       value: value
-    }
+    };
 
     return [ obj, true ];
   }
@@ -130,7 +130,7 @@ function propsWorker(insertoObj: Props): Props {
   let obj: any = { ...insertoObj };
 
   Object.keys(obj).forEach((key: string) => {
-    if (key.startsWith('on')) {
+    if (key.startsWith("on")) {
       obj = workWithEvent(obj, key);
       return;
     }
@@ -138,7 +138,7 @@ function propsWorker(insertoObj: Props): Props {
     const [object, stat] = workWithStaticProps(obj, key);
 
     if (stat) {
-      obj = object
+      obj = object;
       return;
     }
 
@@ -148,4 +148,4 @@ function propsWorker(insertoObj: Props): Props {
   return obj;
 }
 
-export { propsWorker }
+export { propsWorker };

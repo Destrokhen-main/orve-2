@@ -11,7 +11,9 @@
   "author": "Destrokhen <armagiddon19@gmail.com>",
   "license": "MIT",
   "devDependencies": {
+    "@typescript-eslint/eslint-plugin": "^6.2.0",
     "eslint": "^8.43.0",
+    "eslint-config-prettier": "^8.8.0",
     "prettier": "^2.8.8",
     "typescript": "^5.1.3"
   },

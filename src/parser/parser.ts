@@ -1,5 +1,5 @@
 import { Props, Children, NodeB } from "../jsx";
-import { validationNode } from "./helper"
+import { validationNode } from "./helper";
 import { genUID } from "../helper/generation";
 import { parseChildren } from "./children";
 import { propsWorker } from "./props";
@@ -24,7 +24,7 @@ function prepareComponent(func: (props?: Props) => unknown, props: Props | null 
   let component: unknown | null = null;
 
   try {
-    component = func.call(this, props !== null ? props : {})
+    component = func.call(this, props !== null ? props : {});
   } catch(error) {
     console.error(`[Parser error]: ${error}`);
   }
@@ -33,7 +33,7 @@ function prepareComponent(func: (props?: Props) => unknown, props: Props | null 
     return component as NodeO;
   }
 
-  return null
+  return null;
 }
 
 function recursiveNode(node: NodeO): NodeO | null {
@@ -51,7 +51,7 @@ function recursiveNode(node: NodeO): NodeO | null {
       }
       if (node.children !== undefined) {
         const ch =(node.children as any).flat(1);
-        object['children'] = ch
+        object["children"] = ch;
       }
 
       let component: unknown | null = null; 
@@ -103,12 +103,12 @@ function parserNodeF(app: () => unknown, props: Props | null = null, parent : No
   }
 
   if (REACTIVE_COMPONENT.includes(String(componentO.tag))) {
-    return reactiveWorkComponent(componentO) as any
+    return reactiveWorkComponent(componentO) as any;
   }
 
   //NOTE beforeCreate 
   if (componentO.hooks && !InvokeHook(componentO, "beforeCreate", null)) {
-    console.error(`Error in hook "beforeCreate"`)
+    console.error("Error in hook \"beforeCreate\"");
   }
 
   if (componentO.props !== undefined) {
@@ -120,7 +120,7 @@ function parserNodeF(app: () => unknown, props: Props | null = null, parent : No
   }
 
   if (componentO.hooks && !InvokeHook(componentO, "created", null)) {
-    console.error(`Error in hook "created"`)
+    console.error("Error in hook \"created\"");
   }
 
   return componentO;
@@ -145,7 +145,7 @@ function parserNodeO(node: NodeO, parent : NodeOP | null = null): NodeOP | null 
     node: null,
     parent,
     type: TypeNode.Component
-  }
+  };
 
   if (workNode.keyNode === undefined) {
     componentO.keyNode = genUID(8);
@@ -156,7 +156,7 @@ function parserNodeO(node: NodeO, parent : NodeOP | null = null): NodeOP | null 
   }
   
   if (componentO.hooks && !InvokeHook(componentO, "beforeCreate", null)) {
-    console.warn(`Error in hook "beforeCreate"`)
+    console.warn("Error in hook \"beforeCreate\"");
   }
 
   if (componentO.props !== undefined) {
@@ -168,7 +168,7 @@ function parserNodeO(node: NodeO, parent : NodeOP | null = null): NodeOP | null 
   }
 
   if (componentO.hooks && !InvokeHook(componentO, "created", null)) {
-    console.error(`Error in hook "beforeCreate"`)
+    console.error("Error in hook \"beforeCreate\"");
   }
   return componentO;
 }

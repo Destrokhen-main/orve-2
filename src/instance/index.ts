@@ -4,10 +4,10 @@ import { CreateApp, OptionsInstance, createApp } from "../parser";
 import { NodeOP } from "../parser/parser";
 
 export interface OrveInstance {
-  tree: NodeOP | null, // TODO поменять тип
+  tree: NodeOP | null,
   context: Record<string, any>, // TODO поменять тип
   use: (obj?: unknown) => boolean | OrveInstance,
-  createApp: (entry: unknown, options: OptionsInstance | null) => CreateApp | null, // TODO поменять тип
+  createApp: (entry: unknown, options: OptionsInstance | null) => CreateApp | null,
 }
 
 declare global {
@@ -42,7 +42,7 @@ function use(obj: unknown = null) {
   }
 
   if (workObject.setup === undefined) {
-    context.context["options"] = { ...obj }
+    context.context["options"] = { ...obj };
     return context;
   }
 
@@ -69,7 +69,7 @@ function orveCreate() {
     context: {},
     use: use,
     createApp: createApp
-  }
+  };
 
   window.Orve[keyInstance] = instance;
 

@@ -11,7 +11,7 @@ function refL() {
   const obj = {
     value: undefined,
     $sub: subject.pipe(startWith(undefined), share())
-  }
+  };
 
   const proxy = new Proxy(obj, {
     set(t: refL, p: string | keyof refL, v: any) {
@@ -22,9 +22,9 @@ function refL() {
       }
       return false;
     }
-  })
+  });
 
   return proxy;
 }
 
-export { refL }
+export { refL };

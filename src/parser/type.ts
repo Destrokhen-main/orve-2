@@ -1,4 +1,4 @@
-import { Ref } from "../reactive/ref"
+import { Ref } from "../reactive/ref";
 
 export enum TypeNode {
   Static = "Static",

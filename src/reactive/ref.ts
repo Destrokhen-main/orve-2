@@ -2,7 +2,7 @@ import { Subject, startWith, share } from "rxjs";
 import { Reactive, ReactiveType } from "./type";
 import { refArrayBuilder } from "./refHelper";
 
-type refInput = string | number | Function;
+type refInput = string | number | (() => any);
 
 interface Ref extends Reactive {
   value: refInput,
@@ -32,7 +32,7 @@ export interface RefFormater {
   parent: any
 }
 
-const TYPE_REF = ["string", "number", "function", "undefined", "boolean"]
+const TYPE_REF = ["string", "number", "function", "undefined", "boolean"];
 
 function ref(value: unknown) {
   const typeValue = typeof value;
@@ -50,16 +50,16 @@ function ref(value: unknown) {
           type: ReactiveType.RefFormater,
           value: func,
           parent: this
-        }
+        };
       }
-    }
+    };
 
     return new Proxy(obj, {
       set(t: Ref, p:string, v: unknown) {
         if (p === "value") {
           const s = Reflect.set(t,p,v);
           if (TYPE_REF.includes(typeof v)) {
-            t.$sub.next(v)
+            t.$sub.next(v);
           }
           return s;
         }
@@ -67,11 +67,11 @@ function ref(value: unknown) {
       },
       deleteProperty(t: Ref, p: string) {
         if (["value", "$sub"].includes(p)) {
-          return false
+          return false;
         }
         return true;
       }
-    })
+    });
   }
 
   if (Array.isArray(value)) {
@@ -86,13 +86,13 @@ function ref(value: unknown) {
           type: ReactiveType.RefArrFor,
           value: func,
           parent: this
-        }
+        };
       }
-    }
+    };
 
     const arr = refArrayBuilder(value, obj);
 
-    obj['value'] = arr;
+    obj["value"] = arr;
 
     const refProxy = new Proxy(obj, {
       set(t: RefA, p: string, v: any) {
@@ -102,13 +102,13 @@ function ref(value: unknown) {
             type: "delete",
             start: 0,
             count: t.value.length
-          })
+          });
 
           obj.$sub.next({
             type: "insert",
             dir: "right",
             value: v
-          })
+          });
 
           t.value = newAr;
         }
@@ -117,13 +117,13 @@ function ref(value: unknown) {
       deleteProperty() {
         return false;
       }
-    })
+    });
 
     return refProxy;
   }
 
   if (typeValue === "object") {
-    console.log('object');
+    console.log("object");
   }
 }
 

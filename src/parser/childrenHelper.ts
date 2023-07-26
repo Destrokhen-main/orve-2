@@ -9,12 +9,12 @@ function isComponent(item: object): boolean {
 }
 
 function isHtmlNode(item: string): boolean {
-  const REQEX = /<\/?[a-z][\s\S]*>/i
+  const REQEX = /<\/?[a-z][\s\S]*>/i;
   if (REQEX.test(item)) {
     return true;
   }
 
-  return false
+  return false;
 }
 
 function isReactiveObject(item: unknown): boolean {
@@ -23,7 +23,7 @@ function isReactiveObject(item: unknown): boolean {
   }
 
   if (item === null) {
-    return false
+    return false;
   }
 
   const workObject = item as Record<string, any>;
@@ -41,16 +41,16 @@ function isFormater(item: unknown): boolean {
   }
 
   if (item === null) {
-    return false
+    return false;
   }
 
   const workObject = item as Record<string, any>;
 
   if (workObject.type !== undefined && workObject.type === ReactiveType.RefFormater) {
-    return true
+    return true;
   }
 
   return false;
 }
 
-export { isComponent, isHtmlNode, isReactiveObject, isFormater }
+export { isComponent, isHtmlNode, isReactiveObject, isFormater };

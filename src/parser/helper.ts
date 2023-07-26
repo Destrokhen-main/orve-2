@@ -1,5 +1,5 @@
 import { NodeB } from "../jsx";
-import { HOOKS_STRING_NAME, ACCESS_KEY } from "../jsx"
+import { HOOKS_STRING_NAME, ACCESS_KEY } from "../jsx";
 
 function validationNode(node: unknown): boolean {
   if (typeof node !== "object") {
@@ -17,7 +17,7 @@ function validationNode(node: unknown): boolean {
     }
   }
 
-  const knowNode = node as NodeB
+  const knowNode = node as NodeB;
 
   if (knowNode.hooks !== undefined) {
     if (typeof knowNode.hooks !== "object") {
@@ -39,4 +39,4 @@ function validationNode(node: unknown): boolean {
   return true;
 }
 
-export { validationNode }
+export { validationNode };

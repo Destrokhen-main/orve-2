@@ -10,4 +10,4 @@ function reactiveWorkComponent(componentO: NodeOP) {
   return null;
 }
 
-export { reactiveWorkComponent }
+export { reactiveWorkComponent };

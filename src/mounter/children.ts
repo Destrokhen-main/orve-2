@@ -1,7 +1,7 @@
-import { FRAGMENT } from "../keys"
-import { NodeOP } from "../parser/parser"
-import { NodeHtml, NodeChild } from "../parser/type"
-import { TypeNode } from "../parser/type"
+import { FRAGMENT } from "../keys";
+import { NodeOP } from "../parser/parser";
+import { NodeHtml, NodeChild } from "../parser/type";
+import { TypeNode } from "../parser/type";
 import { Ref } from "../reactive/ref";
 import { ReactiveType } from "../reactive/type";
 import { textNodeCreator, htmlNodeCreate, RefChildCreator, RefFormateChildCreator, RefArray, RefOWorker, OifWorker, RefCWorker } from "./helper";
@@ -24,18 +24,18 @@ function singelMounterChildren(root: Element | null) {
       }
 
       if (knowItem.tag === FRAGMENT && knowItem.children?.length > 0) {
-        return mounterChildren(root, knowItem.children)
+        return mounterChildren(root, knowItem.children);
       }
     }
 
     if (item.type === TypeNode.Static) {
-      const knowItem = textNodeCreator(item as NodeChild)
+      const knowItem = textNodeCreator(item as NodeChild);
 
       if (root !== null && knowItem.node !== null) {
         root.appendChild(knowItem.node);
       }
 
-      return knowItem
+      return knowItem;
     }
 
     if (item.type === TypeNode.HTML) {
@@ -44,23 +44,23 @@ function singelMounterChildren(root: Element | null) {
       if (root !== null && knowItem.node !== null) {
         root.appendChild(knowItem.node);
       }
-      return knowItem
+      return knowItem;
     }
 
     if (item.type === TypeNode.Reactive) {
       const reactiveObject: Ref = (item as any).value;
       if (reactiveObject.type === ReactiveType.Ref) {
-        RefChildCreator(root, reactiveObject)
+        RefChildCreator(root, reactiveObject);
         return item;
       }
 
       if (reactiveObject.type === ReactiveType.RefFormater) {
-        RefFormateChildCreator(root, reactiveObject as any)
+        RefFormateChildCreator(root, reactiveObject as any);
         return item;
       }
 
       if (reactiveObject.type === ReactiveType.RefA) {
-        console.warn(`Пожалуйста, используйте "for" для отображения массива правильно`)
+        console.warn("Пожалуйста, используйте \"for\" для отображения массива правильно");
         return item;
       }
 
@@ -70,29 +70,29 @@ function singelMounterChildren(root: Element | null) {
       }
 
       if (reactiveObject.type === ReactiveType.RefO) {
-        RefOWorker(root, item as any)
+        RefOWorker(root, item as any);
         return item;
       }
 
       if (reactiveObject.type === ReactiveType.Oif) {
-        OifWorker(root, reactiveObject)
+        OifWorker(root, reactiveObject);
         return item;
       }
 
       if (reactiveObject.type === ReactiveType.RefC) {
         RefCWorker(root, reactiveObject);
-        return item
+        return item;
       }
     }
-  }
+  };
 }
 
 function mounterChildren(root: Element | null, listNode: InsertType[]): any {
   const prepaireFunction = singelMounterChildren(root);
 
-  const finaly = listNode.map(prepaireFunction)
+  const finaly = listNode.map(prepaireFunction);
 
-  return finaly.filter((x) => x !== null)
+  return finaly.filter((x) => x !== null);
 }
 
-export { mounterChildren, singelMounterChildren }
+export { mounterChildren, singelMounterChildren };

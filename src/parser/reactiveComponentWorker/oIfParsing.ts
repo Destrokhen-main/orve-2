@@ -5,34 +5,34 @@ import { NodeOP } from "../parser";
 import { TypeNode } from "../type";
 
 function validationPropsParent(props: Record<string, any>): Record<string, any> | null {
-  if (props['rules'] === undefined) {
-    console.warn(`o-if: "rules" Не указано`);
-    return null
-  } else if (typeof props['rules'] !== "function") {
-    console.warn(`o-if: Для правильной работы необходимо передавать в "rules" функцию`)
+  if (props["rules"] === undefined) {
+    console.warn("o-if: \"rules\" Не указано");
+    return null;
+  } else if (typeof props["rules"] !== "function") {
+    console.warn("o-if: Для правильной работы необходимо передавать в \"rules\" функцию");
   }
 
-  if (props['dep'] === undefined) {
-    console.warn(`o-if: "dep" - Чтобы реактивно следить за изменения в функции. Необходимо передать dep`);
+  if (props["dep"] === undefined) {
+    console.warn("o-if: \"dep\" - Чтобы реактивно следить за изменения в функции. Необходимо передать dep");
   } else {
     const check = (req: any) => {
       if (req.$sub !== undefined) return true;
-    }
+    };
 
     const workerDep: any[] = [];
-    if (Array.isArray(props['dep'])) {
-      props['dep'].forEach((e) => {
+    if (Array.isArray(props["dep"])) {
+      props["dep"].forEach((e) => {
         if (check(e)) {
           workerDep.push(e);
         } else {
-          console.warn(`o-if: "dep" - ${JSON.stringify(e)} - не могу работать с такой зависимостью`)
+          console.warn(`o-if: "dep" - ${JSON.stringify(e)} - не могу работать с такой зависимостью`);
         }
-      })
+      });
     } else {
-      if (check(props['dep'])) {
-        workerDep.push(props['dep']);
+      if (check(props["dep"])) {
+        workerDep.push(props["dep"]);
       } else {
-        console.warn(`o-if: "dep" - ${JSON.stringify(props['dep'])} - не могу работать с такой зависимостью`)
+        console.warn(`o-if: "dep" - ${JSON.stringify(props["dep"])} - не могу работать с такой зависимостью`);
       }
     }
 
@@ -52,7 +52,7 @@ interface IChildrenOif {
 function validationChildren(children: Array<any>) {
   const parserInstance = parseSingleChildren.call(null, null);
 
-  if (children.length === 0) return null
+  if (children.length === 0) return null;
   
   const newChildren : IChildrenOif[] = [];
   children.forEach((e) => {
@@ -77,7 +77,7 @@ function validationChildren(children: Array<any>) {
         } else {
           parsedProps[key] = e.props[key];
         }
-      })
+      });
 
       if (isLegal) {
         if (Object.keys(parsedProps).length > 0) {
@@ -88,7 +88,7 @@ function validationChildren(children: Array<any>) {
 
         if (ChildNode.fragment === true) {
           delete newNode.props;
-          newNode.tag = FRAGMENT
+          newNode.tag = FRAGMENT;
         }
 
         if (ChildNode.else === true) {
@@ -98,12 +98,12 @@ function validationChildren(children: Array<any>) {
         const comp = parserInstance(newNode);
 
         ChildNode.component = comp;
-        newChildren.push(ChildNode)
+        newChildren.push(ChildNode);
       }
     } else {
       return;
     }
-  })
+  });
 
   return newChildren;
 }
@@ -120,7 +120,7 @@ function oifParsing(component: NodeOP) {
   if (component.children !== undefined) {
     newChildren = validationChildren(component.children!);
   }
-  if (newChildren === null) return null
+  if (newChildren === null) return null;
   const answerSettings: Record<any, any> = {};
   newChildren.forEach((e) => {
     if (e.ans !== undefined) {
@@ -128,7 +128,7 @@ function oifParsing(component: NodeOP) {
     } else if (e.else !== undefined) {
       answerSettings.else = e.component;
     }
-  })
+  });
 
   return {
     type: TypeNode.Reactive,
@@ -140,4 +140,4 @@ function oifParsing(component: NodeOP) {
   };
 }
 
-export { oifParsing }
+export { oifParsing };

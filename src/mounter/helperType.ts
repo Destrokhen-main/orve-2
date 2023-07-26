@@ -1,4 +1,4 @@
-import { Dir, EtypeRefRequest } from "../reactive/refHelper"
+import { Dir, EtypeRefRequest } from "../reactive/refHelper";
 
 export enum EtypeComment {
   append = "append",

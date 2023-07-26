@@ -18,7 +18,7 @@ export interface NodeHooks {
   unmounted: (instance?: any) => void
 }
 
-export const ACCESS_KEY = ['tag', 'props', 'children', 'hooks', 'ref', "keyNode"];
+export const ACCESS_KEY = ["tag", "props", "children", "hooks", "ref", "keyNode"];
 
 export interface NodeB {
   tag: Tag,
@@ -44,7 +44,7 @@ const DIRECTIVES_ORVE = ["o-hooks", "o-ref", "o-key"];
  */
 function Node(tag: Tag, props: Props | null = null, ...children: Children): NodeB {
   if (typeof tag === "function" && tag.name === FRAGMENT) {
-    return Fragment({ children })
+    return Fragment({ children });
   }
 
   const Node: NodeB = { tag };
@@ -64,13 +64,13 @@ function Node(tag: Tag, props: Props | null = null, ...children: Children): Node
       } else {
         SetProps[key] = props[key];
       }
-    })
+    });
 
-    Node.props = SetProps
+    Node.props = SetProps;
   }
 
   if (children.length > 0) {
-    Node.children = children
+    Node.children = children;
   }
   return Node;
 }
@@ -84,7 +84,7 @@ function Fragment(node: FragmentT): NodeB {
   return {
     tag: FRAGMENT,
     children: node.children !== undefined ? node.children : []
-  }
+  };
 }
 
 export { Node, Fragment };

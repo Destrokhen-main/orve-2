@@ -4,6 +4,6 @@ const changerAttributes = (root: HTMLElement, key: string, value: any) => {
   } else {
     root.setAttribute(key, String(value));
   }
-}
+};
 
-export { changerAttributes }
+export { changerAttributes };

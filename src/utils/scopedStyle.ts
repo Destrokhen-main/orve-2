@@ -17,11 +17,11 @@ interface IOptions {
 */
 function scopedStyle(styles: Record<string, string>, options: IOptions) {
   if (typeof styles !== "object") {
-    console.warn(`Ошибка в создание scoped style ${styles}`)
+    console.warn(`Ошибка в создание scoped style ${styles}`);
     return {};
   }
 
-  let finalStyle = ``;
+  let finalStyle = "";
   const obj: Record<string, string> = {};
 
   Object.keys(styles).forEach(
@@ -30,14 +30,14 @@ function scopedStyle(styles: Record<string, string>, options: IOptions) {
       obj[key] = prKey;
       finalStyle += `${key.startsWith("#") ? "#" : "."}${prKey} {${styles[key]}}\n`;
     }
-  )
+  );
   
   if (options?.single === true) {
     const style = document.createElement("style");
-    style.setAttribute("orve", "")
-    style.innerHTML = finalStyle
+    style.setAttribute("orve", "");
+    style.innerHTML = finalStyle;
     if (document.querySelector("head")?.appendChild(style) === undefined) {
-      console.warn("scopedStyle - Ошибка в построение scoped styles")
+      console.warn("scopedStyle - Ошибка в построение scoped styles");
     }
     return obj;
   }
@@ -47,11 +47,11 @@ function scopedStyle(styles: Record<string, string>, options: IOptions) {
     // Пометим тег
     StyleTag.setAttribute("orve", "");
     if (document.querySelector("head")?.appendChild(StyleTag) === undefined) {
-      console.warn("scopedStyle - Ошибка в построение scoped styles")
+      console.warn("scopedStyle - Ошибка в построение scoped styles");
     };
   }
   StyleTag.innerHTML += finalStyle;
   return obj;
 }
 
-export { scopedStyle }
+export { scopedStyle };

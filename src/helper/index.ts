@@ -1,2 +1,2 @@
 export * from "./generation";
-export * from "./random"
+export * from "./random";

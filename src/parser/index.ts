@@ -19,7 +19,7 @@ function isValidEntry(entry: unknown): boolean {
     return false;
   }
 
-  return true
+  return true;
 }
 
 function optionsInstace(options: OptionsInstance) {
@@ -31,7 +31,7 @@ function optionsInstace(options: OptionsInstance) {
       window.orve = {
         Node,
         Fragment
-      }
+      };
     }
   }
 }
@@ -62,13 +62,13 @@ function createApp(entry: unknown = null, options: OptionsInstance | null = null
       if (allContext.tree) {
         InvokeAllNodeHook(allContext.tree, "beforeUnmount");
       }
-    }
+    };
 
     const unmounter = function() {
       if (allContext.tree) {
         InvokeAllNodeHook(allContext.tree, "unmounted");
       }
-    }
+    };
     
 
 
@@ -76,7 +76,7 @@ function createApp(entry: unknown = null, options: OptionsInstance | null = null
 
     //window.onbeforeunload = beforeUnmounter;
 
-    window.addEventListener('unload', unmounter);
+    window.addEventListener("unload", unmounter);
 
     //window.onunload = unmounter;
   }
@@ -95,8 +95,8 @@ function createApp(entry: unknown = null, options: OptionsInstance | null = null
         rootElement = root;
       }
       if (rootElement === null) {
-        console.warn(" root is null ")
-        return false
+        console.warn(" root is null ");
+        return false;
       }
       if (allContext.tree !== null) {
         allContext.tree = mounterNode(rootElement, allContext.tree);
@@ -104,7 +104,7 @@ function createApp(entry: unknown = null, options: OptionsInstance | null = null
 
       return allContext;
     }
-  }
+  };
 }
 
 export { createApp };
