@@ -9,6 +9,7 @@ import {
   REACTIVE_COMPONENT,
   reactiveWorkComponent,
 } from "./reactiveComponentWorker";
+import { definedProps } from "../utils";
 
 export interface NodeO extends NodeB {
   tag: string | ((props?: Record<string, any>) => unknown);
@@ -28,9 +29,16 @@ function prepareComponent(
   props: Props | null = null,
 ): NodeO | null {
   let component: unknown | null = null;
-
   try {
-    component = func.call(this, props !== null ? props : {});
+    if ((func as Record<string, any>).props !== undefined) {
+      // TODO +1 непроверенный код
+      const propFunction = (func as Record<string, any>).props;
+      delete (func as Record<string, any>).props;
+      const prepFunc = definedProps(func, propFunction);
+      component = prepFunc.call(this, props !== null ? props : {});
+    } else {
+      component = func.call(this, props !== null ? props : {});
+    }
   } catch (error) {
     console.error(`[Parser error]: ${error}`);
   }
@@ -66,7 +74,15 @@ function recursiveNode(node: NodeO): NodeO | null {
 
       let component: unknown | null = null;
       try {
-        component = node.tag.call(this, object);
+        if ((node.tag as Record<string, any>).props !== undefined) {
+          // TODO Не тестированный код!!
+          const prop = (node.tag as Record<string, any>).props;
+          delete (node.tag as Record<string, any>).props;
+          const prepComp = definedProps(node.tag, prop);
+          component = prepComp.call(this, object);
+        } else {
+          component = node.tag.call(this, object);
+        }
       } catch (error) {
         console.warn(`Recursive ${error}`);
       }

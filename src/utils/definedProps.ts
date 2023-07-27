@@ -59,13 +59,14 @@ const checkTypeObject = (
 };
 
 type Props = {
-  children: any[];
+  children?: any[];
   [T: string]: any;
 };
 
 // TODO
 /*
 [ ] - Посмотреть код и переписать по необходимости
+[ ] - Проверить как прокидывает контекст
 */
 function definedProps(
   node: any,
