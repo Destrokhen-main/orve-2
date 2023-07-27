@@ -80,10 +80,26 @@ function validationChildren(children: Array<any>) {
       const newNode = { ...e };
 
       Object.keys(e.props).forEach((key) => {
-        if (key === "o-else") {
+        if (["o-else", "v-else"].includes(key)) {
+          if (key.startsWith("v")) {
+            console.warn(
+              `%c[o-if]%c We called it anouther)`,
+              `font-weight: bold`,
+              `font-weight: normal`,
+            );
+          }
+
           ChildNode.else = true;
           isLegal = true;
-        } else if (key === "o-if") {
+        } else if (["o-if", "v-if"].includes(key)) {
+          if (key.startsWith("v")) {
+            console.warn(
+              `%c[o-if]%c We called it anouther)`,
+              `font-weight: bold`,
+              `font-weight: normal`,
+            );
+          }
+
           ChildNode.ans = e.props[key];
           isLegal = true;
         } else if (key === "o-fragment" && typeof e.props[key] === "boolean") {
