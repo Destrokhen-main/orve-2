@@ -1,9 +1,9 @@
 import { Node } from "../jsx";
 
-interface Iprops {
-  default?: () => any | string | number | boolean | undefined | null;
-  required: boolean;
-}
+// interface Iprops {
+//   default?: () => any | string | number | boolean | undefined | null;
+//   required: boolean;
+// }
 
 type TPropsRequired = {
   required: boolean;

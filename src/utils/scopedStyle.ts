@@ -35,7 +35,7 @@ function scopedStyle(styles: Record<string, any>, options: IOptions) {
         : `${key.replace("#", "")}__${genUID(8)}`;
     obj[key] = prKey;
 
-    let partString = `${key.startsWith("#") ? "#" : "."}${prKey}`;
+    const partString = `${key.startsWith("#") ? "#" : "."}${prKey}`;
 
     let fn;
 
