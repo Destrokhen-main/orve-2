@@ -3,6 +3,7 @@
  */
 
 import { genUID } from "../helper/generation";
+import { objectToCss } from "../parser/props";
 
 let StyleTag: HTMLElement | null = null;
 
@@ -13,9 +14,10 @@ interface IOptions {
 
 /* TODO 
 [ ] - стили по типу .class-1, .class-2 должны правильно отрабатывать.
-[ ] - помимо string в стилях можно отправить и object ("display: 'flex'" === { display: "flex"}). В таком случаи это тоже надо обработать. 
+[X] - помимо string в стилях можно отправить и object ("display: 'flex'" === { display: "flex"}). В таком случаи это тоже надо обработать. 
+[X] - Можно использовать функции для вызова повторного кода из объекта выше
 */
-function scopedStyle(styles: Record<string, string>, options: IOptions) {
+function scopedStyle(styles: Record<string, any>, options: IOptions) {
   if (typeof styles !== "object") {
     console.warn(`Ошибка в создание scoped style ${styles}`);
     return {};
@@ -24,14 +26,27 @@ function scopedStyle(styles: Record<string, string>, options: IOptions) {
   let finalStyle = "";
   const obj: Record<string, string> = {};
 
-  Object.keys(styles).forEach((key: string) => {
+  const styledKeys = Object.keys(styles);
+
+  styledKeys.forEach((key: string) => {
     const prKey =
       options?.scoped === false
         ? key.replace("#", "")
         : `${key.replace("#", "")}__${genUID(8)}`;
     obj[key] = prKey;
-    finalStyle += `${key.startsWith("#") ? "#" : "."}${prKey} {${
-      styles[key]
+
+    let partString = `${key.startsWith("#") ? "#" : "."}${prKey}`;
+
+    let fn;
+
+    if (typeof styles[key] === "function") {
+      fn = styles[key]();
+    } else {
+      fn = styles[key];
+    }
+
+    finalStyle += `${partString} {${
+      typeof fn === "object" ? objectToCss(fn) : fn
     }}\n`;
   });
 
