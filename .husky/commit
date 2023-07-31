@@ -1,0 +1,18 @@
+#!/usr/bin/env sh
+. "$(dirname -- "$0")/_/husky.sh"
+
+echo "[-] check commit message"
+message="$(cat $1)"
+requiredPattern="^(feat|fix|edit|merge): .*$"
+
+if ! [[ $message =~ $requiredPattern ]];
+then
+  echo "🚨 Wrong commit message!"
+  echo "The commit message must have this format:"
+  echo "Allowed verbs in imperative mood: feat, fix, edit, merge"
+  echo "Example: fix: bla bla bla"
+  echo " "
+  echo "Your commit message was:"
+  echo $message
+  exit 1
+fi
