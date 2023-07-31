@@ -8,7 +8,8 @@
     "build": "tsc --build",
     "lint": "eslint ./src",
     "prettier": "prettier --config .prettierrc 'src/**/*.ts' --write",
-    "prettier-watch": "onchange 'src/**/*.ts' -- prettier --write {{changed}}"
+    "prettier-watch": "onchange 'src/**/*.ts' -- prettier --write {{changed}}",
+    "prepare": "husky install"
   },
   "author": "Destrokhen <armagiddon19@gmail.com>",
   "license": "MIT",
@@ -19,7 +20,8 @@
     "eslint-config-prettier": "^8.8.0",
     "onchange": "^7.1.0",
     "prettier": "^2.8.8",
-    "typescript": "^5.1.3"
+    "typescript": "^5.1.3",
+    "husky": "^8.0.0"
   },
   "dependencies": {
     "rxjs": "^7.8.1"
