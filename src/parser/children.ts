@@ -21,6 +21,18 @@ function compareHTML(item: string): NodeHtml {
   };
 }
 
+function hasUnreformateArray(nodes: unknown[]): boolean {
+  if (Array.isArray(nodes)) {
+    for (let i = 0; i !== nodes.length; i++) {
+      if (Array.isArray(nodes[i])) {
+        return true;
+      }
+    }
+  }
+
+  return false;
+}
+
 /**
  * if you wanna use this function u need do .call(context);
  * @param parent NodeOP | null - node
@@ -59,10 +71,16 @@ const parseSingleChildren = function (parent: NodeOP | null) {
   }.bind(this);
 };
 
-function parseChildren(arrayNode: unknown[], parent: NodeOP | null) {
+function parseChildren(arrayNode: unknown[], parent: NodeOP | null): any {
   const singleChildParser = parseSingleChildren.call(this, parent);
 
-  return arrayNode.map(singleChildParser);
+  // TODO
+  // [ ] - Необходимо убедиться, что тут после flat всё ещё валидный массив
+  let workNodes = arrayNode;
+  if (hasUnreformateArray(arrayNode)) {
+    workNodes = (arrayNode as any).flat(1);
+  }
+  return workNodes.map(singleChildParser);
 }
 
 export { parseChildren, parseSingleChildren };
