@@ -3,13 +3,13 @@
 
 echo "[-] check commit message"
 message="$(cat $1)"
-requiredPattern="^(feat|fix|edit|merge): .*$"
+requiredPattern="^(feat|fix|edit|merge|mix): .*$"
 
 if ! [[ $message =~ $requiredPattern ]];
 then
   echo "🚨 Wrong commit message!"
   echo "The commit message must have this format:"
-  echo "Allowed verbs in imperative mood: feat, fix, edit, merge"
+  echo "Allowed verbs in imperative mood: feat, fix, edit, merge, mix"
   echo "Example: fix: bla bla bla"
   echo " "
   echo "Your commit message was:"
