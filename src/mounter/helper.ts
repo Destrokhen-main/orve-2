@@ -632,6 +632,11 @@ function RefCWorker(root: Element | null, item: Record<string, any>) {
 }
 
 /* TODO
+Эта конструкция даёт возможность сделать вот такую штуку
+<RefC ....>
+  ....
+</RefC>
+
 [ ] - Дать возможность передавать () => import("...") и обычные компоненты <Component />
 [ ] - Комент если value undefined
 [ ] - Компоненты могут быть fragment
