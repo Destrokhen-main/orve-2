@@ -3,3 +3,4 @@ test
 built
 /.vscode
 /.github
+jest.config.js
