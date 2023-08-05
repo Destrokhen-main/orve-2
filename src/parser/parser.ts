@@ -162,7 +162,6 @@ function parserNodeF(
   if (componentO.hooks && !InvokeHook(componentO, "created")) {
     console.error('Error in hook "created"');
   }
-
   return componentO;
 }
 

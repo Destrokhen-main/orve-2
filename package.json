@@ -5,7 +5,7 @@
   "main": "built/index.js",
   "scripts": {
     "watch": "tsc --watch",
-    "build": "tsc --build",
+    "build": "tsc --build tsconfig.prod.json",
     "lint": "eslint ./src",
     "prettier": "prettier --config .prettierrc 'src/**/*.ts' --write",
     "prettier-watch": "onchange 'src/**/*.ts' -- prettier --write {{changed}}",

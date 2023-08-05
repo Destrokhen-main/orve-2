@@ -126,10 +126,15 @@ function Node(
   } else if (children.length > 0) {
     // На всякий случай, если остается тут template
     // но прошлое уловие не прошло, тогда надо удалить все template
-    const prep = children.filter(
-      (e: any) => typeof e !== "object" && e.tag !== TEMPLATE,
-    );
-
+    const prep = [];
+    for (let i = 0; i !== children.length; i++) {
+      if (
+        typeof children[i] !== "object" ||
+        (typeof children[i] === "object" && children[i].tag !== TEMPLATE)
+      ) {
+        prep.push(children[i]);
+      }
+    }
     if (prep.length > 0) {
       Node.children = prep;
     }

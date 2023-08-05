@@ -149,4 +149,24 @@ describe("jsx", () => {
       tag: "div",
     });
   });
+
+  test("Rewrite template in component", () => {
+    const Component = () => {};
+
+    const node = Node(
+      Component,
+      null,
+      Node(TEMPLATE, null, "before"),
+      Node(TEMPLATE, null, "after"),
+    );
+
+    expect(node).toStrictEqual({
+      tag: Component,
+      props: {
+        template: {
+          default: ["after"],
+        },
+      },
+    });
+  });
 });
