@@ -16,3 +16,5 @@ then
   echo $message
   exit 1
 fi
+
+echo "[-] check commit message === DONE"
