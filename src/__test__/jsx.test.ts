@@ -99,7 +99,7 @@ describe("jsx", () => {
   test("Component with template", () => {
     const Component = () => {};
 
-    const div = Node(Component, null, Node("template", null, "test"));
+    const div = Node(Component, null, Node(TEMPLATE, null, "test"));
     expect(div).toStrictEqual({
       tag: Component,
       props: {
@@ -116,8 +116,8 @@ describe("jsx", () => {
     const div = Node(
       Component,
       { id: "123" },
-      Node("template", { name: "test" }, "test"),
-      Node("template", null, "test"),
+      Node(TEMPLATE, { name: "test" }, "test"),
+      Node(TEMPLATE, null, "test"),
     );
 
     expect(div).toStrictEqual({
@@ -144,7 +144,7 @@ describe("jsx", () => {
   });
 
   test("Div with template", () => {
-    const div = Node("div", null, Node("template", null, "test"));
+    const div = Node("div", null, Node(TEMPLATE, null, "test"));
     expect(div).toStrictEqual({
       tag: "div",
     });

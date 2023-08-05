@@ -1,6 +1,8 @@
 node_modules
-test
 built
 /.vscode
 /.github
 jest.config.js
+
+.eslintrc.js
+*.config.js
