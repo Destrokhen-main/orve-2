@@ -605,6 +605,8 @@ function OifWorker(
 }
 
 /* TODO
+{RefC} - вставка в код
+
 [ ] - Дать возможность передавать () => import("...") и обычные компоненты <Component />
 [ ] - Комент если value undefined
 [ ] - Компоненты могут быть fragment

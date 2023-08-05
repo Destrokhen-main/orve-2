@@ -1,4 +1,5 @@
 import { Props } from "../jsx";
+import { TEMPLATE } from "../keys";
 import { ReactiveType } from "../reactive/type";
 import { TypeProps } from "./type";
 
@@ -138,6 +139,11 @@ function workWithStaticProps(obj: any, key: string) {
       value: value,
     };
 
+    return [obj, true];
+  }
+
+  if (typeof value === "object" && key === TEMPLATE) {
+    obj[key] = value;
     return [obj, true];
   }
 

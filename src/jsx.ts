@@ -1,4 +1,4 @@
-import { FRAGMENT } from "./keys";
+import { FRAGMENT, TEMPLATE } from "./keys";
 
 type Tag = string | (() => any); // TODO изменить типы
 export type Props = Record<string, any>;
@@ -91,9 +91,48 @@ function Node(
 
     Node.props = SetProps;
   }
+  if (children.length > 0 && typeof tag === "function") {
+    // Проведём работы, чтобы избавиться от всех template
+    const newChild: any[] = [];
 
-  if (children.length > 0) {
-    Node.children = children;
+    const template: Record<string, any> = {};
+
+    children.forEach((e: any) => {
+      if (typeof e !== "object") {
+        newChild.push(e);
+        return;
+      }
+
+      if (e.tag !== undefined && e.tag === TEMPLATE) {
+        if (e.props !== undefined && e.props.name !== undefined) {
+          template[e.props.name] = e.children;
+        } else {
+          template.default = e.children;
+        }
+      }
+    });
+
+    if (Object.keys(template).length > 0) {
+      if (Node.props !== undefined && Node.props !== null) {
+        Node.props.template = template;
+      } else {
+        Node.props = { template };
+      }
+    }
+
+    if (newChild.length > 0) {
+      Node.children = newChild;
+    }
+  } else if (children.length > 0) {
+    // На всякий случай, если остается тут template
+    // но прошлое уловие не прошло, тогда надо удалить все template
+    const prep = children.filter(
+      (e: any) => typeof e !== "object" && e.tag !== TEMPLATE,
+    );
+
+    if (prep.length > 0) {
+      Node.children = prep;
+    }
   }
   return Node;
 }
