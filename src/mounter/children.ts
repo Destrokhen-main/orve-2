@@ -13,6 +13,7 @@ import {
   RefOWorker,
   OifWorker,
   RefCWorker,
+  RefCComponentWorker,
 } from "./helper";
 
 import { mounterNode } from "./index";
@@ -97,6 +98,11 @@ function singelMounterChildren(root: Element | null) {
 
       if (reactiveObject.type === ReactiveType.RefC) {
         RefCWorker(root, reactiveObject);
+        return item;
+      }
+
+      if (reactiveObject.type === ReactiveType.RefCComponent) {
+        RefCComponentWorker(root, reactiveObject);
         return item;
       }
     }

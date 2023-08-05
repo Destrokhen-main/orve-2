@@ -1,4 +1,5 @@
 import { Ref } from "../reactive/ref";
+import { ReactiveType } from "../reactive/type";
 
 export enum TypeNode {
   Static = "Static",
@@ -33,4 +34,10 @@ export interface ReactiveNode {
   type: TypeNode;
   value: Ref;
   node: HTMLElement | null;
+}
+
+export interface IRefCSetup {
+  type: ReactiveType;
+  proxy: any;
+  props?: Record<string, any>;
 }

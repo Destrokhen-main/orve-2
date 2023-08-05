@@ -10,6 +10,7 @@ export enum ReactiveType {
   Oif = "Oif",
 
   RefC = "RefC",
+  RefCComponent = "RefCComponent",
 }
 
 export interface Reactive {

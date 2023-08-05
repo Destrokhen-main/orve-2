@@ -626,9 +626,33 @@ function RefCWorker(root: Element | null, item: Record<string, any>) {
     root?.appendChild(mount.node);
   }
 
-  console.log(mountedNode);
-
   item.$sub.subscribe(async (next: any) => {
+    console.log(next);
+  });
+}
+
+/* TODO
+[ ] - Дать возможность передавать () => import("...") и обычные компоненты <Component />
+[ ] - Комент если value undefined
+[ ] - Компоненты могут быть fragment
+*/
+function RefCComponentWorker(root: Element | null, item: Record<string, any>) {
+  const component = parserNodeF.call(null, item.proxy.value, item.props);
+  const mounterInsance = singelMounterChildren(null);
+
+  let mountedNode: NodeOP | null = null;
+
+  if (component === null) {
+    return;
+  }
+
+  const mount = mounterInsance(component);
+  if (mount.node !== undefined) {
+    mountedNode = mount;
+    root?.appendChild(mount.node);
+  }
+
+  item.proxy.$sub.subscribe((next: any) => {
     console.log(next);
   });
 }
@@ -642,4 +666,5 @@ export {
   RefOWorker,
   OifWorker,
   RefCWorker,
+  RefCComponentWorker,
 };

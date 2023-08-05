@@ -1,9 +1,10 @@
 import { validationNode } from "./helper";
 import { NodeO, NodeOP } from "./parser";
 import { parserNodeO } from "./parser";
-import { TypeNode, NodeChild, NodeHtml } from "./type";
+import { TypeNode, NodeChild, NodeHtml, IRefCSetup } from "./type";
 import { isComponent, isHtmlNode, isReactiveObject } from "./childrenHelper";
 import { genUID } from "../helper/generation";
+import { ReactiveType } from "../reactive/type";
 
 function compareStatic(item: string | number): NodeChild {
   return {
@@ -33,6 +34,27 @@ function hasUnreformateArray(nodes: unknown[]): boolean {
   return false;
 }
 
+function setupRefCAsComponent(parse: NodeO) {
+  const ObjectForWork: IRefCSetup = {
+    type: ReactiveType.RefCComponent,
+    proxy: parse.tag,
+    props: {},
+  };
+  if (parse.props !== undefined) {
+    ObjectForWork.props = { ...parse.props };
+  }
+
+  if (parse.children !== undefined && ObjectForWork.props) {
+    ObjectForWork.props.children = parse.children;
+  }
+
+  return {
+    type: TypeNode.Reactive,
+    keyNode: genUID(8),
+    value: ObjectForWork,
+  };
+}
+
 /**
  * if you wanna use this function u need do .call(context);
  * @param parent NodeOP | null - node
@@ -55,7 +77,18 @@ const parseSingleChildren = function (parent: NodeOP | null) {
       validationNode(item)
     ) {
       const component = item as NodeO;
+
+      // Проверь, есть ли tag реактивный объект.
+      if (
+        typeof component.tag === "object" &&
+        (component.tag as Record<string, any>).type !== undefined &&
+        (component.tag as Record<string, any>).type === ReactiveType.RefC
+      ) {
+        return setupRefCAsComponent(component);
+      }
+
       const parse = parserNodeO.call(this, component, parent);
+
       return parse !== null ? parse : null;
     }
 
