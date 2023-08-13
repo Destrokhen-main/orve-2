@@ -8,17 +8,25 @@ function validationPropsParent(
   props: Record<string, any>,
 ): Record<string, any> | null {
   if (props["rules"] === undefined) {
-    console.warn('o-if: "rules" Не указано');
+    console.warn(
+      '%c[o-if]%c: "rules" Не указано',
+      `font-weight: bold`,
+      `font-weight: normal`,
+    );
     return null;
   } else if (typeof props["rules"] !== "function") {
     console.warn(
-      'o-if: Для правильной работы необходимо передавать в "rules" функцию',
+      '%c[o-if]%c: Для правильной работы необходимо передавать в "rules" функцию',
+      `font-weight: bold`,
+      `font-weight: normal`,
     );
   }
 
   if (props["dep"] === undefined) {
     console.warn(
-      'o-if: "dep" - Чтобы реактивно следить за изменения в функции. Необходимо передать dep',
+      '%c[o-if]%c: "dep" - Чтобы реактивно следить за изменения в функции. Необходимо передать dep',
+      `font-weight: bold`,
+      `font-weight: normal`,
     );
   } else {
     const check = (req: any) => {
@@ -32,9 +40,11 @@ function validationPropsParent(
           workerDep.push(e);
         } else {
           console.warn(
-            `o-if: "dep" - ${JSON.stringify(
+            `%c[o-if]%c: "dep" - ${JSON.stringify(
               e,
             )} - не могу работать с такой зависимостью`,
+            `font-weight: bold`,
+            `font-weight: normal`,
           );
         }
       });
@@ -43,9 +53,11 @@ function validationPropsParent(
         workerDep.push(props["dep"]);
       } else {
         console.warn(
-          `o-if: "dep" - ${JSON.stringify(
+          `%c[o-if]%c: "dep" - ${JSON.stringify(
             props["dep"],
           )} - не могу работать с такой зависимостью`,
+          `font-weight: bold`,
+          `font-weight: normal`,
         );
       }
     }
@@ -83,7 +95,7 @@ function validationChildren(children: Array<any>) {
         if (["o-else", "v-else"].includes(key)) {
           if (key.startsWith("v")) {
             console.warn(
-              `%c[o-if]%c We called it anouther)`,
+              `%c[v-else]%c: We called it anouther)`,
               `font-weight: bold`,
               `font-weight: normal`,
             );
@@ -94,7 +106,7 @@ function validationChildren(children: Array<any>) {
         } else if (["o-if", "v-if"].includes(key)) {
           if (key.startsWith("v")) {
             console.warn(
-              `%c[o-if]%c We called it anouther)`,
+              `%c[v-if]%c: We called it anouther)`,
               `font-weight: bold`,
               `font-weight: normal`,
             );
