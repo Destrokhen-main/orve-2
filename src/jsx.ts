@@ -51,6 +51,11 @@ export interface JSX {
 }
 
 const DIRECTIVES_ORVE = ["o-hooks", "o-ref", "o-key"];
+
+/* TODO 
+[ ] - Если пользовать использует RefC template тоже должен работать
+*/
+
 /**
  * Node creater
  * @param tag - String or Component
