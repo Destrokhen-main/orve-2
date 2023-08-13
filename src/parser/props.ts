@@ -107,7 +107,11 @@ function workWithStaticProps(obj: any, key: string) {
     return specificProps(obj, key);
   }
 
-  if (typeof value === "string" || typeof value === "number") {
+  if (
+    typeof value === "string" ||
+    typeof value === "number" ||
+    typeof value === "boolean"
+  ) {
     obj[key] = {
       type: TypeProps.Static,
       value: obj[key],

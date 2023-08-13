@@ -70,24 +70,28 @@ type Props = {
 [ ] - Сделать для template отдельное свойство для того, чтобы можно было валидировать template
 */
 function definedProps(
-  node: any,
-  pt: Record<string, TPropsRequired & TNotRequired>,
+  Component: () => unknown,
+  propsType: Record<string, TPropsRequired & TNotRequired>,
 ) {
-  return (props: Props) => {
-    const ptype: Record<string, any> = {};
+  return (insertProps: Props) => {
+    const propsSettings: Record<string, any> = {};
 
-    Object.keys(pt).forEach((e) => {
-      const p = pt[e];
+    // Обработка найтроек пропсов
+    Object.keys(propsType).forEach((e) => {
+      const blockPropsSettings = propsType[e];
 
-      if (p.type !== undefined) {
-        if (typeof p.type !== "function" && !Array.isArray(p.type)) {
+      if (blockPropsSettings.type !== undefined) {
+        if (
+          typeof blockPropsSettings.type !== "function" &&
+          !Array.isArray(blockPropsSettings.type)
+        ) {
           console.warn(
             `Key "${e}" - type must be "String", "Number", "Array", "Object", "Function", "Boolean"`,
           );
           return;
-        } else if (Array.isArray(p.type)) {
-          for (let i = 0; i !== p.type.length; i++) {
-            if (typeof p.type[i] !== "function") {
+        } else if (Array.isArray(blockPropsSettings.type)) {
+          for (let i = 0; i !== blockPropsSettings.type.length; i++) {
+            if (typeof blockPropsSettings.type[i] !== "function") {
               console.warn(
                 `Key "${e}" - type must be "String", "Number", "Array", "Object", "Function"`,
               );
@@ -95,21 +99,8 @@ function definedProps(
             }
           }
         }
-        if (p.required !== true) {
-          if (
-            p.required !== undefined &&
-            p.required === false &&
-            p.default !== undefined
-          ) {
-            ptype[e] = p;
-          } else {
-            console.warn(
-              `Key "${e}" - if "required" is set to "false" you must specify the default value "default"`,
-            );
-            return;
-          }
-        } else {
-          ptype[e] = p;
+        if (blockPropsSettings.required === true) {
+          propsSettings[e] = blockPropsSettings;
         }
       } else {
         console.warn(`Key "${e}" - you must specify "type"`);
@@ -117,14 +108,14 @@ function definedProps(
       }
     });
 
-    const obj = props;
+    const obj = insertProps;
     if (
-      ptype !== undefined &&
-      Object.keys(ptype).length > 0 &&
-      props !== undefined
+      propsSettings !== undefined &&
+      Object.keys(propsSettings).length > 0 &&
+      insertProps !== undefined
     ) {
-      Object.keys(ptype).forEach((e) => {
-        const prop = ptype[e] ?? null;
+      Object.keys(propsSettings).forEach((e) => {
+        const prop = propsSettings[e] ?? null;
         const value = obj[e];
         if (prop["required"] === true && value === undefined) {
           console.error(`MISS "${e}" key in props`);
@@ -207,7 +198,7 @@ function definedProps(
         }
       });
     }
-    return Node(node, obj);
+    return Node(Component, obj);
   };
 }
 

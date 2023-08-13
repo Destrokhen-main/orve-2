@@ -13,28 +13,29 @@ describe("defined props", () => {
         string: "1",
         function: func,
         object,
+        boolean: false,
       });
 
     const n = definedProps(Component, {
       number: {
         type: Number,
         required: false,
-        default: 2,
       },
       string: {
         type: String,
         required: false,
-        default: "2",
       },
       function: {
         type: Function,
         required: false,
-        default: () => {},
       },
       object: {
         type: Object,
         required: false,
-        default: () => ({}),
+      },
+      boolean: {
+        type: Boolean,
+        required: false,
       },
     });
 
@@ -44,6 +45,7 @@ describe("defined props", () => {
       string: { type: "Static", value: "1" },
       function: { type: "Static", value: func },
       object: { type: "Static", value: object },
+      boolean: { type: "Static", value: false },
     });
   });
 
@@ -115,4 +117,7 @@ describe("defined props", () => {
       id: { type: "Static", value: 1 },
     });
   });
+
+  // Создать компонент с пропсом Плохого типа
+  // Создать компонент с пропсом типа String и прокинуть в него Number
 });
