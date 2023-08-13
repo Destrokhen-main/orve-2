@@ -74,7 +74,6 @@ function definedProps(
   pt: Record<string, TPropsRequired & TNotRequired>,
 ) {
   return (props: Props) => {
-    console.log(props, pt);
     const ptype: Record<string, any> = {};
 
     Object.keys(pt).forEach((e) => {

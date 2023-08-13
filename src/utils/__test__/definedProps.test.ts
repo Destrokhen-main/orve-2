@@ -91,9 +91,13 @@ describe("defined props", () => {
     });
   });
 
-  test.only("Create component with required props", () => {
-    const Comoponent = function () {
-      return Node("div");
+  test("Create component with required props", () => {
+    const consoleSpy = jest
+      .spyOn(console, "error")
+      .mockImplementation(() => {});
+
+    const Comoponent = function ({ number }: { number: any }) {
+      return Node("div", { id: number });
     };
 
     Comoponent.props = {
@@ -106,9 +110,9 @@ describe("defined props", () => {
 
     const component = parserNodeF(Comoponent as any, null);
 
+    expect(consoleSpy).toHaveBeenCalledWith('MISS "number" key in props');
     expect(component?.props).toStrictEqual({
-      number: 1,
+      id: { type: "Static", value: 1 },
     });
-    console.log(component);
   });
 });
