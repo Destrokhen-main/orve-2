@@ -147,6 +147,14 @@ function workWithStaticProps(obj: any, key: string) {
     return [obj, true];
   }
 
+  if (typeof value === "object" || typeof value === "function") {
+    obj[key] = {
+      type: TypeProps.Static,
+      value: value,
+    };
+    return [obj, true];
+  }
+
   return [obj, false];
 }
 

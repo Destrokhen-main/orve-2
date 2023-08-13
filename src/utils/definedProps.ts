@@ -7,7 +7,7 @@ import { Node } from "../jsx";
 
 type TPropsRequired = {
   required: boolean;
-  default?: () => any | string | number | boolean | undefined | null;
+  default?: (() => any) | string | number | boolean | undefined | null;
 };
 
 type TNotRequired = {
@@ -74,6 +74,7 @@ function definedProps(
   pt: Record<string, TPropsRequired & TNotRequired>,
 ) {
   return (props: Props) => {
+    console.log(props, pt);
     const ptype: Record<string, any> = {};
 
     Object.keys(pt).forEach((e) => {

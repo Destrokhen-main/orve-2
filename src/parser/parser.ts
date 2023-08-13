@@ -81,7 +81,9 @@ function recursiveNode(node: NodeO): NodeO | null {
           const prepComp = definedProps(node.tag, prop);
           component = prepComp.call(this, object);
         } else {
+          console.log("ASDASDASD", object);
           component = node.tag.call(this, object);
+          console.log("COMPONENT", component);
         }
       } catch (error) {
         console.warn(`Recursive ${error}`);
