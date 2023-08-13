@@ -1,7 +1,7 @@
 #!/usr/bin/env sh
 . "$(dirname -- "$0")/_/husky.sh"
 
-echo "[-] check commit message"
+echo "2️⃣ check commit message"
 message="$(cat $1)"
 requiredPattern="^(feat|fix|edit|merge|mix): .*$"
 
@@ -17,4 +17,4 @@ then
   exit 1
 fi
 
-echo "[-] check commit message === DONE"
+echo "[-] check commit message - ✅ DONE"

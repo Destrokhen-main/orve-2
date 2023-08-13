@@ -1,5 +1,5 @@
 #!/usr/bin/env sh
 . "$(dirname -- "$0")/_/husky.sh"
 
-echo "[-] run lint"
+echo "1️⃣ run lint"
 npm run lint;
