@@ -17,7 +17,17 @@ interface IOptions {
 [X] - помимо string в стилях можно отправить и object ("display: 'flex'" === { display: "flex"}). В таком случаи это тоже надо обработать. 
 [X] - Можно использовать функции для вызова повторного кода из объекта выше
 */
-function scopedStyle(styles: Record<string, any>, options: IOptions) {
+
+/**
+ * Создать scoped стили.
+ * @param styles - Объект стилей
+ * @param options - Объект настроек для функции. { scoped: boolean, single: boolean }
+ * @returns
+ */
+function scopedStyle(
+  styles: Record<string, any>,
+  options?: IOptions,
+): Record<string, string> {
   if (typeof styles !== "object") {
     console.warn(`Ошибка в создание scoped style ${styles}`);
     return {};
@@ -58,6 +68,12 @@ function scopedStyle(styles: Record<string, any>, options: IOptions) {
       console.warn("scopedStyle - Ошибка в построение scoped styles");
     }
     return obj;
+  }
+  // Проверим есть ли тег
+
+  const tag = document.querySelector("head")?.querySelector("style[orve='']");
+  if (tag === null) {
+    StyleTag = null;
   }
 
   if (StyleTag === null) {
