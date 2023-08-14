@@ -79,7 +79,6 @@ function definedProps(
     // Обработка найтроек пропсов
     Object.keys(propsType).forEach((e) => {
       const blockPropsSettings = propsType[e];
-
       if (blockPropsSettings.type !== undefined) {
         if (
           typeof blockPropsSettings.type !== "function" &&
@@ -107,7 +106,6 @@ function definedProps(
         return;
       }
     });
-
     const obj = insertProps;
     if (
       propsSettings !== undefined &&

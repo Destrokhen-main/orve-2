@@ -177,7 +177,6 @@ function propsWorker(insertoObj: Props): Props {
       obj = object;
       return;
     }
-
     console.warn(`"${key}" this key is not supported`);
     delete obj[key];
   });

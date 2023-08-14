@@ -118,6 +118,64 @@ describe("defined props", () => {
     });
   });
 
-  // Создать компонент с пропсом Плохого типа
-  // Создать компонент с пропсом типа String и прокинуть в него Number
+  test("Create component with bad props", () => {
+    const consoleSpy = jest.spyOn(console, "warn").mockImplementation(() => {});
+
+    const Component = function ({ testProp }: { testProp: any }) {
+      return Node("div", { id: testProp });
+    };
+
+    const MainComponent = function () {
+      return Node(Component as any, { testProp: 123 });
+    };
+
+    Component.props = {
+      testProp: {
+        type: String,
+        required: true,
+      },
+    };
+
+    const component = parserNodeF(MainComponent as any, null);
+    expect(consoleSpy).toBeCalledWith(
+      `Error type key "testProp" expected "string" but got "number"`,
+    );
+    expect(component?.props).toStrictEqual({
+      id: {
+        type: "Static",
+        value: "",
+      },
+    });
+  });
+
+  test("Create component with bad props and default value", () => {
+    const consoleSpy = jest.spyOn(console, "warn").mockImplementation(() => {});
+
+    const Component = function ({ testProp }: { testProp: any }) {
+      return Node("div", { id: testProp });
+    };
+
+    const MainComponent = function () {
+      return Node(Component as any, { testProp: 123 });
+    };
+
+    Component.props = {
+      testProp: {
+        type: String,
+        required: true,
+        default: "123",
+      },
+    };
+
+    const component = parserNodeF(MainComponent as any, null);
+    expect(consoleSpy).toBeCalledWith(
+      `Error type key "testProp" expected "string" but got "number"`,
+    );
+    expect(component?.props).toStrictEqual({
+      id: {
+        type: "Static",
+        value: "123",
+      },
+    });
+  });
 });
