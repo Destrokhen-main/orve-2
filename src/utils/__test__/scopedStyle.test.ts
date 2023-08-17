@@ -52,6 +52,36 @@ describe("scopedStyle", () => {
 
     const doc = document.head;
     const style = doc.querySelector("style")?.innerHTML;
-    expect(style).toMatch(/.test {color:white;}/gm);
+    expect(style).toMatch(".test {color:white;}");
+  });
+
+  test("Check scoped object", () => {
+    const object = scopedStyle({
+      m: {
+        color: "white",
+      },
+    });
+
+    const doc = document.head;
+    const style = doc.querySelector("style")?.innerHTML;
+    expect(style).toMatch(/m/gm);
+
+    expect(Object.keys(object).length === 1).toBe(true);
+    expect(object['m']).toBeDefined();
+  });
+
+  test.only("Check scoped style with more that one key", () => {
+    // Тоже будет работать для scoped
+    const styles = scopedStyle({
+      ".class-1, .class-2": { color: 'black' },
+      "#test-1, .class-3": { color: "white" }
+    }, { scoped: false });
+
+    const doc = document.head;
+    const style = doc.querySelector("style")?.innerHTML;
+
+    expect(Object.keys(styles).length).toBe(4);
+    expect(Object.keys(styles).some((e) => e.startsWith('#'))).toBe(true);
+    expect(style).toMatch(`.class-1, .class-2 {color:black;}\n#test-1, .class-3 {color:white;}`);
   });
 });

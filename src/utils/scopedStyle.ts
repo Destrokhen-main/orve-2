@@ -13,7 +13,7 @@ interface IOptions {
 }
 
 /* TODO 
-[ ] - стили по типу .class-1, .class-2 должны правильно отрабатывать.
+[X] - стили по типу .class-1, .class-2 должны правильно отрабатывать.
 [X] - помимо string в стилях можно отправить и object ("display: 'flex'" === { display: "flex"}). В таком случаи это тоже надо обработать. 
 [X] - Можно использовать функции для вызова повторного кода из объекта выше
 */
@@ -39,13 +39,31 @@ function scopedStyle(
   const styledKeys = Object.keys(styles);
 
   styledKeys.forEach((key: string) => {
-    const prKey =
-      options?.scoped === false
-        ? key.replace("#", "")
-        : `${key.replace("#", "")}__${genUID(8)}`;
-    obj[key] = prKey;
+    let partString;
+    if (key.indexOf(',') !== -1) {
+      const parseClass = key.split(',').map((e) => e.trim());
 
-    const partString = `${key.startsWith("#") ? "#" : "."}${prKey}`;
+      const afterWorkClass = parseClass.map((parsedKey: string) => {
+        const prKey =
+          options?.scoped === false
+            ? parsedKey.replace(/[#.]/gm, "")
+            : `${parsedKey.replace(/[#.]/gm, "")}__${genUID(8)}`;
+        obj[parsedKey.replace('.', '')] = prKey;
+
+        const partString = `${parsedKey.startsWith("#") ? "#" : "."}${prKey}`;
+        return partString;
+      });
+
+      partString = afterWorkClass.join(', ');
+    } else {
+      const prKey =
+        options?.scoped === false
+          ? key.replace(/[#.]/gm, "")
+          : `${key.replace(/[#.]/gm, "")}__${genUID(8)}`;
+      obj[key] = prKey;
+
+      partString = `${key.startsWith("#") ? "#" : "."}${prKey}`;
+    }
 
     let fn;
 
@@ -55,9 +73,8 @@ function scopedStyle(
       fn = styles[key];
     }
 
-    finalStyle += `${partString} {${
-      typeof fn === "object" ? objectToCss(fn) : fn
-    }}\n`;
+    finalStyle += `${partString} {${typeof fn === "object" ? objectToCss(fn) : fn
+      }}\n`;
   });
 
   if (options?.single === true) {
