@@ -10,6 +10,7 @@ import {
   reactiveWorkComponent,
 } from "./reactiveComponentWorker";
 import { definedProps } from "../utils";
+import { snakeToCamel } from "../utils/transformFunctions";
 
 export interface NodeO extends NodeB {
   tag: string | ((props?: Record<string, any>) => unknown);
@@ -128,6 +129,27 @@ function parserNodeF(
     return null;
   }
 
+  if (
+    this.globalComponents !== undefined &&
+    typeof component.tag === "string"
+  ) {
+    const nameTag = /([-_][a-z])/g.test(component.tag)
+      ? snakeToCamel(component.tag)
+      : component.tag;
+
+    if (this.globalComponents[nameTag] !== undefined) {
+      component = prepareComponent.call(
+        this,
+        this.globalComponents[nameTag],
+        props,
+      );
+    }
+  }
+
+  if (component === null) {
+    return null;
+  }
+
   const componentO: NodeOP = {
     ...component,
     node: null,
@@ -171,6 +193,21 @@ function parserNodeF(
  */
 function parserNodeO(node: NodeO, parent: NodeOP | null = null): NodeOP | null {
   let workNode: NodeO | null = node;
+
+  // TODO Не уверен в этом коде
+  if (this.globalComponents !== undefined && typeof workNode.tag === "string") {
+    const nameTag = /([-_][a-z])/g.test(workNode.tag)
+      ? snakeToCamel(workNode.tag)
+      : workNode.tag;
+
+    if (this.globalComponents[nameTag] !== undefined) {
+      workNode = prepareComponent.call(this, this.globalComponents[nameTag]);
+    }
+  }
+  if (workNode === null) {
+    return null;
+  }
+
   if (typeof workNode.tag === "function") {
     workNode = recursiveNode.call(this, workNode);
   }
