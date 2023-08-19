@@ -2,11 +2,16 @@ import { genUID } from "../helper/";
 import { JSX } from "../jsx";
 import { CreateApp, OptionsInstance, createApp } from "../parser";
 import { NodeOP } from "../parser/parser";
+import { cameCase } from "../utils/transformFunctions";
 
 export interface OrveInstance {
   tree: NodeOP | null;
-  context: Record<string, any>; // TODO поменять тип
+  context: {
+    globalComponents?: Record<string, () => unknown>;
+    [T: string]: any;
+  };
   use: (obj?: unknown) => boolean | OrveInstance;
+  component: (nameComponent: string, component: () => unknown) => void;
   createApp: (
     entry: unknown,
     options: OptionsInstance | null,
@@ -55,6 +60,20 @@ function use(obj: unknown = null) {
   return false;
 }
 
+function component(name: string, component: () => unknown) {
+  const context = this.context;
+  const camelWord = cameCase(name);
+  if (context.globalComponents === undefined) {
+    context.globalComponents = {};
+  }
+
+  if (context.globalComponents[camelWord] === undefined) {
+    context.globalComponents[camelWord] = component;
+  } else {
+    console.warn("[ Component ] - имя данного компонента уже успользуется.");
+  }
+}
+
 /**
  * Create instance Orve application
  * @returns Orve instance
@@ -73,6 +92,7 @@ function orveCreate() {
   const instance: OrveInstance = {
     tree: null,
     context: {},
+    component,
     use: use,
     createApp: createApp,
   };

@@ -1,10 +1,11 @@
 import { validationNode } from "./helper";
-import { NodeO, NodeOP } from "./parser";
+import { NodeO, NodeOP, parserNodeF } from "./parser";
 import { parserNodeO } from "./parser";
 import { TypeNode, NodeChild, NodeHtml, IRefCSetup } from "./type";
 import { isComponent, isHtmlNode, isReactiveObject } from "./childrenHelper";
 import { genUID } from "../helper/generation";
 import { ReactiveType } from "../reactive/type";
+import { snakeToCamel } from "../utils/transformFunctions";
 
 function compareStatic(item: string | number): NodeChild {
   return {
@@ -77,6 +78,26 @@ const parseSingleChildren = function (parent: NodeOP | null) {
       validationNode(item)
     ) {
       const component = item as NodeO;
+
+      // Проверим есть ли globalComponent
+      if (
+        typeof component.tag === "string" &&
+        this.globalComponents !== undefined
+      ) {
+        const nameTag = /([-_][a-z])/g.test(component.tag)
+          ? snakeToCamel(component.tag)
+          : component.tag;
+
+        if (this.globalComponents[nameTag] !== undefined) {
+          const parse = parserNodeF.call(
+            this,
+            this.globalComponents[nameTag],
+            null,
+            parent,
+          );
+          return parse !== null ? parse : null;
+        }
+      }
 
       // Проверь, есть ли tag реактивный объект.
       if (
