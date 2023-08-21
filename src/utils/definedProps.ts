@@ -69,6 +69,13 @@ type Props = {
 [ ] - Проверить как прокидывает контекст
 [ ] - Сделать для template отдельное свойство для того, чтобы можно было валидировать template
 */
+
+/**
+ * Функция для обозначения props
+ * @param Component - {function} - Компонент
+ * @param propsType - Объект с настройками props
+ * @returns Новый компонент в котором включена прослойка на props.
+ */
 function definedProps(
   Component: () => unknown,
   propsType: Record<string, TPropsRequired & TNotRequired>,

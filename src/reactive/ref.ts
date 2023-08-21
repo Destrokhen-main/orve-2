@@ -34,6 +34,11 @@ export interface RefFormater {
 
 const TYPE_REF = ["string", "number", "function", "undefined", "boolean"];
 
+/**
+ * Реактивная переменная
+ * @param value - начальные данные
+ * @returns ref переменную.
+ */
 function ref(value: unknown) {
   const typeValue = typeof value;
   if (TYPE_REF.includes(typeValue)) {

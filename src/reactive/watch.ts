@@ -5,6 +5,12 @@ interface Dep {
   $sub: Subject<any>;
 }
 
+/**
+ * Смотритель для реактивной переменной
+ * @param func - watcher - что будет вызываться при срабатывания watch
+ * @param dep - реактивные переменные, для которых будет применять функция watch
+ * @returns  либо одно или массив функций, для отключения watch
+ */
 function watch(func: (n: any, o: any) => void, dep: Dep | Dep[]) {
   if (typeof dep !== "object" || dep === null) {
     console.warn("Dep is bad");

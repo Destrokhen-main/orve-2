@@ -22,6 +22,10 @@ function isValidEntry(entry: unknown): boolean {
   return true;
 }
 
+/**
+ * Обрабатывает массив настроек для функции createApp
+ * @param options - объект с настройками
+ */
 function optionsInstace(options: OptionsInstance) {
   if (options.root !== undefined && options.root === true) {
     if (window.orve !== undefined) {

@@ -1,6 +1,11 @@
 import { NodeB } from "../jsx";
 import { HOOKS_STRING_NAME, ACCESS_KEY } from "../jsx";
 
+/**
+ * Валидация компонента
+ * @param node - Компонент
+ * @returns true если всё хорошо
+ */
 function validationNode(node: unknown): boolean {
   if (typeof node !== "object") {
     return false;

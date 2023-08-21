@@ -1,6 +1,7 @@
 import { Props } from "../jsx";
 import { TEMPLATE } from "../keys";
 import { ReactiveType } from "../reactive/type";
+import { camelToSnakeCase } from "../utils/transformFunctions";
 import { TypeProps } from "./type";
 
 export interface PropsItem {
@@ -8,6 +9,12 @@ export interface PropsItem {
   value: any;
 }
 
+/**
+ * Функция помогающая работать с событиями
+ * @param obj - props
+ * @param key - ключ
+ * @returns обновлённый объект props
+ */
 function workWithEvent(obj: any, key: string) {
   const func = obj[key];
   const pKey = key.replace("on", "").toLowerCase().trim();
@@ -37,9 +44,11 @@ function workWithEvent(obj: any, key: string) {
   return obj;
 }
 
-const camelToSnakeCase = (str: string) =>
-  str.replace(/[A-Z]/g, (letter) => `-${letter.toLowerCase()}`);
-
+/**
+ * Функция для преобразования обхектов с css строки.
+ * @param obj - Объект стилей.
+ * @returns - строку
+ */
 export function objectToCss(obj: Record<string, any>): string {
   let o = "";
 
@@ -51,6 +60,12 @@ export function objectToCss(obj: Record<string, any>): string {
   return o;
 }
 
+/**
+ * Существует специальные атрибуты в тегах, с которыми нужно производить специальные операции.
+ * @param obj - props
+ * @param key - аттрибут
+ * @returns объект props и ключ изменений. true - что-то сделали
+ */
 function specificProps(obj: any, key: string): [Record<string, any>, boolean] {
   const value = obj[key];
 
@@ -100,6 +115,12 @@ function specificProps(obj: any, key: string): [Record<string, any>, boolean] {
 
 export const SPECIFIC_KEYS = ["style"];
 
+/**
+ * Работа с props которые не являютя event. Необходимо чтобы правильно работать с реактивными переменными и так далее.
+ * @param obj
+ * @param key
+ * @returns
+ */
 function workWithStaticProps(obj: any, key: string) {
   const value = obj[key];
 
@@ -162,6 +183,11 @@ function workWithStaticProps(obj: any, key: string) {
   return [obj, false];
 }
 
+/**
+ * Функция помогающая правильно обработать props
+ * @param insertoObj - Объект props
+ * @returns обновленный объект props
+ */
 function propsWorker(insertoObj: Props): Props {
   let obj: any = { ...insertoObj };
 

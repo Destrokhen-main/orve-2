@@ -60,7 +60,12 @@ function use(obj: unknown = null) {
   return false;
 }
 
-function component(name: string, component: () => unknown) {
+/**
+ * Регистрация глобального компонента в Instance Orve
+ * @param name - string название компонента в camelСase
+ * @param component - {function} - Component
+ */
+function component(name: string, component: () => unknown): void {
   const context = this.context;
   const camelWord = cameCase(name);
   if (context.globalComponents === undefined) {

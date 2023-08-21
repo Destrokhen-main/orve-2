@@ -4,6 +4,12 @@ import { NodeOP } from "../parser/parser";
 import { mounterChildren } from "./children";
 import { propsWorker } from "./props";
 
+/**
+ * Монтирование node
+ * @param root - HTMLElement родителя
+ * @param tree - Компонент, который нужно отрисовать
+ * @returns Обновлённый объект с HTMLElement
+ */
 function mounterNode(root: Element | null, tree: NodeOP) {
   if (typeof tree.tag !== "string") {
     return null;

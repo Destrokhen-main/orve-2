@@ -25,6 +25,13 @@ export interface NodeOP extends NodeO {
   type: TypeNode;
 }
 
+/**
+ * Так как мы не знаем, что мы получим после вызова функции,
+ * то необходимо перед работой с объектом вызвать её и проверить всё ли окей.
+ * @param func - компонент
+ * @param props - объект props с комопнента выше
+ * @returns Или объект или null
+ */
 function prepareComponent(
   func: (props?: Props) => unknown,
   props: Props | null = null,
@@ -55,6 +62,11 @@ function prepareComponent(
   return null;
 }
 
+/**
+ * Если функция в tag имеет ещё компонент, то необходимо обработать его
+ * @param node - Component
+ * @returns Или объект или null
+ */
 function recursiveNode(node: NodeO): NodeO | null {
   const quee: NodeO[] = [node];
   let returnedNode: NodeO = node;
@@ -104,11 +116,15 @@ function recursiveNode(node: NodeO): NodeO | null {
   return returnedNode;
 }
 
+/* TODO
+[ ] - Есть чувство, что parseNodeF и parseNodeO - имеют очень много общего и их можно объединить 
+*/
+
 /**
- * parse function component
- * @param app function
- * @param props
- * @returns
+ * Функция помогающая обработать компонент.
+ * @param app Функция компонента
+ * @param props Объект props сверху
+ * @returns Или объект или null
  */
 function parserNodeF(
   app: () => unknown,
@@ -188,8 +204,9 @@ function parserNodeF(
 }
 
 /**
- * parsing object component
- * @param node
+ * Функция для обработки объекта Компонента
+ * @param node - объект с настройками компонента
+ * @returns Или объект или null
  */
 function parserNodeO(node: NodeO, parent: NodeOP | null = null): NodeOP | null {
   let workNode: NodeO | null = node;

@@ -67,21 +67,32 @@ describe("scopedStyle", () => {
     expect(style).toMatch(/m/gm);
 
     expect(Object.keys(object).length === 1).toBe(true);
-    expect(object['m']).toBeDefined();
+    expect(object["m"]).toBeDefined();
   });
 
-  test.only("Check scoped style with more that one key", () => {
+  test("Check scoped style with more that one key", () => {
     // Тоже будет работать для scoped
-    const styles = scopedStyle({
-      ".class-1, .class-2": { color: 'black' },
-      "#test-1, .class-3": { color: "white" }
-    }, { scoped: false });
+    const styles = scopedStyle(
+      {
+        ".class-1, .class-2": { color: "black" },
+        "#test-1, .class-3": { color: "white" },
+      },
+      { scoped: false },
+    );
 
     const doc = document.head;
     const style = doc.querySelector("style")?.innerHTML;
 
     expect(Object.keys(styles).length).toBe(4);
-    expect(Object.keys(styles).some((e) => e.startsWith('#'))).toBe(true);
-    expect(style).toMatch(`.class-1, .class-2 {color:black;}\n#test-1, .class-3 {color:white;}`);
+    expect(Object.keys(styles).some((e) => e.startsWith("#"))).toBe(true);
+    expect(style).toMatch(
+      `.class-1, .class-2 {color:black;}\n#test-1, .class-3 {color:white;}`,
+    );
+  });
+
+  test("returns an empty object and logs a warning when styles is not an object", () => {
+    const styles = "invalid styles";
+    const result = scopedStyle(styles as any);
+    expect(result).toEqual({});
   });
 });

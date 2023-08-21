@@ -11,7 +11,7 @@
     "prettier-watch": "onchange 'src/**/*.ts' -- prettier --write {{changed}}",
     "prepare": "husky install",
     "test:unit": "jest ./src",
-    "test:watch": "jest ./src --watch"
+    "test:watch": "jest --watch"
   },
   "author": "Destrokhen <armagiddon19@gmail.com>",
   "license": "MIT",

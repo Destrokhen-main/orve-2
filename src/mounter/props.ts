@@ -4,6 +4,13 @@ import { PropsItem, SPECIFIC_KEYS, objectToCss } from "../parser/props";
 import { TypeProps } from "../parser/type";
 import { changerAttributes } from "./propHelper";
 
+/**
+ * Функция для работы с реактивными props
+ * @param item - ref object
+ * @param key - аттрибут
+ * @param val - значение которое необходимо прокинуть в реактивный обхект
+ * @returns Реззультат выполнения
+ */
 function prepaireStaticRectF(item: any, key: string, val: any = null) {
   let value = null;
 
@@ -16,6 +23,11 @@ function prepaireStaticRectF(item: any, key: string, val: any = null) {
   return value;
 }
 
+/**
+ * Функция для работы со стрилямо
+ * @param insertValue - значение
+ * @returns строка стилей
+ */
 function prepaireClass(insertValue: any) {
   let insertV: string = insertValue;
   if (typeof insertValue === "object") {
@@ -25,6 +37,11 @@ function prepaireClass(insertValue: any) {
   return insertV;
 }
 
+/**
+ * Функция, которая устанавливает атрибуты внутрь HTMLElement
+ * @param root - HTMLElement в который будет указаны атрибуты
+ * @param item - Объект props
+ */
 function propsWorker(root: HTMLElement, item: Props) {
   Object.keys(item).forEach((key: string) => {
     const obj: PropsItem = item[key];

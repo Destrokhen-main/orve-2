@@ -1,5 +1,10 @@
 import { ReactiveType } from "../reactive/type";
 
+/**
+ * Проверяет элемент на компонент
+ * @param item - Элемент
+ * @returns - true если это правда
+ */
 function isComponent(item: object): boolean {
   const obj: Record<string, any> = item;
   if (obj.tag !== undefined) {
@@ -8,6 +13,11 @@ function isComponent(item: object): boolean {
   return false;
 }
 
+/**
+ * Проверяет html ли это
+ * @param item - строка
+ * @returns true - если правда
+ */
 function isHtmlNode(item: string): boolean {
   const REQEX = /<\/?[a-z][\s\S]*>/i;
   if (REQEX.test(item)) {
@@ -17,6 +27,11 @@ function isHtmlNode(item: string): boolean {
   return false;
 }
 
+/**
+ * Проверяет является ли это реактивным объектом
+ * @param item - обхект
+ * @returns true если это правда
+ */
 function isReactiveObject(item: unknown): boolean {
   if (typeof item !== "object") {
     return false;
@@ -38,6 +53,11 @@ function isReactiveObject(item: unknown): boolean {
   return false;
 }
 
+/**
+ * Проверяет является ли объект функцией форматирования
+ * @param item - объект
+ * @returns - true если это правда
+ */
 function isFormater(item: unknown): boolean {
   if (typeof item !== "object") {
     return false;

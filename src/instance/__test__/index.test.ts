@@ -5,6 +5,7 @@ describe("Component", () => {
     const app = orveCreate();
     app.component("test", () => {});
 
-    console.log(app);
+    expect(app.context.globalComponents).toBeDefined();
+    expect(app.context.globalComponents?.test).toBeDefined();
   });
 });

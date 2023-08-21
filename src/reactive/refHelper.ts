@@ -12,6 +12,12 @@ export enum Dir {
   left = "Left",
 }
 
+/**
+ * Функция помогающая правильно отрисовывать реактивные массивы
+ * @param arr - массив
+ * @param obj - реактивная переменная массива
+ * @returns Реактивную переменную массива
+ */
 export function refArrayBuilder(arr: any[], obj: RefA) {
   return new Proxy(arr, {
     get(t: any[], p: any) {

@@ -5,6 +5,10 @@ interface refL {
   $sub: any;
 }
 
+/**
+ * Создает реактивную переменную под ссылку на тег
+ * @returns реактивную переменную
+ */
 function refL() {
   const subject: Subject<Element> = new Subject();
 

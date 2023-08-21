@@ -4,6 +4,13 @@ import { NodeOP } from "../parser/parser";
 /* TODO
 [ ] - Передавать что-то в хуки
 */
+
+/**
+ * Функция вызывает хук внутри обхекта.
+ * @param obj - NodeOP объект, который содержит свойство - [hooks]
+ * @param nameHook - Название хука. Тип NodeHooks
+ * @returns boolean - true если все прошло успешно.
+ */
 export function InvokeHook(
   obj: NodeOP,
   nameHook: string | keyof NodeHooks,
@@ -26,6 +33,11 @@ export function InvokeHook(
   }
 }
 
+/**
+ * Запускает вызов хука для всех NodeOP переданных внутрь функции
+ * @param obj - NodeOP объект
+ * @param hook - Название хука. Тип NodeHooks
+ */
 export function InvokeAllNodeHook(obj: NodeOP, hook: keyof NodeHooks): void {
   let quee = [obj];
 

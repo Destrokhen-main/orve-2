@@ -7,6 +7,11 @@ import { genUID } from "../helper/generation";
 import { ReactiveType } from "../reactive/type";
 import { snakeToCamel } from "../utils/transformFunctions";
 
+/**
+ * Надстройка для статики.
+ * @param item
+ * @returns
+ */
 function compareStatic(item: string | number): NodeChild {
   return {
     type: TypeNode.Static,
@@ -15,6 +20,11 @@ function compareStatic(item: string | number): NodeChild {
   };
 }
 
+/**
+ * Надстройка для html кода внутри children
+ * @param item
+ * @returns
+ */
 function compareHTML(item: string): NodeHtml {
   return {
     type: TypeNode.HTML,
@@ -23,6 +33,11 @@ function compareHTML(item: string): NodeHtml {
   };
 }
 
+/**
+ * Если в children есть массив
+ * @param nodes - массив node
+ * @returns boolean true - если массив есть
+ */
 function hasUnreformateArray(nodes: unknown[]): boolean {
   if (Array.isArray(nodes)) {
     for (let i = 0; i !== nodes.length; i++) {
@@ -35,6 +50,11 @@ function hasUnreformateArray(nodes: unknown[]): boolean {
   return false;
 }
 
+/**
+ * Преднастройка для <refC />
+ * @param parse
+ * @returns
+ */
 function setupRefCAsComponent(parse: NodeO) {
   const ObjectForWork: IRefCSetup = {
     type: ReactiveType.RefCComponent,
@@ -125,6 +145,12 @@ const parseSingleChildren = function (parent: NodeOP | null) {
   }.bind(this);
 };
 
+/**
+ * Проходиться по children комопнента
+ * @param arrayNode - массив компонентов
+ * @param parent - родитель этого массива
+ * @returns - обработанный массив
+ */
 function parseChildren(arrayNode: unknown[], parent: NodeOP | null): any {
   const singleChildParser = parseSingleChildren.call(this, parent);
 

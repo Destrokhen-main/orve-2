@@ -4,6 +4,11 @@ import { parseSingleChildren } from "../children";
 import { NodeOP } from "../parser";
 import { TypeNode } from "../type";
 
+/**
+ * Проверка верно ли настроенно props
+ * @param props - объект настроект для o-if
+ * @returns Переработанный объект props
+ */
 function validationPropsParent(
   props: Record<string, any>,
 ): Record<string, any> | null {
@@ -75,6 +80,11 @@ interface IChildrenOif {
   else?: boolean;
 }
 
+/**
+ * Функция проверяет children o-if
+ * @param children - массив children
+ * @returns массив обработанных children
+ */
 function validationChildren(children: Array<any>) {
   const parserInstance = parseSingleChildren.call(null, null);
 
@@ -150,6 +160,11 @@ function validationChildren(children: Array<any>) {
   return newChildren;
 }
 
+/**
+ * Реактианый компонент o-if
+ * @param component - Сам реактивный компонент
+ * @returns Надстройку для последующуго монтирования.
+ */
 function oifParsing(component: NodeOP) {
   let newProps = null;
   let newChildren = null;

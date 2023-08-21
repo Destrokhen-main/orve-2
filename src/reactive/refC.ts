@@ -6,6 +6,11 @@ interface IRefC extends Reactive {
   value: any;
 }
 
+/**
+ * Создаёт реактивный компонент
+ * @param startComponent - Изначальный компонент.
+ * @returns - Реактивный компонент
+ */
 function refC(startComponent: any) {
   const subject: Subject<any> = new Subject();
   const component: IRefC = {

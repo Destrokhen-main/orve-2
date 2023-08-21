@@ -20,6 +20,11 @@ import { mounterNode } from "./index";
 
 export type InsertType = NodeOP | NodeChild | NodeHtml;
 
+/**
+ * Обработка одиночноq node
+ * @param root - HTMLElement
+ * @returns - переработанный node
+ */
 function singelMounterChildren(root: Element | null) {
   return (item: InsertType) => {
     if (item === undefined || item === null) {
@@ -109,6 +114,12 @@ function singelMounterChildren(root: Element | null) {
   };
 }
 
+/**
+ * Монтирование node
+ * @param root - HTMLElement
+ * @param listNode - массив node
+ * @returns - обработанные массив node
+ */
 function mounterChildren(root: Element | null, listNode: InsertType[]): any {
   const prepaireFunction = singelMounterChildren(root);
 

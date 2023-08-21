@@ -16,6 +16,9 @@ import {
 import { ReactiveType } from "../reactive/type";
 import { NodeOP, parserNodeF } from "../parser/parser";
 
+// TODO
+// [ ] - раскидать код отсюда на разные файлы.
+
 const compareObjects = (a: any, b: any) => {
   if (a === b) return true;
 
