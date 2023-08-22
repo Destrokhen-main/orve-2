@@ -98,20 +98,23 @@ const parseSingleChildren = function (parent: NodeOP | null) {
       validationNode(item)
     ) {
       const component = item as NodeO;
+      const context = this ?? {};
 
       // Проверим есть ли globalComponent
+
       if (
         typeof component.tag === "string" &&
-        this.globalComponents !== undefined
+        context !== null &&
+        context.globalComponents !== undefined
       ) {
         const nameTag = /([-_][a-z])/g.test(component.tag)
           ? snakeToCamel(component.tag)
           : component.tag;
 
-        if (this.globalComponents[nameTag] !== undefined) {
+        if (context.globalComponents[nameTag] !== undefined) {
           const parse = parserNodeF.call(
-            this,
-            this.globalComponents[nameTag],
+            context,
+            context.globalComponents[nameTag],
             null,
             parent,
           );
@@ -127,8 +130,7 @@ const parseSingleChildren = function (parent: NodeOP | null) {
       ) {
         return setupRefCAsComponent(component);
       }
-
-      const parse = parserNodeO.call(this, component, parent);
+      const parse = parserNodeO.call(context, component, parent);
 
       return parse !== null ? parse : null;
     }
