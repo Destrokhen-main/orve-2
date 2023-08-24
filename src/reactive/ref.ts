@@ -1,4 +1,4 @@
-import { Subject, startWith, share } from "rxjs";
+import { BehaviorSubject, share } from "rxjs";
 import { Reactive, ReactiveType } from "./type";
 import { refArrayBuilder } from "./refHelper";
 
@@ -18,7 +18,7 @@ export interface RefA extends Reactive {
 }
 
 export interface RefO extends Reactive {
-  $sub: Subject<any>;
+  $sub: BehaviorSubject<any>;
 }
 
 export interface RefOF extends Reactive {
@@ -44,12 +44,12 @@ function ref(value: unknown) {
   if (TYPE_REF.includes(typeValue)) {
     const val = value as refInput;
 
-    const subject: Subject<refInput> = new Subject();
+    const subject: BehaviorSubject<refInput> = new BehaviorSubject(val);
 
     const obj: Ref = {
       type: ReactiveType.Ref,
       value: val,
-      $sub: subject.pipe(startWith(val), share()),
+      $sub: subject.pipe(share()),
       formate: function (func): RefFormater {
         return {
           type: ReactiveType.RefFormater,
@@ -80,12 +80,12 @@ function ref(value: unknown) {
   }
 
   if (Array.isArray(value)) {
-    const subject: Subject<any> = new Subject();
+    const subject: BehaviorSubject<any> = new BehaviorSubject(value);
 
     const obj: RefA = {
       type: ReactiveType.RefA,
       value: null,
-      $sub: subject.pipe(startWith(value), share()),
+      $sub: subject.pipe(share()),
       for: function (func) {
         return {
           type: ReactiveType.RefArrFor,

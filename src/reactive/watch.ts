@@ -1,8 +1,8 @@
-import { Subject, pairwise } from "rxjs";
+import { BehaviorSubject, pairwise } from "rxjs";
 
 interface Dep {
   [T: string]: any;
-  $sub: Subject<any>;
+  $sub: BehaviorSubject<any>;
 }
 
 /**

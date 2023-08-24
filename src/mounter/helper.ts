@@ -1,7 +1,7 @@
 import { parseSingleChildren } from "../parser/children";
 import { NodeChild, NodeHtml, TypeNode } from "../parser/type";
 import { Ref, RefA, RefFormater } from "../reactive/ref";
-import { pairwise, startWith } from "rxjs";
+import { pairwise } from "rxjs";
 import { InsertType, singelMounterChildren } from "./children";
 import { Dir, EtypeRefRequest } from "../reactive/refHelper";
 import {
@@ -70,7 +70,7 @@ function RefChildCreator(root: Element | null, item: Ref) {
   const textNode = document.createTextNode(String(item.value));
 
   const sub = item.$sub;
-  sub.pipe(startWith(item.value), pairwise()).subscribe({
+  sub.pipe(pairwise()).subscribe({
     next([before, after]: [string | number, string | number]) {
       if (after !== undefined && before !== after) {
         textNode.textContent = String(after);
@@ -138,6 +138,9 @@ function createCommentAndInsert(
 /* TODO 
 [] - fragment - там больно, надо доработать
 [ ] - По условию может приходить null и надо не отрисовывать ничего - [ ]
+[ ] - При огромном количестве перерисовок ( использовал 1000000 ) - начинает жестко тротлить
+      Надо подумать, может получиться сделать так, чтоб алгос понимал что его дрочат и не проверял пока его дрочат 
+      наверно поможет debounce ток хз как его сюда пока вставить
 */
 function RefArray(
   root: Element | null,
@@ -570,7 +573,7 @@ function OifWorker(
 
   if (item.dep !== undefined) {
     item.dep.forEach((e: any) => {
-      e.$sub.pipe(startWith(undefined)).subscribe(() => {
+      e.$sub.subscribe(() => {
         const currentRules = item.rules();
         if (lastAnswer !== currentRules) {
           if (item.answer[currentRules] !== undefined) {

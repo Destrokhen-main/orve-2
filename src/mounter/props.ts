@@ -1,4 +1,4 @@
-import { fromEvent, startWith, pairwise } from "rxjs";
+import { fromEvent, pairwise } from "rxjs";
 import { Props } from "../jsx";
 import { PropsItem, SPECIFIC_KEYS, objectToCss } from "../parser/props";
 import { TypeProps } from "../parser/type";
@@ -58,7 +58,7 @@ function propsWorker(root: HTMLElement, item: Props) {
       let event = fromEvent(root, key).subscribe(obj.value.value);
 
       obj.value.$sub
-        .pipe(startWith(obj.value.value), pairwise())
+        .pipe(pairwise())
         .subscribe(([before, after]: [() => any, () => any]) => {
           if (String(before || "") !== String(after || "")) {
             event.unsubscribe();
@@ -74,7 +74,7 @@ function propsWorker(root: HTMLElement, item: Props) {
         let event = fromEvent(root, key).subscribe(value);
 
         item.parent.$sub
-          .pipe(startWith(value), pairwise())
+          .pipe(pairwise())
           .subscribe(([before, after]: [any, any]) => {
             const newKey = prepaireStaticRectF(item, key, after);
 
@@ -94,7 +94,7 @@ function propsWorker(root: HTMLElement, item: Props) {
       changerAttributes(root, key, obj.value.value);
 
       obj.value.$sub
-        .pipe(startWith(obj.value.value), pairwise())
+        .pipe(pairwise())
         .subscribe(([before, after]: [string | number, string | number]) => {
           if (before !== after) {
             changerAttributes(root, key, after);
@@ -119,7 +119,7 @@ function propsWorker(root: HTMLElement, item: Props) {
             root.setAttribute(key, insertV);
 
             item.parent.$sub
-              .pipe(startWith(insertV), pairwise())
+              .pipe(pairwise())
               .subscribe(([before, after]: [any, any]) => {
                 const newKey = prepaireStaticRectF(item, key, after);
                 const st = prepaireClass(newKey);
@@ -133,7 +133,7 @@ function propsWorker(root: HTMLElement, item: Props) {
           root.setAttribute(key, insertValue);
 
           item.parent.$sub
-            .pipe(startWith(insertValue), pairwise())
+            .pipe(pairwise())
             .subscribe(([before, after]: [any, any]) => {
               const newKey = prepaireStaticRectF(item, key, after);
 

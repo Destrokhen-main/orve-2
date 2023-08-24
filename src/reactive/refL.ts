@@ -1,4 +1,4 @@
-import { Subject, share, startWith } from "rxjs";
+import { BehaviorSubject, share } from "rxjs";
 
 interface refL {
   value: any;
@@ -10,11 +10,11 @@ interface refL {
  * @returns реактивную переменную
  */
 function refL() {
-  const subject: Subject<Element> = new Subject();
+  const subject: BehaviorSubject<any> = new BehaviorSubject(undefined);
 
   const obj = {
     value: undefined,
-    $sub: subject.pipe(startWith(undefined), share()),
+    $sub: subject.pipe(share()),
   };
 
   const proxy = new Proxy(obj, {
