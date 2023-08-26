@@ -276,7 +276,7 @@ function parserNodeO(node: NodeO, parent: NodeOP | null = null): NodeOP | null {
   }
 
   if (componentO.hooks && !InvokeHook(componentO, "created")) {
-    console.error(
+    console.warn(
       `[${componentO.nameC ?? "-"}()] hooks: "created" - Error in hook`,
     );
   }
