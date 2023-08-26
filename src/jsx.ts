@@ -35,6 +35,7 @@ export const ACCESS_KEY = [
   "hooks",
   "ref",
   "keyNode",
+  "nameC",
 ];
 
 export interface NodeB {
@@ -43,6 +44,7 @@ export interface NodeB {
   props?: Props;
   children?: Children[];
   hooks?: NodeHooks;
+  nameC?: string;
   ref?: any; // TODO fix this
 }
 

@@ -25,7 +25,7 @@ export function InvokeHook(
       h[nameHook as keyof NodeHooks]({});
       return true;
     } catch (er) {
-      console.error(er);
+      console.error("[hooks] - catch error:", er);
       return false;
     }
   } else {

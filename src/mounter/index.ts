@@ -16,12 +16,16 @@ function mounterNode(root: Element | null, tree: NodeOP) {
   }
 
   if (tree.tag === FRAGMENT) {
-    return mounterChildren(root, tree.children);
+    return mounterChildren(root, tree.children!);
   }
 
   // before mount
   if (tree.hooks && !InvokeHook(tree, "beforeMount")) {
-    console.warn("Before mount hook error");
+    console.warn(
+      `[${
+        tree.nameC ?? "-"
+      }()] - hooks: "beforeMount" - Before mount hook error`,
+    );
   }
 
   const elem = document.createElement(tree.tag);
@@ -45,7 +49,9 @@ function mounterNode(root: Element | null, tree: NodeOP) {
   }
 
   if (tree.hooks && !InvokeHook(tree, "mounted")) {
-    console.warn("Before mount hook error");
+    console.warn(
+      `[${tree.nameC ?? "-"}()] hooks: "mounted" - Before mount hook error`,
+    );
   }
 
   return tree;

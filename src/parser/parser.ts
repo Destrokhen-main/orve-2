@@ -48,12 +48,12 @@ function prepareComponent(
       component = func.call(this, props !== null ? props : {});
     }
   } catch (error) {
-    console.error(`[Parser error]: ${error}`);
+    console.error(`[${func.name ?? "-"}()] - [Parser error]: ${error}`);
   }
 
   if (
     component !== null &&
-    validationNode(component) === true &&
+    validationNode(component, func.name) === true &&
     component !== undefined
   ) {
     return component as NodeO;
@@ -97,12 +97,12 @@ function recursiveNode(node: NodeO): NodeO | null {
           component = node.tag.call(this, object);
         }
       } catch (error) {
-        console.warn(`Recursive ${error}`);
+        console.warn(`[${node.tag.name ?? "-"}()] Recursive ${error}`);
       }
 
       if (
         component !== null &&
-        validationNode(component) === true &&
+        validationNode(component, node.tag.name) === true &&
         component !== undefined
       ) {
         returnedNode = component as NodeO;
@@ -137,6 +137,9 @@ function parserNodeF(
     console.warn("Component don't be build");
     return null;
   }
+
+  component.nameC = app.name;
+
   if (typeof component.tag === "function") {
     component = recursiveNode.call(this, component);
   }
@@ -182,7 +185,9 @@ function parserNodeF(
 
   //NOTE beforeCreate
   if (componentO.hooks && !InvokeHook(componentO, "beforeCreate")) {
-    console.error('Error in hook "beforeCreate"');
+    console.error(
+      `[${componentO.nameC ?? "-"}()] hooks: "beforeCreate" - Error in hook`,
+    );
   }
 
   if (componentO.props !== undefined) {
@@ -198,7 +203,9 @@ function parserNodeF(
   }
 
   if (componentO.hooks && !InvokeHook(componentO, "created")) {
-    console.error('Error in hook "created"');
+    console.error(
+      `[${componentO.nameC ?? "-"}()] hooks: "created" - Error in hook`,
+    );
   }
   return componentO;
 }
@@ -224,8 +231,9 @@ function parserNodeO(node: NodeO, parent: NodeOP | null = null): NodeOP | null {
   if (workNode === null) {
     return null;
   }
-
+  let nameC = undefined;
   if (typeof workNode.tag === "function") {
+    nameC = workNode.tag.name;
     workNode = recursiveNode.call(this, workNode);
   }
 
@@ -239,6 +247,7 @@ function parserNodeO(node: NodeO, parent: NodeOP | null = null): NodeOP | null {
     parent,
     type: TypeNode.Component,
   };
+  componentO.nameC = nameC ?? parent?.nameC;
 
   if (workNode.keyNode === undefined) {
     componentO.keyNode = genUID(8);
@@ -249,7 +258,9 @@ function parserNodeO(node: NodeO, parent: NodeOP | null = null): NodeOP | null {
   }
 
   if (componentO.hooks && !InvokeHook(componentO, "beforeCreate")) {
-    console.warn('Error in hook "beforeCreate"');
+    console.warn(
+      `[${componentO.nameC ?? "-"}()] hooks: "beforeCreate" - Error in hook`,
+    );
   }
 
   if (componentO.props !== undefined) {
@@ -265,7 +276,9 @@ function parserNodeO(node: NodeO, parent: NodeOP | null = null): NodeOP | null {
   }
 
   if (componentO.hooks && !InvokeHook(componentO, "created")) {
-    console.error('Error in hook "beforeCreate"');
+    console.error(
+      `[${componentO.nameC ?? "-"}()] hooks: "created" - Error in hook`,
+    );
   }
   return componentO;
 }

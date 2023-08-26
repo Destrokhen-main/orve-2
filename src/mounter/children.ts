@@ -38,7 +38,7 @@ function singelMounterChildren(root: Element | null) {
         return mounterNode(root, knowItem);
       }
 
-      if (knowItem.tag === FRAGMENT && knowItem.children?.length > 0) {
+      if (knowItem.tag === FRAGMENT && knowItem.children.length > 0) {
         return mounterChildren(root, knowItem.children);
       }
     }

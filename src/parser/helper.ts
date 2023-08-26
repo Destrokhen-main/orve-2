@@ -6,7 +6,7 @@ import { HOOKS_STRING_NAME, ACCESS_KEY } from "../jsx";
  * @param node - Компонент
  * @returns true если всё хорошо
  */
-function validationNode(node: unknown): boolean {
+function validationNode(node: unknown, nameComponent = "-"): boolean {
   if (typeof node !== "object") {
     return false;
   }
@@ -18,6 +18,9 @@ function validationNode(node: unknown): boolean {
 
   for (let i = 0; i !== keys.length; i++) {
     if (!ACCESS_KEY.includes(keys[i])) {
+      console.warn(
+        `[${nameComponent}()] "${keys[i]}" - Этот ключ не является частью nodeObject`,
+      );
       return false;
     }
   }
@@ -26,7 +29,7 @@ function validationNode(node: unknown): boolean {
 
   if (knowNode.hooks !== undefined) {
     if (typeof knowNode.hooks !== "object") {
-      console.error("o-hook not a object");
+      console.error(`[${nameComponent}()] o-hook not a object`);
       return false;
     }
 
@@ -35,7 +38,9 @@ function validationNode(node: unknown): boolean {
 
     for (let i = 0; i !== keys.length; i++) {
       if (!HOOKS_STRING_NAME.includes(keys[i])) {
-        console.error(`o-hook - "${keys[i]}" - not supported`);
+        console.error(
+          `[${nameComponent}()] o-hook - "${keys[i]}" - not supported`,
+        );
         return false;
       }
     }

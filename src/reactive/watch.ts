@@ -13,7 +13,7 @@ interface Dep {
  */
 function watch(func: (n: any, o: any) => void, dep: Dep | Dep[]) {
   if (typeof dep !== "object" || dep === null) {
-    console.warn("Dep is bad");
+    console.warn("[watch] - Dep is bad");
     return false;
   }
 
@@ -34,7 +34,7 @@ function watch(func: (n: any, o: any) => void, dep: Dep | Dep[]) {
     }
 
     if (showD) {
-      console.warn("One or any dep is not subscribe");
+      console.warn("[watch] - One or any dep is not subscribe");
     }
 
     return depArrayDisconnect;
