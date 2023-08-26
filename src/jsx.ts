@@ -1,3 +1,4 @@
+import { KEY_NEED_REWRITE } from "./globalUtils";
 import { FRAGMENT, TEMPLATE } from "./keys";
 
 type Tag = string | (() => any); // TODO изменить типы
@@ -78,7 +79,9 @@ function Node(
     const SetProps: Record<string, any> = {};
 
     Object.keys(props).forEach((key) => {
-      if (DIRECTIVES_ORVE.includes(key)) {
+      if (KEY_NEED_REWRITE.includes(key)) {
+        SetProps[`o${key}`] = props[key];
+      } else if (DIRECTIVES_ORVE.includes(key)) {
         const inseredKey = key
           .replace("o-", "")
           .toLocaleLowerCase()

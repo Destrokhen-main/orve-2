@@ -1,3 +1,4 @@
+import { KEY_NEED_REWRITE_WITH_O } from "../globalUtils";
 import { Props } from "../jsx";
 import { TEMPLATE } from "../keys";
 import { ReactiveType } from "../reactive/type";
@@ -123,6 +124,15 @@ export const SPECIFIC_KEYS = ["style"];
  */
 function workWithStaticProps(obj: any, key: string) {
   const value = obj[key];
+
+  if (KEY_NEED_REWRITE_WITH_O.includes(key)) {
+    const fKey = key.slice(1, key.length);
+    obj[fKey] = {
+      type: TypeProps.Static,
+      value: value,
+    };
+    return [obj, true];
+  }
 
   if (SPECIFIC_KEYS.includes(key)) {
     return specificProps(obj, key);
