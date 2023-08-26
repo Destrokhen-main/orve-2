@@ -1,4 +1,4 @@
-import { KEY_NEED_REWRITE_WITH_O } from "../globalUtils";
+import { KEY_NEED_REWRITE_WITH_O } from "../keys";
 import { Props } from "../jsx";
 import { TEMPLATE } from "../keys";
 import { ReactiveType } from "../reactive/type";

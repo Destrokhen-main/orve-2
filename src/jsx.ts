@@ -1,4 +1,4 @@
-import { KEY_NEED_REWRITE } from "./globalUtils";
+import { KEY_NEED_REWRITE } from "./keys";
 import { FRAGMENT, TEMPLATE } from "./keys";
 
 type Tag = string | (() => any); // TODO изменить типы
