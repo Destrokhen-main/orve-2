@@ -1,6 +1,6 @@
 import { BehaviorSubject, share } from "rxjs";
 import { Reactive, ReactiveType } from "./type";
-import { refArrayBuilder } from "./refHelper";
+import { EtypeRefRequest, refArrayBuilder } from "./refHelper";
 
 type refInput = string | number | (() => any);
 
@@ -103,19 +103,19 @@ function ref(value: unknown) {
       set(t: RefA, p: string, v: any) {
         if (p === "value") {
           const newAr = refArrayBuilder(v, obj);
+          t.value = newAr;
+
           obj.$sub.next({
-            type: "delete",
+            type: EtypeRefRequest.delete,
             start: 0,
             count: t.value.length,
           });
 
           obj.$sub.next({
-            type: "insert",
+            type: EtypeRefRequest.insert,
             dir: "right",
             value: v,
           });
-
-          t.value = newAr;
         }
         return true;
       },

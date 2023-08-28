@@ -1,4 +1,6 @@
 import { BehaviorSubject, pairwise } from "rxjs";
+import { ReactiveType } from "./type";
+import { EtypeRefRequest } from "./refHelper";
 
 interface Dep {
   [T: string]: any;
@@ -45,9 +47,19 @@ function watch(func: (n: any, o: any) => void, dep: Dep | Dep[]) {
       return false;
     }
 
-    const cur: any = d.$sub
-      .pipe(pairwise())
-      .subscribe(([b, c]: any) => func(c, b));
+    const cur: any = d.$sub.pipe(pairwise()).subscribe(([b, c]: any) => {
+      let prev = b;
+      const next = c;
+
+      if (d.type === ReactiveType.RefA) {
+        if (next.type === EtypeRefRequest.delete) return;
+        if (prev.type === EtypeRefRequest.delete) {
+          prev = null;
+        }
+      }
+
+      return func(next, prev);
+    });
     return () => cur.complete();
   }
 }
