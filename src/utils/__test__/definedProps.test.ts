@@ -39,7 +39,7 @@ describe("defined props", () => {
       },
     });
 
-    const component = parserNodeF(n as any, null);
+    const component = parserNodeF.call({}, n as any, null);
     expect(component?.props).toStrictEqual({
       number: { type: "Static", value: 1 },
       string: { type: "Static", value: "1" },
@@ -84,7 +84,7 @@ describe("defined props", () => {
       },
     };
 
-    const component = parserNodeF(Component as any, null);
+    const component = parserNodeF.call({}, Component as any, null);
     expect(component?.props).toStrictEqual({
       number: { type: "Static", value: 1 },
       string: { type: "Static", value: "1" },
@@ -110,7 +110,7 @@ describe("defined props", () => {
       },
     };
 
-    const component = parserNodeF(Comoponent as any, null);
+    const component = parserNodeF.call({}, Comoponent as any, null);
 
     expect(consoleSpy).toHaveBeenCalledWith('MISS "number" key in props');
     expect(component?.props).toStrictEqual({
@@ -136,7 +136,7 @@ describe("defined props", () => {
       },
     };
 
-    const component = parserNodeF(MainComponent as any, null);
+    const component = parserNodeF.call({}, MainComponent as any, null);
     expect(consoleSpy).toBeCalledWith(
       `Error type key "testProp" expected "string" but got "number"`,
     );
@@ -167,7 +167,7 @@ describe("defined props", () => {
       },
     };
 
-    const component = parserNodeF(MainComponent as any, null);
+    const component = parserNodeF.call({}, MainComponent as any, null);
     expect(consoleSpy).toBeCalledWith(
       `Error type key "testProp" expected "string" but got "number"`,
     );

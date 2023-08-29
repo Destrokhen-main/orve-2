@@ -1,5 +1,6 @@
 import { KEY_NEED_REWRITE } from "./keys";
 import { FRAGMENT, TEMPLATE } from "./keys";
+import { ReactiveType } from "./reactive/type";
 
 type Tag = string | (() => any); // TODO изменить типы
 export type Props = Record<string, any>;
@@ -101,7 +102,12 @@ function Node(
 
     Node.props = SetProps;
   }
-  if (children.length > 0 && typeof tag === "function") {
+  if (
+    children.length > 0 &&
+    (typeof tag === "function" ||
+      (typeof tag === "object" &&
+        (tag as Record<string, any>).type === ReactiveType.RefC))
+  ) {
     // Проведём работы, чтобы избавиться от всех template
     const newChild: any[] = [];
 

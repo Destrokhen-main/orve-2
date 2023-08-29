@@ -556,6 +556,9 @@ function OifWorker(
       if (node.value.type === ReactiveType.Oif) {
         const htmlNode: any = OifWorker(root, node.value, true);
         workedNode = htmlNode;
+      } else if (node.value.type === ReactiveType.RefCComponent) {
+        const htmlNode: any = RefCComponentWorker(root, node.value);
+        if (htmlNode !== null) workedNode = htmlNode;
       }
     } else if (node.node !== undefined) {
       workedNode = node.node;
@@ -584,6 +587,12 @@ function OifWorker(
                 const htmlNode: any = OifWorker(root, node.value, true);
                 workedNode?.replaceWith(htmlNode);
                 workedNode = htmlNode;
+              } else if (node.value.type === ReactiveType.RefCComponent) {
+                const htmlNode: any = RefCComponentWorker(root, node.value);
+                if (htmlNode !== null) {
+                  workedNode?.replaceWith(htmlNode);
+                  workedNode = htmlNode;
+                }
               }
             } else if (node.node !== undefined) {
               workedNode?.replaceWith(node.node);
@@ -619,7 +628,7 @@ function OifWorker(
 [ ] - Компоненты могут быть fragment
 */
 function RefCWorker(root: Element | null, item: Record<string, any>) {
-  const component = parserNodeF.call(null, item.value);
+  const component = parserNodeF.call({}, item.value);
   const mounterInsance = singelMounterChildren(null);
 
   let mountedNode: NodeOP | null = null;
@@ -648,10 +657,11 @@ function RefCWorker(root: Element | null, item: Record<string, any>) {
 
 [ ] - Дать возможность передавать () => import("...") и обычные компоненты <Component />
 [ ] - Комент если value undefined
-[ ] - Компоненты могут быть fragment
+[ ] - Компоненты могут быть с в родителе fragment
+[X] - <template></template>
 */
 function RefCComponentWorker(root: Element | null, item: Record<string, any>) {
-  const component = parserNodeF.call(null, item.proxy.value, item.props);
+  const component = parserNodeF.call({}, item.proxy.value, item.props);
   const mounterInsance = singelMounterChildren(null);
 
   let mountedNode: NodeOP | null = null;
@@ -659,7 +669,6 @@ function RefCComponentWorker(root: Element | null, item: Record<string, any>) {
   if (component === null) {
     return;
   }
-
   const mount = mounterInsance(component);
   if (mount.node !== undefined) {
     mountedNode = mount;
@@ -667,8 +676,20 @@ function RefCComponentWorker(root: Element | null, item: Record<string, any>) {
   }
 
   item.proxy.$sub.subscribe((next: any) => {
-    console.log(next);
+    // TODO поправить код, тут нет проверок, это плохо и надо проверять чтоб повторений не было
+    const component = parserNodeF.call({}, next, item.props);
+    if (component === null) {
+      return;
+    }
+
+    const mount = mounterInsance(component);
+    if (mount.node !== undefined) {
+      mountedNode?.node?.replaceWith(mount.node);
+      mountedNode = mount;
+    }
   });
+
+  return mountedNode !== null ? mountedNode.node : null;
 }
 
 export {

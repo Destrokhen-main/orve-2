@@ -105,9 +105,7 @@ function definedProps(
             }
           }
         }
-        if (blockPropsSettings.required === true) {
-          propsSettings[e] = blockPropsSettings;
-        }
+        propsSettings[e] = blockPropsSettings;
       } else {
         console.warn(`Key "${e}" - you must specify "type"`);
         return;
@@ -146,6 +144,8 @@ function definedProps(
             } else {
               obj[e] = prop["default"];
             }
+          } else {
+            obj[e] = prop;
           }
           return;
         }
