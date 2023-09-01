@@ -1,6 +1,6 @@
 import { parseSingleChildren } from "../parser/children";
 import { NodeChild, NodeHtml, TypeNode } from "../parser/type";
-import { Ref, RefA, RefFormater } from "../reactive/ref";
+import { Ref, RefA, RefFormater, RefO } from "../reactive/ref";
 import { pairwise } from "rxjs";
 import { InsertType, singelMounterChildren } from "./children";
 import { Dir, EtypeRefRequest } from "../reactive/refHelper";
@@ -530,8 +530,70 @@ function RefArray(
   });
 }
 
+type refOItem = {
+  isDefined: boolean;
+  key: string;
+  proxy: any;
+  type: ReactiveType.RefO;
+};
+
+/* TODO
+[ ] - В next может приходить другие реактивные переменные, надо их обрабатывать тоже.
+*/
 function RefOWorker(root: Element | null, item: Record<string, any>) {
-  console.log(root, item);
+  const obj: refOItem = item.value;
+  const currentKey = obj.key;
+  if (obj.isDefined) {
+    const printValue = obj.proxy.value[obj.key];
+
+    const node = document.createTextNode(
+      typeof printValue === "string" ? printValue : JSON.stringify(printValue),
+    );
+
+    root?.appendChild(node);
+
+    obj.proxy.$sub.subscribe((next: any) => {
+      if (
+        typeof next === "object" &&
+        next.type === ReactiveType.RefO &&
+        next.key === currentKey
+      ) {
+        node.textContent =
+          typeof next.value === "string"
+            ? next.value
+            : JSON.stringify(next.value);
+      }
+    });
+  } else if (!obj.isDefined) {
+    let isComment = true;
+    const node = document.createComment(` refO - ${currentKey}`);
+
+    root?.appendChild(node);
+
+    obj.proxy.$sub.subscribe((next: any) => {
+      if (
+        typeof next === "object" &&
+        next.type === ReactiveType.RefO &&
+        next.key === currentKey
+      ) {
+        if (isComment) {
+          const newNode = document.createTextNode(
+            typeof next.value === "string"
+              ? next.value
+              : JSON.stringify(next.value),
+          );
+
+          node.replaceWith(newNode);
+          isComment = false;
+        } else {
+          node.textContent =
+            typeof next.value === "string"
+              ? next.value
+              : JSON.stringify(next.value);
+        }
+      }
+    });
+  }
 }
 
 // TODO

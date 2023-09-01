@@ -19,6 +19,7 @@ export interface RefA extends Reactive {
 
 export interface RefO extends Reactive {
   $sub: BehaviorSubject<any>;
+  value: Record<string, any> | null;
 }
 
 export interface RefOF extends Reactive {
@@ -128,7 +129,56 @@ function ref(value: unknown) {
   }
 
   if (typeValue === "object") {
-    console.log("object");
+    const subject = new BehaviorSubject(value);
+
+    const reof: RefO = new Proxy(
+      {
+        type: ReactiveType.RefO,
+        $sub: subject.pipe(share()),
+        value: null,
+      },
+      {
+        get(t: any, p) {
+          if (p in t) {
+            return t[p];
+          }
+
+          if (t.value !== null && !(p in t)) {
+            if (p in t.value) {
+              return {
+                type: ReactiveType.RefO,
+                isDefined: true,
+                proxy: reof,
+                key: p,
+              };
+            } else {
+              return {
+                type: ReactiveType.RefO,
+                isDefined: false,
+                proxy: reof,
+                key: p,
+              };
+            }
+          }
+        },
+      },
+    );
+
+    const valueProxy = new Proxy(value as Record<string, any>, {
+      set(t, prop, value) {
+        const s = Reflect.set(t, prop, value);
+        reof.$sub.next({
+          type: ReactiveType.RefO,
+          key: prop,
+          value,
+        });
+        return s;
+      },
+    });
+
+    reof.value = valueProxy;
+
+    return reof;
   }
 }
 
