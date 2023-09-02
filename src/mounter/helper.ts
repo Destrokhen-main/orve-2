@@ -1,6 +1,6 @@
 import { parseSingleChildren } from "../parser/children";
 import { NodeChild, NodeHtml, TypeNode } from "../parser/type";
-import { Ref, RefA, RefFormater, RefO } from "../reactive/ref";
+import { Ref, RefA, RefFormater } from "../reactive/ref";
 import { pairwise } from "rxjs";
 import { InsertType, singelMounterChildren } from "./children";
 import { Dir, EtypeRefRequest } from "../reactive/refHelper";
@@ -66,7 +66,11 @@ function htmlNodeCreate(item: NodeHtml) {
   return item;
 }
 
-function RefChildCreator(root: Element | null, item: Ref) {
+function RefChildCreator(
+  root: Element | null,
+  item: Ref,
+  replaceItem?: Element | Comment,
+) {
   const textNode = document.createTextNode(String(item.value));
 
   const sub = item.$sub;
@@ -78,7 +82,10 @@ function RefChildCreator(root: Element | null, item: Ref) {
     },
   } as any);
 
-  if (root !== null) {
+  if (replaceItem !== undefined) {
+    replaceItem.replaceWith(textNode);
+    return textNode;
+  } else if (root !== null) {
     root.appendChild(textNode);
   }
 }
@@ -566,7 +573,7 @@ function RefOWorker(root: Element | null, item: Record<string, any>) {
     });
   } else if (!obj.isDefined) {
     let isComment = true;
-    const node = document.createComment(` refO - ${currentKey}`);
+    let node: any = document.createComment(` refO - ${currentKey}`);
 
     root?.appendChild(node);
 
@@ -577,6 +584,19 @@ function RefOWorker(root: Element | null, item: Record<string, any>) {
         next.key === currentKey
       ) {
         if (isComment) {
+          isComment = false;
+          if (
+            typeof next.value === "object" &&
+            Object.values(ReactiveType).includes(next.value.type)
+          ) {
+            switch (next.value.type) {
+              case ReactiveType.Ref:
+                node = RefChildCreator(root, next.value, node);
+                break;
+            }
+            return;
+          }
+
           const newNode = document.createTextNode(
             typeof next.value === "string"
               ? next.value
@@ -584,8 +604,19 @@ function RefOWorker(root: Element | null, item: Record<string, any>) {
           );
 
           node.replaceWith(newNode);
-          isComment = false;
         } else {
+          if (
+            typeof next.value === "object" &&
+            Object.values(ReactiveType).includes(next.value.type)
+          ) {
+            switch (next.value.type) {
+              case ReactiveType.Ref:
+                node = RefChildCreator(root, next.value, node);
+                break;
+            }
+            return;
+          }
+
           node.textContent =
             typeof next.value === "string"
               ? next.value

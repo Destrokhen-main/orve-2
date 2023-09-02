@@ -144,6 +144,10 @@ function ref(value: unknown) {
           }
 
           if (t.value !== null && !(p in t)) {
+            if (typeof t.value[p] === "object" && !Array.isArray(t.value[p])) {
+              return t.value[p];
+            }
+
             if (p in t.value) {
               return {
                 type: ReactiveType.RefO,
@@ -167,6 +171,7 @@ function ref(value: unknown) {
     const valueProxy = new Proxy(value as Record<string, any>, {
       set(t, prop, value) {
         const s = Reflect.set(t, prop, value);
+
         reof.$sub.next({
           type: ReactiveType.RefO,
           key: prop,
