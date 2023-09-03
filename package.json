@@ -2,16 +2,26 @@
   "name": "orve-rxjs",
   "version": "0.0.0",
   "description": "orve with rxjs",
-  "main": "built/index.js",
+  "main": "./built/cjs/index.js",
+  "module": "./built/esm/index.js",
   "scripts": {
-    "watch": "tsc --watch",
+    "watch": "tsc -b ./tsconfig.cjs.json ./tsconfig.esm.json --watch",
     "build": "tsc --build tsconfig.prod.json",
     "lint": "eslint ./src",
     "prettier": "prettier --config .prettierrc 'src/**/*.ts' --write",
     "prettier-watch": "onchange 'src/**/*.ts' -- prettier --write {{changed}}",
     "prepare": "husky install",
     "test:unit": "jest ./src",
-    "test:watch": "jest --watch"
+    "test:watch": "jest --watch",
+
+    "compile": "tsc -b ./tsconfig.cjs.json ./tsconfig.esm.json"
+  },
+  "exports": {
+    ".": {
+      "require": "./built/cjs/index.js",
+      "import": "./built/esm/index.js",
+      "default": "./built/esm/index.js"
+    }
   },
   "author": "Destrokhen <armagiddon19@gmail.com>",
   "license": "MIT",
