@@ -5,16 +5,17 @@
   "main": "./built/cjs/index.js",
   "module": "./built/esm/index.js",
   "scripts": {
-    "watch": "tsc -b ./tsconfig.cjs.json ./tsconfig.esm.json --watch",
-    "build": "tsc --build tsconfig.prod.json",
+    "watch": "tsc -b ./tsconfig.esm.json --watch",
+    "watch:all": "tsc -b ./tsconfig.cjs.json ./tsconfig.esm.json --watch",
+    "build:all": "tsc -b ./tsconfig.cjs.json ./tsconfig.esm.json",
+    "build:esm": "tsc -b ./tsconfig.esm.json",
+    "build:cjs": "tsc -b ./tsconfig.cjs.json",
     "lint": "eslint ./src",
     "prettier": "prettier --config .prettierrc 'src/**/*.ts' --write",
     "prettier-watch": "onchange 'src/**/*.ts' -- prettier --write {{changed}}",
     "prepare": "husky install",
     "test:unit": "jest ./src",
-    "test:watch": "jest --watch",
-
-    "compile": "tsc -b ./tsconfig.cjs.json ./tsconfig.esm.json"
+    "test:watch": "jest --watch"
   },
   "exports": {
     ".": {
