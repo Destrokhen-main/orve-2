@@ -77,11 +77,11 @@ function createApp(
       }
     };
 
-    window.addEventListener("beforeunload", beforeUnmounter);
+    window?.addEventListener("beforeunload", beforeUnmounter);
 
     //window.onbeforeunload = beforeUnmounter;
 
-    window.addEventListener("unload", unmounter);
+    window?.addEventListener("unload", unmounter);
 
     //window.onunload = unmounter;
   }

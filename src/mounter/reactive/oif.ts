@@ -6,6 +6,7 @@ import { RefCComponentWorker } from "./refC";
 // TODO
 // [ ] - o-fragment attribute
 // [x] - o-if in o-if
+// [ ] - Написать тесты для refO и o-if.
 function OifWorker(
   root: Element | null,
   item: Record<string, any>,
@@ -46,7 +47,19 @@ function OifWorker(
 
   if (item.dep !== undefined) {
     item.dep.forEach((e: any) => {
-      e.$sub.subscribe(() => {
+      e.$sub.subscribe((next: unknown) => {
+        // не хочу дублировать функционал, поэтому всё проверку поставлю тут.
+        // эти условия работают только для refO
+        if (
+          (e.type === ReactiveType.RefO && typeof next !== "object") ||
+          (next !== undefined &&
+            next !== null &&
+            (next as Record<string, any>).key !== undefined &&
+            (next as Record<string, any>).key !== e.key)
+        ) {
+          return;
+        }
+
         const currentRules = item.rules();
         if (lastAnswer !== currentRules) {
           if (item.answer[currentRules] !== undefined) {

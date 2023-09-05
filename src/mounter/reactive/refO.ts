@@ -8,6 +8,17 @@ type refOItem = {
   type: ReactiveType.RefO;
 };
 
+function reactiveHelper(
+  root: Element | null,
+  next: Record<string, any>,
+  node: HTMLElement,
+): Text | undefined {
+  switch (next.value.type) {
+    case ReactiveType.Ref:
+      return RefChildCreator(root, next.value, node);
+  }
+}
+
 /* TODO
 [ ] - В next может приходить другие реактивные переменные, надо их обрабатывать тоже.
 */
@@ -53,11 +64,7 @@ function RefOWorker(root: Element | null, item: Record<string, any>) {
             typeof next.value === "object" &&
             Object.values(ReactiveType).includes(next.value.type)
           ) {
-            switch (next.value.type) {
-              case ReactiveType.Ref:
-                node = RefChildCreator(root, next.value, node);
-                break;
-            }
+            node = reactiveHelper(root, next.value, node);
             return;
           }
 
@@ -73,11 +80,7 @@ function RefOWorker(root: Element | null, item: Record<string, any>) {
             typeof next.value === "object" &&
             Object.values(ReactiveType).includes(next.value.type)
           ) {
-            switch (next.value.type) {
-              case ReactiveType.Ref:
-                node = RefChildCreator(root, next.value, node);
-                break;
-            }
+            node = reactiveHelper(root, next.value, node);
             return;
           }
 

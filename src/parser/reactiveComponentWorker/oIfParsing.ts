@@ -54,7 +54,18 @@ function validationPropsParent(
         }
       });
     } else {
-      if (check(props["dep"])) {
+      const prop = props["dep"];
+      if (
+        typeof prop === "object" &&
+        prop.type !== undefined &&
+        prop.type === ReactiveType.RefO
+      ) {
+        workerDep.push({
+          type: ReactiveType.RefO,
+          $sub: props["dep"].proxy.$sub,
+          key: props["dep"].key,
+        });
+      } else if (check(props["dep"])) {
         workerDep.push(props["dep"]);
       } else {
         console.warn(
