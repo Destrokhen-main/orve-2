@@ -92,12 +92,6 @@ function orveCreate() {
     window.Orve = {};
   }
 
-  let keyInstance = genUID(8);
-
-  if (window.Orve[keyInstance] !== undefined) {
-    keyInstance = genUID(9);
-  }
-
   const instance: OrveInstance = {
     tree: null,
     context: {},
@@ -105,8 +99,6 @@ function orveCreate() {
     use: use,
     createApp: createApp,
   };
-
-  window.Orve[keyInstance] = instance;
 
   return instance;
 }
