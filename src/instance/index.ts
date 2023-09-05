@@ -1,4 +1,3 @@
-import { genUID } from "../helper/";
 import { JSX } from "../jsx";
 import { CreateApp, OptionsInstance, createApp } from "../parser";
 import { NodeOP } from "../parser/parser";
