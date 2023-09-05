@@ -84,6 +84,10 @@ function component(name: string, component: () => unknown): void {
  * @returns Orve instance
  */
 function orveCreate() {
+  if (typeof window === "undefined" && typeof global !== "undefined") {
+    global.window = global as any;
+  }
+
   if (window.Orve === undefined) {
     window.Orve = {};
   }

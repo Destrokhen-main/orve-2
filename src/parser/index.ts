@@ -77,13 +77,18 @@ function createApp(
       }
     };
 
-    window?.addEventListener("beforeunload", beforeUnmounter);
+    if (
+      typeof window !== "undefined" &&
+      window.addEventListener !== undefined
+    ) {
+      window?.addEventListener("beforeunload", beforeUnmounter);
 
-    //window.onbeforeunload = beforeUnmounter;
+      //window.onbeforeunload = beforeUnmounter;
 
-    window?.addEventListener("unload", unmounter);
+      window?.addEventListener("unload", unmounter);
 
-    //window.onunload = unmounter;
+      //window.onunload = unmounter;
+    }
   }
 
   return {

@@ -6,6 +6,7 @@
   "module": "./built/esm/index.js",
   "scripts": {
     "watch": "tsc -b ./tsconfig.esm.json --watch",
+    "watch:cjs": "tsc -b ./tsconfig.cjs.json --watch",
     "watch:all": "tsc -b ./tsconfig.cjs.json ./tsconfig.esm.json --watch",
     "build:all": "tsc -b ./tsconfig.cjs.json ./tsconfig.esm.json",
     "build:esm": "tsc -b ./tsconfig.esm.json",
