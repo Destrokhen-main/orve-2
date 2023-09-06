@@ -1,6 +1,6 @@
 import { OrveInstance } from "../instance";
 import { Node, Fragment } from "../jsx";
-import { parserNodeF } from "./parser";
+import { NodeOP, parserNodeF } from "./parser";
 import { mounterNode } from "../mounter";
 import { InvokeAllNodeHook } from "../helper/hookHelper";
 
@@ -9,7 +9,10 @@ export interface OptionsInstance {
 }
 
 export interface CreateApp {
-  mount: (root: string | HTMLElement) => OrveInstance | false;
+  mount: (
+    root: string | HTMLElement,
+    render?: (el: Element, tree: NodeOP) => unknown,
+  ) => OrveInstance | false;
 }
 
 function isValidEntry(entry: unknown): boolean {
@@ -92,7 +95,10 @@ function createApp(
   }
 
   return {
-    mount: (root: string | Element) => {
+    mount: (
+      root: string | Element,
+      render?: (el: Element, tree: NodeOP) => unknown,
+    ) => {
       let rootElement: Element | null = null;
       if (typeof root === "string") {
         const item = document.querySelector(root);
@@ -109,7 +115,10 @@ function createApp(
         return false;
       }
       if (allContext.tree !== null) {
-        allContext.tree = mounterNode(rootElement, allContext.tree);
+        allContext.tree =
+          render !== undefined
+            ? render(rootElement, allContext.tree)
+            : mounterNode(rootElement, allContext.tree);
       }
 
       return allContext;
