@@ -1,4 +1,4 @@
-import { Props, Children, NodeB } from "../jsx";
+import { NodeB, Props } from "../jsx-type";
 import { validationNode } from "./helper";
 import { genUID } from "../helper/generation";
 import { parseChildren } from "./children";
@@ -11,19 +11,8 @@ import {
 } from "./reactiveComponentWorker";
 import { definedProps } from "../utils";
 import { snakeToCamel } from "../utils/transformFunctions";
-
-export interface NodeO extends NodeB {
-  tag: string | ((props?: Record<string, any>) => unknown);
-  props?: Props;
-  children?: Children;
-}
-
-export interface NodeOP extends NodeO {
-  keyNode?: string | number;
-  node: Element | null;
-  parent: NodeOP | null;
-  type: TypeNode;
-}
+import { NodeO, NodeOP } from "./parser-type";
+import { Subject } from "rxjs";
 
 /**
  * Так как мы не знаем, что мы получим после вызова функции,
@@ -38,24 +27,20 @@ function prepareComponent(
 ): NodeO | null {
   let component: unknown | null = null;
   try {
+    let f = func as ((insertProps: Props) => NodeB | null) | (() => unknown);
     if ((func as Record<string, any>).props !== undefined) {
-      // TODO +1 непроверенный код
-      const propFunction = (func as Record<string, any>).props;
-      delete (func as Record<string, any>).props;
-      const prepFunc = definedProps(func, propFunction);
-      component = prepFunc.call(this, props !== null ? props : {});
-    } else {
-      component = func.call(this, props !== null ? props : {});
+      const funcRecord = func as Record<string, any>;
+      const propFunction = funcRecord.props;
+      delete funcRecord.props;
+      f = definedProps(func, propFunction);
     }
+
+    component = f.call(this, props !== null ? props : {});
   } catch (error) {
     console.error(`[${func.name ?? "-"}()] - [Parser error]: ${error}`);
   }
 
-  if (
-    component !== null &&
-    validationNode(component, func.name) === true &&
-    component !== undefined
-  ) {
+  if (component && validationNode(component, func.name) === true) {
     return component as NodeO;
   }
 
@@ -75,38 +60,39 @@ function recursiveNode(node: NodeO): NodeO | null {
     const node = quee.shift();
 
     if (node && typeof node.tag === "function") {
-      let object: Record<string, any> = {};
+      let object: Record<string, unknown> = {};
 
-      if (node.props !== undefined) {
+      if (node.props) {
         object = { ...node.props };
       }
-      if (node.children !== undefined) {
-        const ch = (node.children as any).flat(1);
+      if (node.children) {
+        const ch = node.children.flat(1);
         object["children"] = ch;
       }
 
       let component: unknown | null = null;
       try {
+        let f = node.tag as
+          | ((insertProps: Props) => NodeB | null)
+          | (() => unknown);
         if ((node.tag as Record<string, any>).props !== undefined) {
-          // TODO Не тестированный код!!
           const prop = (node.tag as Record<string, any>).props;
           delete (node.tag as Record<string, any>).props;
-          const prepComp = definedProps(node.tag, prop);
-          component = prepComp.call(this, object);
-        } else {
-          component = node.tag.call(this, object);
+          f = definedProps(node.tag, prop);
         }
+
+        component = f.call(this, object);
       } catch (error) {
         console.warn(`[${node.tag.name ?? "-"}()] Recursive ${error}`);
       }
 
-      if (
-        component !== null &&
-        validationNode(component, node.tag.name) === true &&
-        component !== undefined
-      ) {
+      if (component && validationNode(component, node.tag.name) === true) {
         returnedNode = component as NodeO;
-        quee.push(returnedNode);
+        if (Array.isArray(returnedNode)) {
+          quee.push(...returnedNode);
+        } else {
+          quee.push(returnedNode);
+        }
       } else if (component === null) {
         return null;
       }
@@ -134,24 +120,13 @@ function parserNodeF(
   let component = prepareComponent.call(this, app, props);
 
   if (component === null) {
-    console.warn("Component don't be build");
+    console.warn(`[${app.name ?? "-"}()] Component don't be build`);
     return null;
   }
 
   component.nameC = app.name;
 
-  if (typeof component.tag === "function") {
-    component = recursiveNode.call(this, component);
-  }
-
-  if (component === null) {
-    return null;
-  }
-
-  if (
-    this.globalComponents !== undefined &&
-    typeof component.tag === "string"
-  ) {
+  if (this.globalComponents && typeof component.tag === "string") {
     const nameTag = /([-_][a-z])/g.test(component.tag)
       ? snakeToCamel(component.tag)
       : component.tag;
@@ -163,9 +138,12 @@ function parserNodeF(
         props,
       );
     }
+  } else if (typeof component.tag === "function") {
+    component = recursiveNode.call(this, component);
   }
 
   if (component === null) {
+    console.warn(`[${app.name ?? "-"}()] Component don't be build`);
     return null;
   }
 
@@ -174,12 +152,17 @@ function parserNodeF(
     node: null,
     parent,
     type: TypeNode.Component,
+    $component: new Subject(),
   };
+
   if (component.keyNode === undefined) {
     componentO.keyNode = genUID(8);
   }
 
-  if (REACTIVE_COMPONENT.includes(String(componentO.tag))) {
+  if (
+    typeof componentO.tag === "string" &&
+    REACTIVE_COMPONENT.includes(componentO.tag)
+  ) {
     return reactiveWorkComponent(componentO) as any;
   }
 
@@ -207,6 +190,12 @@ function parserNodeF(
       `[${componentO.nameC ?? "-"}()] hooks: "created" - Error in hook`,
     );
   }
+
+  if (componentO.hooks) {
+    // Тут сразу запуститься проверка на update и beforeUpdate
+    InvokeHook(componentO, "updated");
+  }
+
   return componentO;
 }
 
@@ -246,7 +235,9 @@ function parserNodeO(node: NodeO, parent: NodeOP | null = null): NodeOP | null {
     node: null,
     parent,
     type: TypeNode.Component,
+    $component: new Subject(),
   };
+
   componentO.nameC = nameC ?? parent?.nameC;
 
   if (workNode.keyNode === undefined) {
@@ -279,6 +270,11 @@ function parserNodeO(node: NodeO, parent: NodeOP | null = null): NodeOP | null {
     console.warn(
       `[${componentO.nameC ?? "-"}()] hooks: "created" - Error in hook`,
     );
+  }
+
+  if (componentO.hooks) {
+    // Тут сразу запуститься проверка на update и beforeUpdate
+    InvokeHook(componentO, "updated");
   }
   return componentO;
 }

@@ -1,4 +1,4 @@
-import { NodeB } from "../jsx";
+import { NodeB } from "../jsx-type";
 import { HOOKS_STRING_NAME, ACCESS_KEY } from "../jsx";
 
 /**

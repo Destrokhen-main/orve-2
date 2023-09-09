@@ -2,6 +2,7 @@ import { NodeChild, NodeHtml } from "../parser/type";
 import { Ref, RefFormater } from "../reactive/ref";
 import { pairwise } from "rxjs";
 import { EtypeComment } from "./helperType";
+import { NodeOP } from "../parser/parser-type";
 
 function textNodeCreator(item: NodeChild) {
   const textNode = document.createTextNode(String(item.value));
@@ -22,19 +23,21 @@ function RefChildCreator(
   root: Element | null,
   item: Ref,
   replaceItem?: Element | Comment,
+  parent: NodeOP | null = null,
 ) {
   const textNode = document.createTextNode(String(item.value));
-
   const sub = item.$sub;
   sub.pipe(pairwise()).subscribe({
     next([before, after]: [string | number, string | number]) {
       if (after !== undefined && before !== after) {
+        parent?.$component.next("beforeUpdate");
         textNode.textContent = String(after);
+        parent?.$component.next("updated");
       }
     },
   } as any);
 
-  if (replaceItem !== undefined) {
+  if (replaceItem) {
     replaceItem.replaceWith(textNode);
     return textNode;
   } else if (root !== null) {

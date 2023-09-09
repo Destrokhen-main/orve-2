@@ -1,5 +1,5 @@
 import { fromEvent, pairwise } from "rxjs";
-import { Props } from "../jsx";
+import { Props } from "../jsx-type";
 import { PropsItem, SPECIFIC_KEYS, objectToCss } from "../parser/props";
 import { TypeProps } from "../parser/type";
 import { changerAttributes } from "./propHelper";
@@ -44,7 +44,7 @@ function prepaireClass(insertValue: any) {
  */
 function propsWorker(root: HTMLElement, item: Props) {
   Object.keys(item).forEach((key: string) => {
-    const obj: PropsItem = item[key];
+    const obj: any = item[key];
 
     if (obj.type === TypeProps.Static) {
       changerAttributes(root, key, obj.value);

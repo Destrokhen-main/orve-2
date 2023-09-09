@@ -1,7 +1,7 @@
 import { BehaviorSubject, share } from "rxjs";
 import { Reactive, ReactiveType } from "./type";
 
-interface IRefC extends Reactive {
+export interface IRefC extends Reactive {
   $sub: any;
   value: any;
 }
@@ -11,7 +11,7 @@ interface IRefC extends Reactive {
  * @param startComponent - Изначальный компонент.
  * @returns - Реактивный компонент
  */
-function refC(startComponent: any) {
+function refC(startComponent: any): IRefC {
   const subject: BehaviorSubject<any> = new BehaviorSubject(startComponent);
   const component: IRefC = {
     type: ReactiveType.RefC,

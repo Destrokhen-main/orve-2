@@ -1,4 +1,5 @@
-import { parserNodeF, NodeOP } from "../../parser/parser";
+import { parserNodeF } from "../../parser/parser";
+import { NodeOP } from "../../parser/parser-type";
 import { singelMounterChildren } from "../children";
 
 /* TODO
@@ -10,7 +11,7 @@ import { singelMounterChildren } from "../children";
 */
 function RefCWorker(root: Element | null, item: Record<string, any>) {
   const component = parserNodeF.call({}, item.value);
-  const mounterInsance = singelMounterChildren(null);
+  const mounterInsance = singelMounterChildren(null, null);
 
   let mountedNode: NodeOP | null = null;
 

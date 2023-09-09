@@ -1,5 +1,6 @@
 import { validationNode } from "./helper";
-import { NodeO, NodeOP, parserNodeF } from "./parser";
+import { parserNodeF } from "./parser";
+import { NodeO, NodeOP } from "./parser-type";
 import { parserNodeO } from "./parser";
 import { TypeNode, NodeChild, NodeHtml, IRefCSetup } from "./type";
 import { isComponent, isHtmlNode, isReactiveObject } from "./childrenHelper";

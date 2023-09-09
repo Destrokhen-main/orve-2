@@ -1,11 +1,7 @@
+import { Tag, Props, Children, NodeB, iTemplate, FragmentT } from "./jsx-type";
 import { KEY_NEED_REWRITE } from "./keys";
 import { FRAGMENT, TEMPLATE } from "./keys";
 import { ReactiveType } from "./reactive/type";
-
-type Tag = string | (() => any); // TODO изменить типы
-export type Props = Record<string, any>;
-export type Children = any;
-export type FragmentT = { children?: Children };
 
 export const HOOKS_STRING_NAME = [
   "beforeCreate",
@@ -18,17 +14,6 @@ export const HOOKS_STRING_NAME = [
   "unmounted",
 ];
 
-export interface NodeHooks {
-  beforeCreate: (instance?: any) => void;
-  created: (instance?: any) => void;
-  beforeMount: (instance?: any) => void;
-  mounted: (instance?: any) => void;
-  beforeUpdate: (instance?: any) => void;
-  updated: (instance?: any) => void;
-  beforeUnmount: (instance?: any) => void;
-  unmounted: (instance?: any) => void;
-}
-
 export const ACCESS_KEY = [
   "tag",
   "props",
@@ -38,21 +23,6 @@ export const ACCESS_KEY = [
   "keyNode",
   "nameC",
 ];
-
-export interface NodeB {
-  tag: Tag;
-  keyNode?: string | number;
-  props?: Props;
-  children?: Children[];
-  hooks?: NodeHooks;
-  nameC?: string;
-  ref?: any; // TODO fix this
-}
-
-export interface JSX {
-  Node: (tag: Tag, props: Props | null, ...children: Children) => NodeB;
-  Fragment: (node: FragmentT) => NodeB;
-}
 
 const DIRECTIVES_ORVE = ["o-hooks", "o-ref", "o-key"];
 
@@ -70,8 +40,8 @@ const DIRECTIVES_ORVE = ["o-hooks", "o-ref", "o-key"];
 function Node(
   tag: Tag,
   props: Props | null = null,
-  ...children: Children
-): NodeB {
+  ...children: Children[]
+): NodeB | null {
   if (typeof tag === "function" && tag.name === FRAGMENT) {
     return Fragment({ children });
   }
@@ -79,7 +49,7 @@ function Node(
   const Node: NodeB = { tag };
 
   if (props !== null) {
-    const SetProps: Record<string, any> = {};
+    const SetProps: Record<string, unknown> = {};
 
     Object.keys(props).forEach((key) => {
       if (KEY_NEED_REWRITE.includes(key)) {
@@ -105,31 +75,35 @@ function Node(
   if (
     children.length > 0 &&
     (typeof tag === "function" ||
-      (typeof tag === "object" &&
-        (tag as Record<string, any>).type === ReactiveType.RefC))
+      (typeof tag === "object" && tag.type === ReactiveType.RefC))
   ) {
     // Проведём работы, чтобы избавиться от всех template
-    const newChild: any[] = [];
+    const newChild: Children[] = [];
 
-    const template: Record<string, any> = {};
+    const template: Record<string, unknown> = {};
 
-    children.forEach((e: any) => {
+    children.forEach((e: unknown) => {
       if (typeof e !== "object") {
-        newChild.push(e);
+        newChild.push(e as Children);
         return;
       }
 
-      if (e.tag !== undefined && e.tag === TEMPLATE) {
-        if (e.props !== undefined && e.props.name !== undefined) {
-          template[e.props.name] = e.children;
-        } else {
-          template.default = e.children;
+      // <template name="asd">
+      if (e && typeof e === "object") {
+        const m = e as Record<string, unknown> | iTemplate;
+        if (m.tag && m.tag === TEMPLATE && m.props) {
+          const props = m.props as Record<string, unknown>;
+          if (props.name && typeof props.name === "string") {
+            template[props.name] = m.children;
+          } else {
+            template.default = m.children;
+          }
         }
       }
     });
 
     if (Object.keys(template).length > 0) {
-      if (Node.props !== undefined && Node.props !== null) {
+      if (Node.props) {
         Node.props.template = template;
       } else {
         Node.props = { template };
@@ -142,11 +116,15 @@ function Node(
   } else if (children.length > 0) {
     // На всякий случай, если остается тут template
     // но прошлое уловие не прошло, тогда надо удалить все template
-    const prep = [];
+    const prep: unknown[] = [];
     for (let i = 0; i !== children.length; i++) {
-      if (
-        typeof children[i] !== "object" ||
-        (typeof children[i] === "object" && children[i].tag !== TEMPLATE)
+      if (typeof children[i] !== "object") {
+        prep.push(children[i]);
+      } else if (
+        (typeof children[i] === "object" &&
+          (children[i] as Record<string, unknown>).tag === undefined) ||
+        ((children[i] as Record<string, unknown>).tag &&
+          (children[i] as Record<string, unknown>).tag !== TEMPLATE)
       ) {
         prep.push(children[i]);
       }
@@ -163,7 +141,11 @@ function Node(
  * @param node Object
  * @returns Object of Node
  */
-function Fragment(node: FragmentT): NodeB {
+function Fragment(node: FragmentT): NodeB | null {
+  if (!Array.isArray(node.children)) {
+    return null;
+  }
+
   return {
     tag: FRAGMENT,
     children: node.children !== undefined ? node.children : [],

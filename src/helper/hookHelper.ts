@@ -1,5 +1,5 @@
-import { NodeHooks } from "../jsx";
-import { NodeOP } from "../parser/parser";
+import { NodeHooks } from "../jsx-type";
+import { NodeOP } from "../parser/parser-type";
 
 /* TODO
 [ ] - Передавать что-то в хуки
@@ -17,6 +17,27 @@ export function InvokeHook(
 ): boolean {
   if (obj.hooks === undefined) {
     return false;
+  }
+
+  if (obj.hooks && nameHook === "updated") {
+    const hooks = Object.keys(obj.hooks as Record<keyof NodeHooks, () => void>);
+    obj.$component.subscribe((call: string | unknown) => {
+      if (call && typeof call === "string" && hooks.includes(call)) {
+        const item = call as keyof NodeHooks;
+        const h = obj.hooks as Record<
+          keyof NodeHooks,
+          (instance?: any) => void
+        >;
+        try {
+          h[item]({});
+          return true;
+        } catch (er) {
+          console.error("[hooks] - catch error:", er);
+          return false;
+        }
+      }
+    });
+    return true;
   }
 
   const h = obj.hooks;
@@ -52,7 +73,7 @@ export function InvokeAllNodeHook(obj: NodeOP, hook: keyof NodeHooks): void {
       item.hooks[hook]({});
 
       if (item.children !== undefined && item.children.length > 0) {
-        quee = [...quee, ...item.children];
+        quee = [...quee, ...(item.children as NodeOP[])];
       }
     }
   }

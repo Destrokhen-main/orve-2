@@ -1,4 +1,4 @@
-import { NodeOP } from "./parser";
+import { NodeOP } from "./parser-type";
 import { oifParsing } from "./reactiveComponentWorker/oIfParsing";
 
 export const REACTIVE_COMPONENT = ["o-if"];

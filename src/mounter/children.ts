@@ -1,5 +1,5 @@
 import { FRAGMENT } from "../keys";
-import { NodeOP } from "../parser/parser";
+import { NodeOP } from "../parser/parser-type";
 import { NodeHtml, NodeChild } from "../parser/type";
 import { TypeNode } from "../parser/type";
 import { Ref } from "../reactive/ref";
@@ -25,7 +25,10 @@ export type InsertType = NodeOP | NodeChild | NodeHtml;
  * @param root - HTMLElement
  * @returns - переработанный node
  */
-function singelMounterChildren(root: Element | null) {
+function singelMounterChildren(
+  root: Element | null,
+  parent: NodeOP | null = null,
+) {
   return (item: InsertType) => {
     if (item === undefined || item === null) {
       return null;
@@ -38,8 +41,12 @@ function singelMounterChildren(root: Element | null) {
         return mounterNode(root, knowItem);
       }
 
-      if (knowItem.tag === FRAGMENT && knowItem.children.length > 0) {
-        return mounterChildren(root, knowItem.children);
+      if (
+        knowItem.tag === FRAGMENT &&
+        knowItem.children &&
+        knowItem.children.length > 0
+      ) {
+        return mounterChildren(root, knowItem.children as any, parent);
       }
     }
 
@@ -65,7 +72,7 @@ function singelMounterChildren(root: Element | null) {
     if (item.type === TypeNode.Reactive) {
       const reactiveObject: Ref = (item as any).value;
       if (reactiveObject.type === ReactiveType.Ref) {
-        RefChildCreator(root, reactiveObject);
+        RefChildCreator(root, reactiveObject, undefined, parent);
         return item;
       }
 
@@ -120,8 +127,12 @@ function singelMounterChildren(root: Element | null) {
  * @param listNode - массив node
  * @returns - обработанные массив node
  */
-function mounterChildren(root: Element | null, listNode: InsertType[]): any {
-  const prepaireFunction = singelMounterChildren(root);
+function mounterChildren(
+  root: Element | null,
+  listNode: InsertType[],
+  parent: NodeOP | null = null,
+): any {
+  const prepaireFunction = singelMounterChildren(root, parent);
 
   const finaly = listNode.map(prepaireFunction);
 

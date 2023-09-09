@@ -1,5 +1,5 @@
 import { KEY_NEED_REWRITE_WITH_O } from "../keys";
-import { Props } from "../jsx";
+import { Props } from "../jsx-type";
 import { TEMPLATE } from "../keys";
 import { ReactiveType } from "../reactive/type";
 import { camelToSnakeCase } from "../utils/transformFunctions";

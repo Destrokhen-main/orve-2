@@ -1,7 +1,7 @@
 import { FRAGMENT } from "../../keys";
 import { ReactiveType } from "../../reactive/type";
 import { parseSingleChildren } from "../children";
-import { NodeOP } from "../parser";
+import { NodeOP } from "../parser-type";
 import { TypeNode } from "../type";
 
 /**

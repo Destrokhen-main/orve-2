@@ -1,19 +1,10 @@
-import { OrveInstance } from "../instance";
+import { OrveInstance } from "../instance/index-type";
 import { Node, Fragment } from "../jsx";
-import { NodeOP, parserNodeF } from "./parser";
+import { parserNodeF } from "./parser";
+import { NodeOP } from "./parser-type";
 import { mounterNode } from "../mounter";
 import { InvokeAllNodeHook } from "../helper/hookHelper";
-
-export interface OptionsInstance {
-  root: boolean;
-}
-
-export interface CreateApp {
-  mount: (
-    root: string | HTMLElement,
-    render?: (el: Element, tree: NodeOP) => unknown,
-  ) => OrveInstance | false;
-}
+import { OptionsInstance, CreateApp } from "./index-type";
 
 function isValidEntry(entry: unknown): boolean {
   const typeEntry = typeof entry;
@@ -50,7 +41,7 @@ function optionsInstace(options: OptionsInstance) {
  * @returns
  */
 function createApp(
-  entry: unknown = null,
+  entry: unknown | (() => unknown) = null,
   options: OptionsInstance | null = null,
 ): CreateApp | null {
   if (options !== null) {
@@ -67,7 +58,11 @@ function createApp(
   const workFunction = entry as () => unknown;
   allContext.tree = parserNodeF.call(allContext.context, workFunction);
 
-  if (allContext.tree !== null && window !== undefined) {
+  if (
+    allContext.tree !== null &&
+    window !== undefined &&
+    window.addEventListener !== undefined
+  ) {
     const beforeUnmounter = function () {
       if (allContext.tree) {
         InvokeAllNodeHook(allContext.tree, "beforeUnmount");
@@ -80,18 +75,9 @@ function createApp(
       }
     };
 
-    if (
-      typeof window !== "undefined" &&
-      window.addEventListener !== undefined
-    ) {
-      window?.addEventListener("beforeunload", beforeUnmounter);
+    window?.addEventListener("beforeunload", beforeUnmounter);
 
-      //window.onbeforeunload = beforeUnmounter;
-
-      window?.addEventListener("unload", unmounter);
-
-      //window.onunload = unmounter;
-    }
+    window?.addEventListener("unload", unmounter);
   }
 
   return {
