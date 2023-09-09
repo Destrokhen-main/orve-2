@@ -7,7 +7,7 @@ const ALL_CHAR = "qwertyuiopasdfghjklzxcvbnm1234567890";
  * @param len - Length of the string
  * @returns string - сгенерированную строку.
  */
-function genUID(len: number): string {
+function genUID(len: number = 8): string {
   let key = "";
 
   while (key.length < len) {
