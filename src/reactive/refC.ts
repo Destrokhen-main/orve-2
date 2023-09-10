@@ -12,7 +12,9 @@ export interface IRefC extends Reactive {
  * @returns - Реактивный компонент
  */
 function refC(startComponent: any): IRefC {
-  const subject: BehaviorSubject<any> = new BehaviorSubject(startComponent);
+  const subject: BehaviorSubject<() => unknown> = new BehaviorSubject(
+    startComponent,
+  );
   const component: IRefC = {
     type: ReactiveType.RefC,
     $sub: subject.pipe(share()),
@@ -20,7 +22,7 @@ function refC(startComponent: any): IRefC {
   };
 
   return new Proxy(component, {
-    set(t: IRefC, p: keyof IRefC | string, v) {
+    set(t: IRefC, p: keyof IRefC | string, v: unknown) {
       const s = Reflect.set(t, p, v);
       if (p === "value") {
         t.$sub.next(v);

@@ -1,5 +1,5 @@
 import { parseSingleChildren } from "../../parser/children";
-import { RefA } from "../../reactive/ref";
+import { RefA } from "../../reactive/ref-type";
 import { EtypeRefRequest, Dir } from "../../reactive/refHelper";
 import { singelMounterChildren, InsertType } from "../children";
 import { createCommentAndInsert } from "../helper";
@@ -62,7 +62,7 @@ function RefArray(
   let allInstruction: Comment | SettingNode[] | null = null;
 
   // Есть что отрисовывать
-  if (item.value.length > 0) {
+  if (item.value && item.value.length > 0) {
     const prepaireNodes: any[] =
       callback !== null ? item.value.map(callback) : item.value;
 
@@ -89,7 +89,7 @@ function RefArray(
     );
 
     if (allInstruction === null) return;
-  } else if (item.value.length === 0) {
+  } else if (item.value && item.value.length === 0) {
     const comment = document.createComment(` - refA - ${parent.keyNode} - `);
 
     if (root !== null) {
@@ -162,28 +162,31 @@ function RefArray(
           workObject.dir === Dir.left ? workObject.value.length : 0;
 
         const rebuildAllNode =
-          callback !== null
+          callback !== null && item.value
             ? item.value.map((e: any, i: number) => callback(e, admixture + i))
             : item.value;
 
-        rebuildAllNode.forEach((item: Record<string, any>, index: number) => {
-          if (
-            !compareObjects(
-              item,
-              (allInstruction as SettingNode[])[index].prepaire,
-            )
-          ) {
-            const newItem = {
-              prepaire: item,
-              mount: mounterInsance(parserInstance(item) as InsertType),
-            };
+        rebuildAllNode &&
+          rebuildAllNode.forEach((item: Record<string, any>, index: number) => {
+            if (
+              !compareObjects(
+                item,
+                (allInstruction as SettingNode[])[index].prepaire,
+              )
+            ) {
+              const newItem = {
+                prepaire: item,
+                mount: mounterInsance(parserInstance(item) as InsertType),
+              };
 
-            if (allInstruction !== null && Array.isArray(allInstruction)) {
-              allInstruction[index].mount!.node.replaceWith(newItem.mount.node);
-              allInstruction[index] = newItem;
+              if (allInstruction !== null && Array.isArray(allInstruction)) {
+                allInstruction[index].mount!.node.replaceWith(
+                  newItem.mount.node,
+                );
+                allInstruction[index] = newItem;
+              }
             }
-          }
-        });
+          });
 
         // Необходимо после перерисовок, дополнить массив новыми данными.
         allInstruction[workObject.dir === Dir.right ? "push" : "unshift"](
@@ -337,29 +340,34 @@ function RefArray(
       // Если там комент или null то смысла в этом нет)
       if (workObject.needCheck && Array.isArray(allInstruction)) {
         const prepaire =
-          callback !== null ? item.value.map(callback) : item.value;
+          callback !== null && item.value
+            ? item.value.map(callback)
+            : item.value;
 
         const parserInstance = parseSingleChildren.call(null, null);
         const mounterInsance = singelMounterChildren(null);
 
-        prepaire.forEach((e: Record<string, any>, index: number) => {
-          if (
-            !compareObjects(
-              e,
-              (allInstruction as SettingNode[])[index].prepaire,
-            )
-          ) {
-            const newItem = {
-              prepaire: e,
-              mount: mounterInsance(parserInstance(e) as InsertType),
-            };
+        prepaire &&
+          prepaire.forEach((e: Record<string, any>, index: number) => {
+            if (
+              !compareObjects(
+                e,
+                (allInstruction as SettingNode[])[index].prepaire,
+              )
+            ) {
+              const newItem = {
+                prepaire: e,
+                mount: mounterInsance(parserInstance(e) as InsertType),
+              };
 
-            if (allInstruction !== null && Array.isArray(allInstruction)) {
-              allInstruction[index].mount!.node.replaceWith(newItem.mount.node);
-              allInstruction[index] = newItem;
+              if (allInstruction !== null && Array.isArray(allInstruction)) {
+                allInstruction[index].mount!.node.replaceWith(
+                  newItem.mount.node,
+                );
+                allInstruction[index] = newItem;
+              }
             }
-          }
-        });
+          });
       }
     }
 
@@ -409,31 +417,34 @@ function RefArray(
 
         if (Array.isArray(allInstruction)) {
           const prepaire =
-            callback !== null ? item.value.map(callback) : item.value;
+            callback !== null && item.value
+              ? item.value.map(callback)
+              : item.value;
 
           const parserInstance = parseSingleChildren.call(null, null);
           const mounterInsance = singelMounterChildren(null);
 
-          prepaire.forEach((e: Record<string, any>, index: number) => {
-            if (
-              !compareObjects(
-                e,
-                (allInstruction as SettingNode[])[index].prepaire,
-              )
-            ) {
-              const newItem = {
-                prepaire: e,
-                mount: mounterInsance(parserInstance(e) as InsertType),
-              };
+          prepaire &&
+            prepaire.forEach((e: Record<string, any>, index: number) => {
+              if (
+                !compareObjects(
+                  e,
+                  (allInstruction as SettingNode[])[index].prepaire,
+                )
+              ) {
+                const newItem = {
+                  prepaire: e,
+                  mount: mounterInsance(parserInstance(e) as InsertType),
+                };
 
-              if (allInstruction !== null && Array.isArray(allInstruction)) {
-                allInstruction[index].mount!.node.replaceWith(
-                  newItem.mount.node,
-                );
-                allInstruction[index] = newItem;
+                if (allInstruction !== null && Array.isArray(allInstruction)) {
+                  allInstruction[index].mount!.node.replaceWith(
+                    newItem.mount.node,
+                  );
+                  allInstruction[index] = newItem;
+                }
               }
-            }
-          });
+            });
         }
       }
     }

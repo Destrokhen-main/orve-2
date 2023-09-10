@@ -13,12 +13,12 @@ function use(obj: unknown = null) {
     return false;
   }
 
-  if (typeof obj !== "object" && obj !== null) {
+  if (typeof obj !== "object") {
     console.warn("Insert item not a object");
     return false;
   }
 
-  const workObject: Record<string, any> = obj;
+  const workObject = obj as Record<string, unknown>;
   const context: OrveInstance = this;
 
   if (

@@ -1,17 +1,19 @@
 import { Node } from "../jsx";
 
 // interface Iprops {
-//   default?: () => any | string | number | boolean | undefined | null;
+//   default?: () => unknown | string | number | boolean | undefined | null;
 //   required: boolean;
 // }
 
 type TPropsRequired = {
   required: boolean;
-  default?: (() => any) | string | number | boolean | undefined | null;
+  default?: (() => unknown) | string | number | boolean | undefined | null;
 };
 
+type allType = string | number | boolean | Array<unknown> | object;
+
 type TNotRequired = {
-  type: any;
+  type: allType | allType[] | (() => allType);
 };
 
 const checkTypeObject = (
@@ -59,8 +61,8 @@ const checkTypeObject = (
 };
 
 type Props = {
-  children?: any[];
-  [T: string]: any;
+  children?: unknown[];
+  [T: string]: unknown;
 };
 
 // TODO
@@ -81,7 +83,7 @@ function definedProps(
   propsType: Record<string, TPropsRequired & TNotRequired>,
 ) {
   return (insertProps: Props) => {
-    const propsSettings: Record<string, any> = {};
+    const propsSettings: Record<string, TPropsRequired & TNotRequired> = {};
 
     // Обработка найтроек пропсов
     Object.keys(propsType).forEach((e) => {
@@ -135,7 +137,7 @@ function definedProps(
           if (prop["default"] !== undefined) {
             if (
               !Array.isArray(prop["type"]) &&
-              typeof prop["type"]() !== "function"
+              typeof (prop["type"] as () => unknown)() !== "function"
             ) {
               obj[e] =
                 typeof prop["default"] === "function"
@@ -152,7 +154,7 @@ function definedProps(
 
         if (Array.isArray(prop["type"]) && prop["type"].length >= 1) {
           let ch = 0;
-          prop["type"].forEach((f) => {
+          prop["type"].forEach((f: () => any) => {
             const v = f();
             if (checkTypeObject(v, value, e, true)) {
               ch += 1;
@@ -187,11 +189,19 @@ function definedProps(
             );
             obj[e] =
               prop["default"] ?? typeof prop["default"] === "function"
-                ? prop["default"]()
+                ? (
+                    prop["default"] as () =>
+                      | string
+                      | number
+                      | boolean
+                      | (() => unknown)
+                      | null
+                      | undefined
+                  )()
                 : prop["default"];
           }
         } else {
-          const v = prop["type"]();
+          const v = (prop["type"] as () => unknown)() as string;
           if (!checkTypeObject(v, value, e)) {
             const def = prop["default"] ?? v;
             if (typeof v === "function") {

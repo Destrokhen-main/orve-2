@@ -1,4 +1,4 @@
-import { RefA } from "./ref";
+import { RefA } from "./ref-type";
 
 export enum EtypeRefRequest {
   insert = "Insert",
@@ -18,9 +18,9 @@ export enum Dir {
  * @param obj - реактивная переменная массива
  * @returns Реактивную переменную массива
  */
-export function refArrayBuilder(arr: any[], obj: RefA) {
+export function refArrayBuilder(arr: unknown[], obj: RefA) {
   return new Proxy(arr, {
-    get(t: any[], p: any) {
+    get(t: unknown[], p: any) {
       const val = t[p];
       if (typeof val === "function") {
         if (["push", "unshift"].includes(p)) {

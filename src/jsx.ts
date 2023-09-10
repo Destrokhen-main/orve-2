@@ -91,9 +91,9 @@ function Node(
       // <template name="asd">
       if (e && typeof e === "object") {
         const m = e as Record<string, unknown> | iTemplate;
-        if (m.tag && m.tag === TEMPLATE && m.props) {
+        if (m.tag && m.tag === TEMPLATE) {
           const props = m.props as Record<string, unknown>;
-          if (props.name && typeof props.name === "string") {
+          if (props && props.name && typeof props.name === "string") {
             template[props.name] = m.children;
           } else {
             template.default = m.children;

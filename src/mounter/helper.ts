@@ -1,5 +1,6 @@
 import { NodeChild, NodeHtml } from "../parser/type";
-import { Ref, RefFormater } from "../reactive/ref";
+import { Ref } from "../reactive/ref";
+import { RefFormater } from "../reactive/ref-type";
 import { pairwise } from "rxjs";
 import { EtypeComment } from "./helperType";
 import { NodeOP } from "../parser/parser-type";

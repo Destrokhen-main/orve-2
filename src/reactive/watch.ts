@@ -3,9 +3,11 @@ import { ReactiveType } from "./type";
 import { EtypeRefRequest } from "./refHelper";
 
 interface Dep {
-  [T: string]: any;
+  [T: string]: unknown;
   $sub: BehaviorSubject<any>;
 }
+
+type callbackWacther = () => void;
 
 /**
  * Смотритель для реактивной переменной
@@ -13,14 +15,14 @@ interface Dep {
  * @param dep - реактивные переменные, для которых будет применять функция watch
  * @returns  либо одно или массив функций, для отключения watch
  */
-function watch(func: (n: any, o: any) => void, dep: Dep | Dep[]) {
+function watch(func: (n: unknown, o: unknown) => void, dep: Dep | Dep[]) {
   if (typeof dep !== "object" || dep === null) {
     console.warn("[watch] - Dep is bad");
     return false;
   }
 
   if (Array.isArray(dep) && dep.length > 0) {
-    const depArrayDisconnect = [];
+    const depArrayDisconnect: callbackWacther[] = [];
 
     let showD = false;
 
@@ -44,22 +46,33 @@ function watch(func: (n: any, o: any) => void, dep: Dep | Dep[]) {
     const d = dep as Dep;
 
     if (d.$sub === undefined) {
+      console.warn("[watch] - One or any dep is not subscribe");
       return false;
     }
 
-    const cur: any = d.$sub.pipe(pairwise()).subscribe(([b, c]: any) => {
-      let prev = b;
-      const next = c;
+    const cur: any = d.$sub
+      .pipe(pairwise())
+      .subscribe(([b, c]: [unknown, unknown]) => {
+        let prev = b;
+        const next = c;
 
-      if (d.type === ReactiveType.RefA) {
-        if (next.type === EtypeRefRequest.delete) return;
-        if (prev.type === EtypeRefRequest.delete) {
-          prev = null;
+        if (d && typeof d === "object" && d.type === ReactiveType.RefA) {
+          if (
+            typeof next === "object" &&
+            (next as Record<string, unknown>).type === EtypeRefRequest.delete
+          )
+            return;
+          if (
+            prev &&
+            typeof prev === "object" &&
+            (prev as Record<string, unknown>).type === EtypeRefRequest.delete
+          ) {
+            prev = null;
+          }
         }
-      }
 
-      return func(next, prev);
-    });
+        return func(next, prev);
+      });
     return () => cur.complete();
   }
 }

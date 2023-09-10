@@ -25,7 +25,10 @@ interface IOptions {
  * @returns
  */
 function scopedStyle(
-  styles: Record<string, any>,
+  styles: Record<
+    string,
+    string | Record<string, string> | (() => string | Record<string, string>)
+  >,
   options?: IOptions,
 ): Record<string, string> {
   if (typeof styles !== "object") {
@@ -40,21 +43,21 @@ function scopedStyle(
 
   styledKeys.forEach((key: string) => {
     let partString;
-    if (key.indexOf(',') !== -1) {
-      const parseClass = key.split(',').map((e) => e.trim());
+    if (key.indexOf(",") !== -1) {
+      const parseClass = key.split(",").map((e) => e.trim());
 
       const afterWorkClass = parseClass.map((parsedKey: string) => {
         const prKey =
           options?.scoped === false
             ? parsedKey.replace(/[#.]/gm, "")
             : `${parsedKey.replace(/[#.]/gm, "")}__${genUID(8)}`;
-        obj[parsedKey.replace('.', '')] = prKey;
+        obj[parsedKey.replace(".", "")] = prKey;
 
         const partString = `${parsedKey.startsWith("#") ? "#" : "."}${prKey}`;
         return partString;
       });
 
-      partString = afterWorkClass.join(', ');
+      partString = afterWorkClass.join(", ");
     } else {
       const prKey =
         options?.scoped === false
@@ -68,13 +71,14 @@ function scopedStyle(
     let fn;
 
     if (typeof styles[key] === "function") {
-      fn = styles[key]();
+      fn = (styles[key] as () => string | Record<string, string>)();
     } else {
       fn = styles[key];
     }
 
-    finalStyle += `${partString} {${typeof fn === "object" ? objectToCss(fn) : fn
-      }}\n`;
+    finalStyle += `${partString} {${
+      typeof fn === "object" ? objectToCss(fn) : fn
+    }}\n`;
   });
 
   if (options?.single === true) {

@@ -138,7 +138,13 @@ function parserNodeF(
         props,
       );
     }
-  } else if (typeof component.tag === "function") {
+  }
+  if (component === null) {
+    console.warn(`[${app.name ?? "-"}()] Component don't parse`);
+    return null;
+  }
+
+  if (typeof component.tag === "function") {
     component = recursiveNode.call(this, component);
   }
 
@@ -227,6 +233,7 @@ function parserNodeO(node: NodeO, parent: NodeOP | null = null): NodeOP | null {
   }
 
   if (workNode === null) {
+    console.warn(`[${nameC}()] - failed parsing`);
     return null;
   }
 

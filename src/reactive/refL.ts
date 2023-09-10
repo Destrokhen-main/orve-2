@@ -1,20 +1,20 @@
 import { BehaviorSubject, share } from "rxjs";
 
 interface refL {
-  value: any;
-  $sub: any;
+  value: Element | undefined;
+  $sub: BehaviorSubject<any>;
 }
 
 /**
  * Создает реактивную переменную под ссылку на тег
  * @returns реактивную переменную
  */
-function refL() {
+function refL(): refL {
   const subject: BehaviorSubject<any> = new BehaviorSubject(undefined);
 
-  const obj = {
+  const obj: refL = {
     value: undefined,
-    $sub: subject.pipe(share()),
+    $sub: subject.pipe(share()) as any,
   };
 
   const proxy = new Proxy(obj, {

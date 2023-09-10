@@ -6,7 +6,7 @@ export interface OrveInstance {
   tree: NodeOP | null;
   context: {
     globalComponents?: Record<string, () => unknown>;
-    [T: string]: any;
+    [T: string]: unknown;
   };
   use: (obj?: unknown) => boolean | OrveInstance;
   component: (nameComponent: string, component: () => unknown) => void;

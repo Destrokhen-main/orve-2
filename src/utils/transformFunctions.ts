@@ -3,7 +3,7 @@
  * @param str - строка
  * @returns - переработанная строка
  */
-function cameCase(str: string) {
+function cameCase(str: string): string {
   return str
     .replace(/(?:^\w|[A-Z]|\b\w)/g, function (word, index) {
       return index === 0 ? word.toLowerCase() : word.toUpperCase();
@@ -16,7 +16,7 @@ function cameCase(str: string) {
  * @param str - строка
  * @returns переработанная строка
  */
-function snakeToCamel(str: string) {
+function snakeToCamel(str: string): string {
   return str
     .toLowerCase()
     .replace(/([-_][a-z])/g, (group) =>
@@ -24,7 +24,7 @@ function snakeToCamel(str: string) {
     );
 }
 
-const camelToSnakeCase = (str: string) =>
+const camelToSnakeCase = (str: string): string =>
   str.replace(/[A-Z]/g, (letter) => `-${letter.toLowerCase()}`);
 
 export { cameCase, snakeToCamel, camelToSnakeCase };

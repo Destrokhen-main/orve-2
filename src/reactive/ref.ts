@@ -1,37 +1,15 @@
 import { BehaviorSubject, share } from "rxjs";
-import { Reactive, ReactiveType } from "./type";
+import { ReactiveType } from "./type";
 import { EtypeRefRequest, refArrayBuilder } from "./refHelper";
-
-type refInput = string | number | (() => any);
-
-interface Ref extends Reactive {
-  value: refInput;
-  $sub: any;
-  formate: (func: (e: any) => any) => any;
-  node?: any;
-}
-
-export interface RefA extends Reactive {
-  value: any;
-  $sub: any;
-  for: (item: any, index: number) => any;
-}
-
-export interface RefO extends Reactive {
-  $sub: BehaviorSubject<any>;
-  value: Record<string, any> | null;
-}
-
-export interface RefOF extends Reactive {
-  key: string;
-  value: RefO;
-}
-
-export interface RefFormater {
-  type: ReactiveType;
-  value: (e: any) => any;
-  parent: any;
-}
+import {
+  Ref,
+  RefA,
+  RefFormater,
+  RefO,
+  RefOGet,
+  RefOSet,
+  refInput,
+} from "./ref-type";
 
 const TYPE_REF = ["string", "number", "function", "undefined", "boolean"];
 
@@ -40,7 +18,7 @@ const TYPE_REF = ["string", "number", "function", "undefined", "boolean"];
  * @param value - начальные данные
  * @returns ref переменную.
  */
-function ref(value: unknown) {
+function ref(value: unknown): RefO | RefA | Ref | null {
   const typeValue = typeof value;
   if (TYPE_REF.includes(typeValue)) {
     const val = value as refInput;
@@ -71,7 +49,7 @@ function ref(value: unknown) {
         }
         return Reflect.set(t, p, v);
       },
-      deleteProperty(t: Ref, p: string) {
+      deleteProperty(_: Ref, p: string) {
         if (["value", "$sub"].includes(p)) {
           return false;
         }
@@ -81,13 +59,13 @@ function ref(value: unknown) {
   }
 
   if (Array.isArray(value)) {
-    const subject: BehaviorSubject<any> = new BehaviorSubject(value);
+    const subject: BehaviorSubject<unknown[]> = new BehaviorSubject(value);
 
     const obj: RefA = {
       type: ReactiveType.RefA,
       value: null,
       $sub: subject.pipe(share()),
-      for: function (func) {
+      for: function (func: (item: unknown, index: number) => unknown) {
         return {
           type: ReactiveType.RefArrFor,
           value: func,
@@ -101,7 +79,7 @@ function ref(value: unknown) {
     obj["value"] = arr;
 
     const refProxy = new Proxy(obj, {
-      set(t: RefA, p: string, v: any) {
+      set(t: RefA, p: string, v: unknown[]) {
         if (p === "value") {
           const newAr = refArrayBuilder(v, obj);
           t.value = newAr;
@@ -138,7 +116,7 @@ function ref(value: unknown) {
         value: null,
       },
       {
-        get(t: any, p) {
+        get(t: any, p: string | symbol): unknown | RefOGet {
           if (p in t) {
             return t[p];
           }
@@ -148,35 +126,26 @@ function ref(value: unknown) {
               return t.value[p];
             }
 
-            if (p in t.value) {
-              return {
-                type: ReactiveType.RefO,
-                isDefined: true,
-                proxy: reof,
-                key: p,
-              };
-            } else {
-              return {
-                type: ReactiveType.RefO,
-                isDefined: false,
-                proxy: reof,
-                key: p,
-              };
-            }
+            return {
+              type: ReactiveType.RefO,
+              isDefined: p in t.value,
+              proxy: reof,
+              key: p,
+            };
           }
         },
       },
     );
 
-    const valueProxy = new Proxy(value as Record<string, any>, {
-      set(t, prop, value) {
+    const valueProxy = new Proxy(value as Record<string, unknown>, {
+      set(t, prop, value: unknown) {
         const s = Reflect.set(t, prop, value);
 
         reof.$sub.next({
           type: ReactiveType.RefO,
           key: prop,
           value,
-        });
+        } as RefOSet);
         return s;
       },
     });
@@ -185,6 +154,8 @@ function ref(value: unknown) {
 
     return reof;
   }
+
+  return null;
 }
 
 export { ref, Ref };
