@@ -15,7 +15,8 @@
     "prettier": "prettier --config .prettierrc 'src/**/*.ts' --write",
     "prettier-watch": "onchange 'src/**/*.ts' -- prettier --write {{changed}}",
     "prepare": "husky install",
-    "test:unit": "jest ./src",
+    "test:unit:src": "jest ./src",
+    "test:unit": "jest",
     "test:watch": "jest --watch"
   },
   "exports": {

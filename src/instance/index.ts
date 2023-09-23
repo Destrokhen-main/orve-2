@@ -43,6 +43,16 @@ function use(obj: unknown = null) {
  * @param component - {function} - Component
  */
 function component(name: string, component: () => unknown): void {
+  if (typeof name !== "string") {
+    console.warn("[Global component] - name can be string");
+    return;
+  }
+
+  if (typeof component !== "function") {
+    console.warn("[Global component] - component can be function");
+    return;
+  }
+
   const context = this.context;
   const camelWord = cameCase(name);
   if (context.globalComponents === undefined) {
@@ -60,7 +70,7 @@ function component(name: string, component: () => unknown): void {
  * Create instance Orve application
  * @returns Orve instance
  */
-function orveCreate() {
+function orveCreate(): OrveInstance {
   if (typeof window === "undefined" && typeof global !== "undefined") {
     global.window = global as any;
   }

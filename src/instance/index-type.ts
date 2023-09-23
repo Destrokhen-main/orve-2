@@ -12,7 +12,7 @@ export interface OrveInstance {
   component: (nameComponent: string, component: () => unknown) => void;
   createApp: (
     entry: unknown,
-    options: OptionsInstance | null,
+    options?: OptionsInstance | null,
   ) => CreateApp | null;
 }
 

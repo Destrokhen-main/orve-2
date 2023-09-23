@@ -22,26 +22,84 @@ import { Subject } from "rxjs";
  * @returns Или объект или null
  */
 function prepareComponent(
-  func: (props?: Props) => unknown,
+  func: ((props?: Props) => unknown) | NodeO,
   props: Props | null = null,
 ): NodeO | null {
   let component: unknown | null = null;
-  try {
-    let f = func as ((insertProps: Props) => NodeB | null) | (() => unknown);
-    if ((func as Record<string, any>).props !== undefined) {
-      const funcRecord = func as Record<string, any>;
-      const propFunction = funcRecord.props;
-      delete funcRecord.props;
-      f = definedProps(func, propFunction);
-    }
 
-    component = f.call(this, props !== null ? props : {});
-  } catch (error) {
-    console.error(`[${func.name ?? "-"}()] - [Parser error]: ${error}`);
+  if (typeof func === "function") {
+    try {
+      let f = func as ((insertProps: Props) => NodeB | null) | (() => unknown);
+      if ((func as Record<string, any>).props !== undefined) {
+        const funcRecord = func as Record<string, any>;
+        const propFunction = funcRecord.props;
+        delete funcRecord.props;
+        f = definedProps(func, propFunction);
+      }
+      component = f.call(this, props !== null ? props : {});
+    } catch (error) {
+      console.error(`[${func.name ?? "-"}()] - [Parser error]: ${error}`);
+    }
+  } else {
+    component = func;
   }
 
-  if (component && validationNode(component, func.name) === true) {
-    return component as NodeO;
+  if (
+    component &&
+    validationNode(
+      component,
+      typeof func === "function" ? func.name : func.nameC,
+    ) === true
+  ) {
+    let comp: NodeO | null = component as NodeO;
+
+    if (this && typeof this === "object" && typeof comp.tag === "string") {
+      const context = this as {
+        globalComponents?: Record<string, () => unknown>;
+        [T: string]: unknown;
+      };
+
+      if (context.globalComponents && typeof comp.tag === "string") {
+        const nameTag = /([-_][a-z])/g.test(comp.tag)
+          ? snakeToCamel(comp.tag)
+          : comp.tag;
+
+        if (this.globalComponents[nameTag] !== undefined) {
+          comp = prepareComponent.call(
+            this,
+            this.globalComponents[nameTag],
+            props,
+          );
+        }
+      }
+    }
+
+    if (comp === null) {
+      console.warn(
+        `[${
+          typeof func === "function" ? func.name : func.nameC
+        }()] - parse error`,
+      );
+      return null;
+    }
+
+    if (typeof comp.tag === "function") {
+      comp = recursiveNode.call(this, comp);
+    }
+
+    if (comp === null) {
+      console.warn(
+        `[${
+          typeof func === "function" ? func.name : func.nameC ?? "-"
+        }()] Component don't parse`,
+      );
+      return null;
+    }
+
+    if (comp.nameC === undefined) {
+      comp.nameC = typeof func === "function" ? func.name : func.nameC;
+    }
+    return comp;
   }
 
   return null;
@@ -88,6 +146,7 @@ function recursiveNode(node: NodeO): NodeO | null {
 
       if (component && validationNode(component, node.tag.name) === true) {
         returnedNode = component as NodeO;
+        returnedNode.nameC = node.tag.name;
         if (Array.isArray(returnedNode)) {
           quee.push(...returnedNode);
         } else {
@@ -117,36 +176,7 @@ function parserNodeF(
   props: Props | null = null,
   parent: NodeOP | null = null,
 ): NodeOP | null {
-  let component = prepareComponent.call(this, app, props);
-
-  if (component === null) {
-    console.warn(`[${app.name ?? "-"}()] Component don't be build`);
-    return null;
-  }
-
-  component.nameC = app.name;
-
-  if (this.globalComponents && typeof component.tag === "string") {
-    const nameTag = /([-_][a-z])/g.test(component.tag)
-      ? snakeToCamel(component.tag)
-      : component.tag;
-
-    if (this.globalComponents[nameTag] !== undefined) {
-      component = prepareComponent.call(
-        this,
-        this.globalComponents[nameTag],
-        props,
-      );
-    }
-  }
-  if (component === null) {
-    console.warn(`[${app.name ?? "-"}()] Component don't parse`);
-    return null;
-  }
-
-  if (typeof component.tag === "function") {
-    component = recursiveNode.call(this, component);
-  }
+  const component = prepareComponent.call(this, app, props);
 
   if (component === null) {
     console.warn(`[${app.name ?? "-"}()] Component don't be build`);
@@ -211,43 +241,18 @@ function parserNodeF(
  * @returns Или объект или null
  */
 function parserNodeO(node: NodeO, parent: NodeOP | null = null): NodeOP | null {
-  let workNode: NodeO | null = node;
-
-  // TODO Не уверен в этом коде
-  if (this.globalComponents !== undefined && typeof workNode.tag === "string") {
-    const nameTag = /([-_][a-z])/g.test(workNode.tag)
-      ? snakeToCamel(workNode.tag)
-      : workNode.tag;
-
-    if (this.globalComponents[nameTag] !== undefined) {
-      workNode = prepareComponent.call(this, this.globalComponents[nameTag]);
-    }
-  }
-  if (workNode === null) {
-    return null;
-  }
-  let nameC = undefined;
-  if (typeof workNode.tag === "function") {
-    nameC = workNode.tag.name;
-    workNode = recursiveNode.call(this, workNode);
-  }
-
-  if (workNode === null) {
-    console.warn(`[${nameC}()] - failed parsing`);
-    return null;
-  }
+  // parent не хватает
+  const component = prepareComponent.call(this, node);
 
   const componentO: NodeOP = {
-    ...workNode,
+    ...(component as NodeO),
     node: null,
     parent,
     type: TypeNode.Component,
     $component: new Subject(),
   };
 
-  componentO.nameC = nameC ?? parent?.nameC;
-
-  if (workNode.keyNode === undefined) {
+  if (componentO.keyNode === undefined) {
     componentO.keyNode = genUID(8);
   }
 
