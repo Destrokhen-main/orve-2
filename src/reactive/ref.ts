@@ -108,6 +108,13 @@ function ref(value: unknown) {
     obj["value"] = arr;
 
     const refProxy = new Proxy(obj, {
+      get(t, p) {
+        if (p === Symbol.toPrimitive) {
+          return () => t.value;
+        }
+
+        return Reflect.get(t, p);
+      },
       set(t: RefA, p: string, v: any) {
         if (p === "value") {
           const newAr = refArrayBuilder(v, obj);
