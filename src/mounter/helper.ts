@@ -26,6 +26,7 @@ function RefChildCreator(
   const textNode = document.createTextNode(String(item.value));
 
   const sub = item.$sub;
+  // TODO при первом вызове обновления не приходит next
   sub.pipe(pairwise()).subscribe({
     next([before, after]: [string | number, string | number]) {
       if (after !== undefined && before !== after) {
