@@ -71,6 +71,13 @@ function ref(value: unknown) {
         }
         return Reflect.set(t, p, v);
       },
+      get(t, p) {
+        if (p === Symbol.toPrimitive) {
+          return () => t.value;
+        }
+
+        return Reflect.get(t, p);
+      },
       deleteProperty(t: Ref, p: string) {
         if (["value", "$sub"].includes(p)) {
           return false;

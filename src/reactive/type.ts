@@ -11,6 +11,8 @@ export enum ReactiveType {
 
   RefC = "RefC",
   RefCComponent = "RefCComponent",
+
+  RefComputed = "RefComputed",
 }
 
 export interface Reactive {
