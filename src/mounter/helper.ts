@@ -1,6 +1,6 @@
 import { NodeChild, NodeHtml } from "../parser/type";
 import { Ref, RefFormater } from "../reactive/ref";
-import { pairwise } from "rxjs";
+import { pairwise, startWith } from "rxjs";
 import { EtypeComment } from "./helperType";
 
 function textNodeCreator(item: NodeChild) {
@@ -27,7 +27,7 @@ function RefChildCreator(
 
   const sub = item.$sub;
   // TODO при первом вызове обновления не приходит next
-  sub.pipe(pairwise()).subscribe({
+  sub.pipe(startWith(item.value), pairwise()).subscribe({
     next([before, after]: [string | number, string | number]) {
       if (after !== undefined && before !== after) {
         textNode.textContent = String(after);
