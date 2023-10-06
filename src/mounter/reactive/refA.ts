@@ -13,16 +13,21 @@ import {
   RefAInsertByIndex,
 } from "../helperType";
 
-const compareObjects = (a: any, b: any) => {
+export const compareObjects = (a: any, b: any) => {
   if (a === b) return true;
 
-  if (typeof a != "object" || typeof b != "object" || a == null || b == null)
+  if (
+    typeof a !== "object" ||
+    typeof b !== "object" ||
+    a === null ||
+    b === null
+  )
     return false;
 
   const keysA = Object.keys(a),
     keysB = Object.keys(b);
 
-  if (keysA.length != keysB.length) {
+  if (keysA.length !== keysB.length) {
     return false;
   }
 
@@ -32,7 +37,7 @@ const compareObjects = (a: any, b: any) => {
     }
 
     if (typeof a[key] === "function" || typeof b[key] === "function") {
-      if (a[key].toString() != b[key].toString()) {
+      if (a[key].toString() !== b[key].toString()) {
         return false;
       }
     } else {

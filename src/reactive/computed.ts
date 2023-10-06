@@ -8,29 +8,31 @@ function computed(func: () => unknown, dep: unknown[] = []) {
   }
 
   const firstCall = func();
-  const obj = new Proxy({
-    type: ReactiveType.RefComputed,
-    dep,
-    func,
-    value: firstCall,
-    lastCall: firstCall,
-    $sub: new BehaviorSubject(firstCall),
-  }, {
-    set(t, p, v) {
-      const res = Reflect.set(t, p, v);
-      if (p === "value") {
-        t.$sub.next(v);
-      }
-      return res;
+  const obj = new Proxy(
+    {
+      type: ReactiveType.RefComputed,
+      dep,
+      func,
+      value: firstCall,
+      $sub: new BehaviorSubject(firstCall),
     },
-    get(t, p) {
-      if (p === Symbol.toPrimitive) {
-        return () => t.value;
-      }
+    {
+      set(t, p, v) {
+        const res = Reflect.set(t, p, v);
+        if (p === "value") {
+          t.$sub.next(v);
+        }
+        return res;
+      },
+      get(t, p) {
+        if (p === Symbol.toPrimitive) {
+          return () => t.value;
+        }
 
-      return Reflect.get(t, p);
-    }
-  });
+        return Reflect.get(t, p);
+      },
+    },
+  );
   return obj;
 }
 
