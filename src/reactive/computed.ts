@@ -1,4 +1,4 @@
-import { BehaviorSubject } from "rxjs";
+import { BehaviorSubject, distinctUntilChanged } from "rxjs";
 import { ReactiveType } from "./type";
 
 function computed(func: () => unknown, dep: unknown[] = []) {
@@ -15,13 +15,16 @@ function computed(func: () => unknown, dep: unknown[] = []) {
       func,
       value: firstCall,
       $sub: new BehaviorSubject(firstCall),
+      $recall: function () {
+        const res = this.func();
+        this.value = res;
+        this.$sub.next(res);
+        return res;
+      },
     },
     {
       set(t, p, v) {
         const res = Reflect.set(t, p, v);
-        if (p === "value") {
-          t.$sub.next(v);
-        }
         return res;
       },
       get(t, p) {
@@ -33,6 +36,21 @@ function computed(func: () => unknown, dep: unknown[] = []) {
       },
     },
   );
+  if (Array.isArray(dep) && dep.length > 0) {
+    dep.forEach((d: any) => {
+      if (d.$sub !== undefined) {
+        d.$sub
+          .pipe(
+            distinctUntilChanged((prevHigh: any, temp: any) => {
+              return temp === prevHigh;
+            }),
+          )
+          .subscribe(() => {
+            obj.$recall();
+          });
+      }
+    });
+  }
   return obj;
 }
 

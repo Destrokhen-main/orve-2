@@ -17,7 +17,7 @@ function OifWorker(
 
   const mounterInsance = singelMounterChildren(null);
 
-  const currentRules = item.rules();
+  const currentRules = item.rule();
   lastAnswer = currentRules;
   if (item.answer[currentRules] !== undefined) {
     const node = mounterInsance(item.answer[currentRules]);
@@ -60,7 +60,7 @@ function OifWorker(
           return;
         }
 
-        const currentRules = item.rules();
+        const currentRules = item.rule();
         if (lastAnswer !== currentRules) {
           if (item.answer[currentRules] !== undefined) {
             const node = mounterInsance(item.answer[currentRules]);

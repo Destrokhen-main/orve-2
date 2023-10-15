@@ -12,16 +12,16 @@ import { TypeNode } from "../type";
 function validationPropsParent(
   props: Record<string, any>,
 ): Record<string, any> | null {
-  if (props["rules"] === undefined) {
+  if (props["rule"] === undefined) {
     console.warn(
-      '%c[o-if]%c: "rules" Не указано',
+      '%c[o-if]%c: "rule" Не указано',
       `font-weight: bold`,
       `font-weight: normal`,
     );
     return null;
-  } else if (typeof props["rules"] !== "function") {
+  } else if (typeof props["rule"] !== "function") {
     console.warn(
-      '%c[o-if]%c: Для правильной работы необходимо передавать в "rules" функцию',
+      '%c[o-if]%c: Для правильной работы необходимо передавать в "rule" функцию',
       `font-weight: bold`,
       `font-weight: normal`,
     );
