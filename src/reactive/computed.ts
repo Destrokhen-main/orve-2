@@ -3,8 +3,12 @@ import { ReactiveType } from "./type";
 
 function computed(func: () => unknown, dep: unknown[] = []) {
   if (typeof func !== "function") {
-    console.error("ERROR func");
+    console.error("Первым параметром ожидается функция");
     return;
+  }
+
+  if (dep && !Array.isArray(dep)) {
+    dep = [dep];
   }
 
   const firstCall = func();
@@ -23,10 +27,6 @@ function computed(func: () => unknown, dep: unknown[] = []) {
       },
     },
     {
-      set(t, p, v) {
-        const res = Reflect.set(t, p, v);
-        return res;
-      },
       get(t, p) {
         if (p === Symbol.toPrimitive) {
           return () => t.value;
