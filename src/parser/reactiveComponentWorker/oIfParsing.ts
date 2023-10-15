@@ -91,6 +91,8 @@ interface IChildrenOif {
   else?: boolean;
 }
 
+// TODO
+// [ ] - Необходимо сделать поддержку template вот тут
 /**
  * Функция проверяет children o-if
  * @param children - массив children

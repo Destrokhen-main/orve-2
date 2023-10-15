@@ -87,9 +87,9 @@ function orveCreate() {
     global.window = global as any;
   }
 
-  if (window.Orve === undefined) {
-    window.Orve = {};
-  }
+  // if (window.Orve === undefined) {
+  //   window.Orve = {};
+  // }
 
   const instance: OrveInstance = {
     tree: null,
