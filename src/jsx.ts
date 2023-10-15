@@ -155,6 +155,11 @@ function Node(
       Node.children = prep;
     }
   }
+
+  // if (tag === TEMPLATE) {
+  //   return FragmentTemplate({ props, children });
+  // }
+
   return Node;
 }
 
@@ -169,5 +174,13 @@ function Fragment(node: FragmentT): NodeB {
     children: node.children !== undefined ? node.children : [],
   };
 }
+
+// function FragmentTemplate(node: { props: Props | null; children: Children }) {
+//   return {
+//     tag: FRAGMENT,
+//     props: node.props ? node.props : {},
+//     children: node.children !== undefined ? node.children : [],
+//   };
+// }
 
 export { Node, Fragment };

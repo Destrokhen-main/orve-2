@@ -1,6 +1,7 @@
 import { parseSingleChildren } from "../../parser/children";
 import { RefA } from "../../reactive/ref";
 import { EtypeRefRequest, Dir } from "../../reactive/refHelper";
+import { ReactiveType } from "../../reactive/type";
 import { singelMounterChildren, InsertType } from "../children";
 import { createCommentAndInsert } from "../helper";
 import {
@@ -13,26 +14,36 @@ import {
   RefAInsertByIndex,
 } from "../helperType";
 
-const compareObjects = (a: any, b: any) => {
+export const compareObjects = (a: any, b: any) => {
   if (a === b) return true;
 
-  if (typeof a != "object" || typeof b != "object" || a == null || b == null)
+  if (
+    typeof a !== "object" ||
+    typeof b !== "object" ||
+    a === null ||
+    b === null
+  )
     return false;
 
   const keysA = Object.keys(a),
     keysB = Object.keys(b);
 
-  if (keysA.length != keysB.length) {
+  if (keysA.length !== keysB.length) {
     return false;
   }
 
+  if (a.type !== undefined && Object.values(ReactiveType).includes(a.type))
+    return true;
+
   for (const key of keysA) {
+    if (key.startsWith("$")) continue;
+
     if (!keysB.includes(key)) {
       return false;
     }
 
     if (typeof a[key] === "function" || typeof b[key] === "function") {
-      if (a[key].toString() != b[key].toString()) {
+      if (a[key].toString() !== b[key].toString()) {
         return false;
       }
     } else {
@@ -173,6 +184,10 @@ function RefArray(
               (allInstruction as SettingNode[])[index].prepaire,
             )
           ) {
+            console.log(
+              item,
+              (allInstruction as SettingNode[])[index].prepaire,
+            );
             const newItem = {
               prepaire: item,
               mount: mounterInsance(parserInstance(item) as InsertType),

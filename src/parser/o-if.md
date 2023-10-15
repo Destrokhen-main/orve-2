@@ -8,7 +8,7 @@
 
 o-if это просто прослойка, которая в итоге модифицируется в совсем другой кусок кода. Чтобы компонент отработал как следует, необходимо указать два аттрибута
 
-* rules - Обязатель функция (() => {}) Которая будет возвращать какое-то значение или boolean
+* rule - Обязатель функция (() => {}) Которая будет возвращать какое-то значение или boolean
 * dep - одну или несколько реактивных переменных. Данное свойство важно для работы компонента, так как реактивные функции помогут
         определиться, когда необходимо перепроверить условие.
 
@@ -20,7 +20,7 @@ function App() {
 
   return (
     <div>
-      <o-if rules={() => bol.value} dep={bol}>
+      <o-if rule={() => bol.value} dep={bol}>
       
       </o-if>
     </div>
@@ -38,7 +38,7 @@ function App() {
 
   return (
     <div>
-      <o-if rules={() => bol.value} dep={bol}>
+      <o-if rule={() => bol.value} dep={bol}>
         <div o-if={true}>
           ....
         </div>
@@ -61,7 +61,7 @@ function App() {
 
   return (
     <div>
-      <o-if rules={() => bol.value} dep={bol}>
+      <o-if rule={() => bol.value} dep={bol}>
         <div o-if={1}>
           ....
         </div>
@@ -99,8 +99,8 @@ funciton App() {
         }
       }}
     >
-      <o-if rules={() =>isLoading.value } dep={isLoading}>
-        <o-if o-if={false} rules={() => data.length > 0} dep={data}>
+      <o-if rule={() =>isLoading.value } dep={isLoading}>
+        <o-if o-if={false} rule={() => data.length > 0} dep={data}>
           <div o-if={true}>
             {
               data.for((e) => return (..))

@@ -17,6 +17,7 @@ import {
 } from "./helper";
 
 import { mounterNode } from "./index";
+import { RefComputedWorker } from "./reactive/refComputed";
 
 export type InsertType = NodeOP | NodeChild | NodeHtml;
 
@@ -108,6 +109,11 @@ function singelMounterChildren(root: Element | null) {
 
       if (reactiveObject.type === ReactiveType.RefCComponent) {
         RefCComponentWorker(root, reactiveObject);
+        return item;
+      }
+
+      if (reactiveObject.type === ReactiveType.RefComputed) {
+        RefComputedWorker(root, reactiveObject);
         return item;
       }
     }
