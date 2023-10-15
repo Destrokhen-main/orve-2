@@ -1,6 +1,6 @@
 import { KEY_NEED_REWRITE_WITH_O } from "../keys";
 import { Props } from "../jsx";
-import { TEMPLATE } from "../keys";
+import { SLOT } from "../keys";
 import { ReactiveType } from "../reactive/type";
 import { camelToSnakeCase } from "../utils/transformFunctions";
 import { TypeProps } from "./type";
@@ -177,7 +177,7 @@ function workWithStaticProps(obj: any, key: string) {
     return [obj, true];
   }
 
-  if (typeof value === "object" && key === TEMPLATE) {
+  if (typeof value === "object" && key === SLOT) {
     obj[key] = value;
     return [obj, true];
   }

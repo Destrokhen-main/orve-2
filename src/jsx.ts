@@ -1,5 +1,5 @@
 import { KEY_NEED_REWRITE } from "./keys";
-import { FRAGMENT, TEMPLATE } from "./keys";
+import { FRAGMENT, SLOT } from "./keys";
 import { ReactiveType } from "./reactive/type";
 
 type Tag = string | (() => any); // TODO изменить типы
@@ -57,7 +57,7 @@ export interface JSX {
 const DIRECTIVES_ORVE = ["o-hooks", "o-ref", "o-key"];
 
 /* TODO 
-[ ] - Если пользовать использует RefC template тоже должен работать
+[ ] - Если пользовать использует RefC slot тоже должен работать
 */
 
 /**
@@ -108,10 +108,10 @@ function Node(
       (typeof tag === "object" &&
         (tag as Record<string, any>).type === ReactiveType.RefC))
   ) {
-    // Проведём работы, чтобы избавиться от всех template
+    // Проведём работы, чтобы избавиться от всех slot
     const newChild: any[] = [];
 
-    const template: Record<string, any> = {};
+    const slot: Record<string, any> = {};
 
     children.forEach((e: any) => {
       if (typeof e !== "object") {
@@ -119,20 +119,20 @@ function Node(
         return;
       }
 
-      if (e.tag !== undefined && e.tag === TEMPLATE) {
+      if (e.tag !== undefined && e.tag === SLOT) {
         if (e.props !== undefined && e.props.name !== undefined) {
-          template[e.props.name] = e.children;
+          slot[e.props.name] = e.children;
         } else {
-          template.default = e.children;
+          slot.default = e.children;
         }
       }
     });
 
-    if (Object.keys(template).length > 0) {
+    if (Object.keys(slot).length > 0) {
       if (Node.props !== undefined && Node.props !== null) {
-        Node.props.template = template;
+        Node.props.slot = slot;
       } else {
-        Node.props = { template };
+        Node.props = { slot };
       }
     }
 
@@ -140,13 +140,13 @@ function Node(
       Node.children = newChild;
     }
   } else if (children.length > 0) {
-    // На всякий случай, если остается тут template
-    // но прошлое уловие не прошло, тогда надо удалить все template
+    // На всякий случай, если остается тут slot
+    // но прошлое уловие не прошло, тогда надо удалить все slot
     const prep = [];
     for (let i = 0; i !== children.length; i++) {
       if (
         typeof children[i] !== "object" ||
-        (typeof children[i] === "object" && children[i].tag !== TEMPLATE)
+        (typeof children[i] === "object" && children[i].tag !== SLOT)
       ) {
         prep.push(children[i]);
       }
@@ -159,7 +159,6 @@ function Node(
   // if (tag === TEMPLATE) {
   //   return FragmentTemplate({ props, children });
   // }
-
   return Node;
 }
 

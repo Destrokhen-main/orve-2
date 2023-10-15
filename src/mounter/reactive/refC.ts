@@ -39,7 +39,7 @@ function RefCWorker(root: Element | null, item: Record<string, any>) {
 [ ] - Дать возможность передавать () => import("...") и обычные компоненты <Component />
 [ ] - Комент если value undefined
 [ ] - Компоненты могут быть с в родителе fragment
-[X] - <template></template>
+[X] - <slot></slot>
 */
 function RefCComponentWorker(root: Element | null, item: Record<string, any>) {
   const component = parserNodeF.call({}, item.proxy.value, item.props);

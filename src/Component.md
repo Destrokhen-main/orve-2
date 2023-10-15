@@ -125,9 +125,9 @@ function Comment({ i }) {
 
 На данный момент парсер и маунтер работают до 1280 вложенных компонентов.
 
-#### template
+#### Slot
 
-Иногда при разработке компонентов, есть потребность использовать template
+Иногда при разработке компонентов, есть потребность использовать Slot
 
 ```
 function Modal() {
@@ -155,7 +155,7 @@ function Modal() {
 
 Если вы привыкли так решать данную задачу, вы также сможете решить её тут.
 
-В противном случаи у вас есть возможность использовать template.
+В противном случаи у вас есть возможность использовать Slot.
 
 Для этого в компоненте необходимо указать вот такие конструкции.
 
@@ -163,33 +163,33 @@ function Modal() {
 function App() {
   return (
     <Modal>
-      <template name="header">...</template>
-      <template name="body">...</template>
-      <template name="footer">...</template>
+      <slot name="header">...</slot>
+      <slot name="body">...</slot>
+      <slot name="footer">...</slot>
     </Modal>
   )
 }
 ```
 
-В случаи если name не указать, код внутри `template` будет располагаться под свойством `default`
+В случаи если name не указать, код внутри `slot` будет располагаться под свойством `default`
 
-*Обратите внимание, template можно использовать только в компонентах*
+*Обратите внимание, slot можно использовать только в компонентах*
 
-Данные template буду объявлены в props
+Данные slot буду объявлены в props
 
 ```
-function Modal({ template }) {
+function Modal({ slot }) {
   return (
     <div class="wrapper">
       <div class="modal>
         <div>
-          {template?.header}
+          {slot?.header}
         </div>
         <div>
-          {template?.body}
+          {slot?.body}
         </div>
         <div>
-          {template?.footer}
+          {slot?.footer}
         </div>
       </div>
     </div>
@@ -199,13 +199,13 @@ function Modal({ template }) {
 
 *Знаки вопроса, сделаны специально, чтобы не ломать приложение, не забывайте о них пожалуйста*
 
-В таком случаи template будут работать
+В таком случаи slot будут работать
 
 Если есть необходимость задать значени по умолчанию:
 Тогда вы можете использовать "??":
 
 ```
-{ template?.header ?? <...jsx> }
+{ slot?.header ?? <...jsx> }
 ```
 
 #### Типизация пропсов.

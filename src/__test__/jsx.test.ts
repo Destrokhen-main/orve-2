@@ -1,5 +1,5 @@
 import { Node, Fragment } from "../jsx";
-import { FRAGMENT, TEMPLATE } from "../keys";
+import { FRAGMENT, SLOT } from "../keys";
 
 describe("jsx", () => {
   test("div element", () => {
@@ -99,11 +99,11 @@ describe("jsx", () => {
   test("Component with template", () => {
     const Component = () => {};
 
-    const div = Node(Component, null, Node(TEMPLATE, null, "test"));
+    const div = Node(Component, null, Node(SLOT, null, "test"));
     expect(div).toStrictEqual({
       tag: Component,
       props: {
-        template: {
+        slot: {
           default: ["test"],
         },
       },
@@ -116,15 +116,15 @@ describe("jsx", () => {
     const div = Node(
       Component,
       { id: "123" },
-      Node(TEMPLATE, { name: "test" }, "test"),
-      Node(TEMPLATE, null, "test"),
+      Node(SLOT, { name: "test" }, "test"),
+      Node(SLOT, null, "test"),
     );
 
     expect(div).toStrictEqual({
       tag: Component,
       props: {
         id: "123",
-        template: {
+        slot: {
           default: ["test"],
           test: ["test"],
         },
@@ -144,7 +144,7 @@ describe("jsx", () => {
   });
 
   test("Div with template", () => {
-    const div = Node("div", null, Node(TEMPLATE, null, "test"));
+    const div = Node("div", null, Node(SLOT, null, "test"));
     expect(div).toStrictEqual({
       tag: "div",
     });
@@ -156,14 +156,14 @@ describe("jsx", () => {
     const node = Node(
       Component,
       null,
-      Node(TEMPLATE, null, "before"),
-      Node(TEMPLATE, null, "after"),
+      Node(SLOT, null, "before"),
+      Node(SLOT, null, "after"),
     );
 
     expect(node).toStrictEqual({
       tag: Component,
       props: {
-        template: {
+        slot: {
           default: ["after"],
         },
       },
