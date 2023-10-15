@@ -1,6 +1,7 @@
 import { parseSingleChildren } from "../../parser/children";
 import { RefA } from "../../reactive/ref";
 import { EtypeRefRequest, Dir } from "../../reactive/refHelper";
+import { ReactiveType } from "../../reactive/type";
 import { singelMounterChildren, InsertType } from "../children";
 import { createCommentAndInsert } from "../helper";
 import {
@@ -31,7 +32,12 @@ export const compareObjects = (a: any, b: any) => {
     return false;
   }
 
+  if (a.type !== undefined && Object.values(ReactiveType).includes(a.type))
+    return true;
+
   for (const key of keysA) {
+    if (key.startsWith("$")) continue;
+
     if (!keysB.includes(key)) {
       return false;
     }
@@ -178,6 +184,10 @@ function RefArray(
               (allInstruction as SettingNode[])[index].prepaire,
             )
           ) {
+            console.log(
+              item,
+              (allInstruction as SettingNode[])[index].prepaire,
+            );
             const newItem = {
               prepaire: item,
               mount: mounterInsance(parserInstance(item) as InsertType),
