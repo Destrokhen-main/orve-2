@@ -37,25 +37,26 @@ function prepareComponent(
   props: Props | null = null,
 ): NodeO | null {
   let component: unknown | null = null;
+
+  const propsW = props !== null ? props : {};
+  if (propsW.slot === undefined) {
+    propsW.slot = {};
+  }
+
   try {
     if ((func as Record<string, any>).props !== undefined) {
       // TODO +1 непроверенный код
       const propFunction = (func as Record<string, any>).props;
       delete (func as Record<string, any>).props;
       const prepFunc = definedProps(func, propFunction);
-      component = prepFunc.call(this, props !== null ? props : {});
+      component = prepFunc.call(this, propsW);
     } else {
-      component = func.call(this, props !== null ? props : {});
+      component = func.call(this, propsW);
     }
   } catch (error) {
-    console.error(`[${func.name ?? "-"}()] - [Parser error]: ${error}`);
+    console.error(`[${func.name ?? "-"}()] - [Parser error]:`, error);
   }
-
-  if (
-    component !== null &&
-    validationNode(component, func.name) === true &&
-    component !== undefined
-  ) {
+  if (component && validationNode(component, func.name) === true) {
     return component as NodeO;
   }
 
@@ -85,6 +86,10 @@ function recursiveNode(node: NodeO): NodeO | null {
         object["children"] = ch;
       }
 
+      if (object.slot === undefined) {
+        object.slot = {};
+      }
+
       let component: unknown | null = null;
       try {
         if ((node.tag as Record<string, any>).props !== undefined) {
@@ -97,14 +102,10 @@ function recursiveNode(node: NodeO): NodeO | null {
           component = node.tag.call(this, object);
         }
       } catch (error) {
-        console.warn(`[${node.tag.name ?? "-"}()] Recursive ${error}`);
+        console.warn(`[${node.tag.name ?? "-"}()] Recursive `, error);
       }
 
-      if (
-        component !== null &&
-        validationNode(component, node.tag.name) === true &&
-        component !== undefined
-      ) {
+      if (component && validationNode(component, node.tag.name) === true) {
         returnedNode = component as NodeO;
         quee.push(returnedNode);
       } else if (component === null) {

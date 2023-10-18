@@ -145,8 +145,9 @@ function Node(
     const prep = [];
     for (let i = 0; i !== children.length; i++) {
       if (
-        typeof children[i] !== "object" ||
-        (typeof children[i] === "object" && children[i].tag !== SLOT)
+        children[i] &&
+        (typeof children[i] !== "object" ||
+          (typeof children[i] === "object" && children[i].tag !== SLOT))
       ) {
         prep.push(children[i]);
       }
