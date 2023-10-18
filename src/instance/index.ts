@@ -4,7 +4,7 @@ import { NodeOP } from "../parser/parser";
 import { cameCase } from "../utils/transformFunctions";
 
 export interface OrveInstance {
-  tree: NodeOP | null;
+  tree: NodeOP | null | any;
   context: {
     globalComponents?: Record<string, () => unknown>;
     [T: string]: any;

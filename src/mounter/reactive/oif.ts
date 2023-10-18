@@ -7,6 +7,7 @@ import { RefCComponentWorker } from "./refC";
 // [ ] - o-fragment attribute
 // [x] - o-if in o-if
 // [ ] - Написать тесты для refO и o-if.
+// [ ] - Если захочу работать с tempalte тут, то нужно уметь работать с массивами элементов, а не с единичными. СЕЙЧАС ЭТОГО НЕТ
 function OifWorker(
   root: Element | null,
   item: Record<string, any>,
@@ -14,7 +15,6 @@ function OifWorker(
 ) {
   let workedNode: Comment | HTMLElement | null | Element = null;
   let lastAnswer: any = null;
-
   const mounterInsance = singelMounterChildren(null);
 
   const currentRules = item.rule();
@@ -22,6 +22,7 @@ function OifWorker(
   if (item.answer[currentRules] !== undefined) {
     const node = mounterInsance(item.answer[currentRules]);
 
+    // NOTE отсюда думать надо, если придёт массив
     if (node.type === TypeNode.Reactive) {
       if (node.value.type === ReactiveType.Oif) {
         const htmlNode: any = OifWorker(root, node.value, true);

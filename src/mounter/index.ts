@@ -1,8 +1,9 @@
 import { InvokeHook } from "../helper/hookHelper";
-import { FRAGMENT } from "../keys";
+import { FRAGMENT, TEMPLATE } from "../keys";
 import { NodeOP } from "../parser/parser";
 import { mounterChildren } from "./children";
 import { propsWorker } from "./props";
+import { mounterTemplate } from "./childrenMounterHelper";
 
 /**
  * Монтирование node
@@ -17,6 +18,10 @@ function mounterNode(root: Element | null, tree: NodeOP) {
 
   if (tree.tag === FRAGMENT) {
     return mounterChildren(root, tree.children!);
+  }
+
+  if (tree.tag === TEMPLATE) {
+    return mounterTemplate(root, tree);
   }
 
   // before mount

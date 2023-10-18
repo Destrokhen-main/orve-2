@@ -1,4 +1,4 @@
-import { FRAGMENT } from "../keys";
+import { FRAGMENT, TEMPLATE } from "../keys";
 import { NodeOP } from "../parser/parser";
 import { NodeHtml, NodeChild } from "../parser/type";
 import { TypeNode } from "../parser/type";
@@ -26,7 +26,9 @@ export type InsertType = NodeOP | NodeChild | NodeHtml;
  * @param root - HTMLElement
  * @returns - переработанный node
  */
-function singelMounterChildren(root: Element | null) {
+function singelMounterChildren(
+  root: Element | null,
+): (item: InsertType) => any {
   return (item: InsertType) => {
     if (item === undefined || item === null) {
       return null;
@@ -35,12 +37,16 @@ function singelMounterChildren(root: Element | null) {
     if (item.type === TypeNode.Component) {
       const knowItem = item as NodeOP;
 
-      if (knowItem.tag !== FRAGMENT) {
+      if (knowItem.tag !== FRAGMENT && knowItem.tag !== TEMPLATE) {
         return mounterNode(root, knowItem);
       }
 
       if (knowItem.tag === FRAGMENT && knowItem.children.length > 0) {
         return mounterChildren(root, knowItem.children);
+      }
+
+      if (knowItem.tag === TEMPLATE && knowItem.children.length > 0) {
+        return mounterNode(root, knowItem);
       }
     }
 
@@ -126,7 +132,7 @@ function singelMounterChildren(root: Element | null) {
  * @param listNode - массив node
  * @returns - обработанные массив node
  */
-function mounterChildren(root: Element | null, listNode: InsertType[]): any {
+function mounterChildren(root: Element | null, listNode: InsertType[]): any[] {
   const prepaireFunction = singelMounterChildren(root);
 
   const finaly = listNode.map(prepaireFunction);

@@ -1,4 +1,4 @@
-import { FRAGMENT } from "../../keys";
+import { FRAGMENT, TEMPLATE } from "../../keys";
 import { ReactiveType } from "../../reactive/type";
 import { parseSingleChildren } from "../children";
 import { NodeOP } from "../parser";
@@ -151,11 +151,6 @@ function validationChildren(children: Array<any>) {
           delete newNode.props;
         }
 
-        if (ChildNode.fragment === true) {
-          delete newNode.props;
-          newNode.tag = FRAGMENT;
-        }
-
         if (ChildNode.else === true) {
           delete ChildNode.ans;
         }
@@ -169,7 +164,6 @@ function validationChildren(children: Array<any>) {
       return;
     }
   });
-
   return newChildren;
 }
 

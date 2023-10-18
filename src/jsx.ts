@@ -1,4 +1,4 @@
-import { KEY_NEED_REWRITE } from "./keys";
+import { KEY_NEED_REWRITE, TEMPLATE } from "./keys";
 import { FRAGMENT, SLOT } from "./keys";
 import { ReactiveType } from "./reactive/type";
 
@@ -102,6 +102,11 @@ function Node(
 
     Node.props = SetProps;
   }
+
+  if (tag === TEMPLATE) {
+    return FragmentTemplate(props, children);
+  }
+
   if (
     children.length > 0 &&
     (typeof tag === "function" ||
@@ -156,9 +161,6 @@ function Node(
     }
   }
 
-  // if (tag === TEMPLATE) {
-  //   return FragmentTemplate({ props, children });
-  // }
   return Node;
 }
 
@@ -174,12 +176,12 @@ function Fragment(node: FragmentT): NodeB {
   };
 }
 
-// function FragmentTemplate(node: { props: Props | null; children: Children }) {
-//   return {
-//     tag: FRAGMENT,
-//     props: node.props ? node.props : {},
-//     children: node.children !== undefined ? node.children : [],
-//   };
-// }
+function FragmentTemplate(props: Props | null, children: Children) {
+  return {
+    tag: TEMPLATE,
+    props: props ? props : {},
+    children: children !== undefined ? children : [],
+  };
+}
 
 export { Node, Fragment };
