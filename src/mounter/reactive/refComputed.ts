@@ -7,9 +7,14 @@ export function RefComputedWorker(
   item: Record<string, any>,
 ) {
   const textNode = document.createTextNode(item.value);
-  root?.append(textNode);
+
+  if (root !== null)
+    root.append(textNode);
 
   item.$sub.subscribe((v: any) => {
     textNode.textContent = String(v);
   });
+
+  if (root === null)
+    return textNode;
 }
