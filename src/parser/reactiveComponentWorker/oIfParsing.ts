@@ -1,5 +1,6 @@
 import { FRAGMENT } from "../../keys";
 import { ReactiveType } from "../../reactive/type";
+import { logger } from "../../utils/logger";
 import { parseSingleChildren } from "../children";
 import { NodeOP } from "../parser";
 import { TypeNode } from "../type";
@@ -13,26 +14,14 @@ function validationPropsParent(
   props: Record<string, any>,
 ): Record<string, any> | null {
   if (props["rule"] === undefined) {
-    console.warn(
-      '%c[o-if]%c: "rule" Не указано',
-      `font-weight: bold`,
-      `font-weight: normal`,
-    );
+    logger('warn', '%c[o-if]%c: "rule" Не указано');
     return null;
   } else if (typeof props["rule"] !== "function") {
-    console.warn(
-      '%c[o-if]%c: Для правильной работы необходимо передавать в "rule" функцию',
-      `font-weight: bold`,
-      `font-weight: normal`,
-    );
+    logger('warn', '%c[o-if]%c: Для правильной работы необходимо передавать в "rule" функцию');
   }
 
   if (props["dep"] === undefined) {
-    console.warn(
-      '%c[o-if]%c: "dep" - Чтобы реактивно следить за изменения в функции. Необходимо передать dep',
-      `font-weight: bold`,
-      `font-weight: normal`,
-    );
+    logger('warn', '%c[o-if]%c: "dep" - Чтобы реактивно следить за изменения в функции. Необходимо передать dep');
   } else {
     const check = (req: any) => {
       if (req.$sub !== undefined) return true;
@@ -44,13 +33,9 @@ function validationPropsParent(
         if (check(e)) {
           workerDep.push(e);
         } else {
-          console.warn(
-            `%c[o-if]%c: "dep" - ${JSON.stringify(
-              e,
-            )} - не могу работать с такой зависимостью`,
-            `font-weight: bold`,
-            `font-weight: normal`,
-          );
+          logger('warn', `%c[o-if]%c: "dep" - ${JSON.stringify(
+            e,
+          )} - не могу работать с такой зависимостью`);
         }
       });
     } else {
@@ -68,13 +53,9 @@ function validationPropsParent(
       } else if (check(props["dep"])) {
         workerDep.push(props["dep"]);
       } else {
-        console.warn(
-          `%c[o-if]%c: "dep" - ${JSON.stringify(
-            props["dep"],
-          )} - не могу работать с такой зависимостью`,
-          `font-weight: bold`,
-          `font-weight: normal`,
-        );
+        logger('warn', `%c[o-if]%c: "dep" - ${JSON.stringify(
+          props["dep"],
+        )} - не могу работать с такой зависимостью`);
       }
     }
 
@@ -117,22 +98,14 @@ function validationChildren(children: Array<any>) {
       Object.keys(e.props).forEach((key) => {
         if (["o-else", "v-else"].includes(key)) {
           if (key.startsWith("v")) {
-            console.warn(
-              `%c[v-else]%c: We called it anouther)`,
-              `font-weight: bold`,
-              `font-weight: normal`,
-            );
+            logger('warn', `%c[v-else]%c: We called it another)`);
           }
 
           ChildNode.else = true;
           isLegal = true;
         } else if (["o-if", "v-if"].includes(key)) {
           if (key.startsWith("v")) {
-            console.warn(
-              `%c[v-if]%c: We called it anouther)`,
-              `font-weight: bold`,
-              `font-weight: normal`,
-            );
+            logger('warn', `%c[v-if]%c: We called it another)`);
           }
 
           ChildNode.ans = e.props[key];
