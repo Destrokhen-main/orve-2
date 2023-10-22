@@ -2,7 +2,7 @@ import { parseSingleChildren } from "../../parser/children";
 import { RefA } from "../../reactive/ref";
 import { EtypeRefRequest, Dir } from "../../reactive/refHelper";
 import { ReactiveType } from "../../reactive/type";
-import { singelMounterChildren, InsertType } from "../children";
+import { singleMounterChildren, InsertType } from "../children";
 import { createCommentAndInsert } from "../helper";
 import {
   SettingNode,
@@ -78,7 +78,7 @@ function RefArray(
       callback !== null ? item.value.map(callback) : item.value;
 
     const parserInstance = parseSingleChildren.call(null, null);
-    const mounterInsance = singelMounterChildren(null);
+    const mounterInsance = singleMounterChildren(null);
 
     let startNode = root;
 
@@ -126,12 +126,12 @@ function RefArray(
         const prepaire =
           callback !== null
             ? workObject.value.map((item: any, i: number) =>
-                callback(item, startIndex + i),
-              )
+              callback(item, startIndex + i),
+            )
             : workObject.value;
 
         const parserInstance = parseSingleChildren.call(null, null);
-        const mounterInsance = singelMounterChildren(null);
+        const mounterInsance = singleMounterChildren(null);
 
         const instractionPrepaire: SettingNode[] = prepaire.map(
           (item: Record<string, any>): SettingNode => {
@@ -210,7 +210,7 @@ function RefArray(
           callback !== null ? workObject.value.map(callback) : workObject.value;
 
         const parserInstance = parseSingleChildren.call(null, null);
-        const mounterInsance = singelMounterChildren(null);
+        const mounterInsance = singleMounterChildren(null);
 
         let startNode = allInstruction;
 
@@ -245,7 +245,7 @@ function RefArray(
 
         if (!compareObjects(prepaire, beforeInstriction.prepaire)) {
           const parserInstance = parseSingleChildren.call(null, null);
-          const mounterInsance = singelMounterChildren(null);
+          const mounterInsance = singleMounterChildren(null);
 
           const m = {
             prepaire: prepaire,
@@ -355,7 +355,7 @@ function RefArray(
           callback !== null ? item.value.map(callback) : item.value;
 
         const parserInstance = parseSingleChildren.call(null, null);
-        const mounterInsance = singelMounterChildren(null);
+        const mounterInsance = singleMounterChildren(null);
 
         prepaire.forEach((e: Record<string, any>, index: number) => {
           if (
@@ -392,7 +392,7 @@ function RefArray(
             : workObject.value;
 
         const parserInstance = parseSingleChildren.call(null, null);
-        const mounterInsance = singelMounterChildren(null);
+        const mounterInsance = singleMounterChildren(null);
 
         let startInstruction = allInstruction[workObject.start];
         let isThisLastItem = false;
@@ -427,7 +427,7 @@ function RefArray(
             callback !== null ? item.value.map(callback) : item.value;
 
           const parserInstance = parseSingleChildren.call(null, null);
-          const mounterInsance = singelMounterChildren(null);
+          const mounterInsance = singleMounterChildren(null);
 
           prepaire.forEach((e: Record<string, any>, index: number) => {
             if (

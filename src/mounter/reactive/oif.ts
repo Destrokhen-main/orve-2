@@ -1,6 +1,6 @@
 import { TypeNode } from "../../parser/type";
 import { ReactiveType } from "../../reactive/type";
-import { singelMounterChildren } from "../children";
+import { singleMounterChildren } from "../children";
 import { RefCComponentWorker } from "./refC";
 
 // TODO
@@ -15,13 +15,12 @@ function OifWorker(
   let workedNode: Comment | HTMLElement | null | Element = null;
   let lastAnswer: any = null;
 
-  const mounterInsance = singelMounterChildren(null);
+  const mounterInstance = singleMounterChildren(null);
 
   const currentRules = item.rule();
   lastAnswer = currentRules;
   if (item.answer[currentRules] !== undefined) {
-    const node = mounterInsance(item.answer[currentRules]);
-
+    const node = mounterInstance(item.answer[currentRules]);
     if (node.type === TypeNode.Reactive) {
       if (node.value.type === ReactiveType.Oif) {
         const htmlNode: any = OifWorker(root, node.value, true);
@@ -35,7 +34,7 @@ function OifWorker(
       root?.appendChild(node.node);
     }
   } else if (item.answer["else"] !== undefined) {
-    const node = mounterInsance(item.answer["else"]);
+    const node = mounterInstance(item.answer["else"]);
     if (node.node !== undefined) {
       workedNode = node.node;
       root?.appendChild(node.node);
@@ -63,7 +62,7 @@ function OifWorker(
         const currentRules = item.rule();
         if (lastAnswer !== currentRules) {
           if (item.answer[currentRules] !== undefined) {
-            const node = mounterInsance(item.answer[currentRules]);
+            const node = mounterInstance(item.answer[currentRules]);
             if (node.type === TypeNode.Reactive) {
               if (node.value.type === ReactiveType.Oif) {
                 const htmlNode: any = OifWorker(root, node.value, true);
@@ -81,7 +80,7 @@ function OifWorker(
               workedNode = node.node;
             }
           } else if (item.answer.else !== undefined) {
-            const node = mounterInsance(item.answer["else"]);
+            const node = mounterInstance(item.answer["else"]);
             if (node.node !== undefined) {
               workedNode?.replaceWith(node.node);
               workedNode = node.node;

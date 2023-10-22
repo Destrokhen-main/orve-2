@@ -26,7 +26,7 @@ export type InsertType = NodeOP | NodeChild | NodeHtml;
  * @param root - HTMLElement
  * @returns - переработанный node
  */
-function singelMounterChildren(root: Element | null) {
+function singleMounterChildren(root: Element | null) {
   return (item: InsertType) => {
     if (item === undefined || item === null) {
       return null;
@@ -127,11 +127,11 @@ function singelMounterChildren(root: Element | null) {
  * @returns - обработанные массив node
  */
 function mounterChildren(root: Element | null, listNode: InsertType[]): any {
-  const prepaireFunction = singelMounterChildren(root);
+  const prepaireFunction = singleMounterChildren(root);
 
   const finaly = listNode.map(prepaireFunction);
 
   return finaly.filter((x) => x !== null);
 }
 
-export { mounterChildren, singelMounterChildren };
+export { mounterChildren, singleMounterChildren };

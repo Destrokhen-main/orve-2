@@ -1,5 +1,5 @@
 import { parserNodeF, NodeOP } from "../../parser/parser";
-import { singelMounterChildren } from "../children";
+import { singleMounterChildren } from "../children";
 
 /* TODO
 {RefC} - вставка в код
@@ -10,7 +10,7 @@ import { singelMounterChildren } from "../children";
 */
 function RefCWorker(root: Element | null, item: Record<string, any>) {
   const component = parserNodeF.call({}, item.value);
-  const mounterInsance = singelMounterChildren(null);
+  const mounterInsance = singleMounterChildren(null);
 
   let mountedNode: NodeOP | null = null;
 
@@ -43,7 +43,7 @@ function RefCWorker(root: Element | null, item: Record<string, any>) {
 */
 function RefCComponentWorker(root: Element | null, item: Record<string, any>) {
   const component = parserNodeF.call({}, item.proxy.value, item.props);
-  const mounterInsance = singelMounterChildren(null);
+  const mounterInsance = singleMounterChildren(null);
 
   let mountedNode: NodeOP | null = null;
 
