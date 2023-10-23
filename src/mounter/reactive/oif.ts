@@ -2,6 +2,7 @@ import { TypeNode } from "../../parser/type";
 import { ReactiveType } from "../../reactive/type";
 import { singleMounterChildren } from "../children";
 import { RefCComponentWorker } from "./refC";
+import { insertHTMLNode, removeAllAndInsertComment } from '../../utils/insertHTML';
 
 // TODO
 // [ ] - o-fragment attribute
@@ -12,7 +13,7 @@ function OifWorker(
   item: Record<string, any>,
   needReturnRoot: boolean = false,
 ) {
-  let workedNode: Comment | HTMLElement | null | Element = null;
+  let workedNode: Comment | HTMLElement | null | Element | any[] = null;
   let lastAnswer: any = null;
 
   const mounterInstance = singleMounterChildren(null);
@@ -21,24 +22,22 @@ function OifWorker(
   lastAnswer = currentRules;
   if (item.answer[currentRules] !== undefined) {
     const node = mounterInstance(item.answer[currentRules]);
-    if (node.type === TypeNode.Reactive) {
-      if (node.value.type === ReactiveType.Oif) {
-        const htmlNode: any = OifWorker(root, node.value, true);
-        workedNode = htmlNode;
-      } else if (node.value.type === ReactiveType.RefCComponent) {
-        const htmlNode: any = RefCComponentWorker(root, node.value);
-        if (htmlNode !== null) workedNode = htmlNode;
-      }
-    } else if (node.node !== undefined) {
-      workedNode = node.node;
-      root?.appendChild(node.node);
-    }
+    workedNode = insertHTMLNode(workedNode === null ? root : workedNode, node);
+    // if (node.type === TypeNode.Reactive) {
+    //   if (node.value.type === ReactiveType.Oif) {
+    //     const htmlNode: any = OifWorker(root, node.value, true);
+    //     workedNode = htmlNode;
+    //   } else if (node.value.type === ReactiveType.RefCComponent) {
+    //     const htmlNode: any = RefCComponentWorker(root, node.value);
+    //     if (htmlNode !== null) workedNode = htmlNode;
+    //   }
+    // } else if (node.node !== undefined) {
+    //   workedNode = node.node;
+    //   root?.appendChild(node.node);
+    // }
   } else if (item.answer["else"] !== undefined) {
     const node = mounterInstance(item.answer["else"]);
-    if (node.node !== undefined) {
-      workedNode = node.node;
-      root?.appendChild(node.node);
-    }
+    workedNode = insertHTMLNode(workedNode === null ? root : workedNode, node);
   } else {
     workedNode = document.createComment(" o-if ");
     root?.appendChild(workedNode);
@@ -63,32 +62,29 @@ function OifWorker(
         if (lastAnswer !== currentRules) {
           if (item.answer[currentRules] !== undefined) {
             const node = mounterInstance(item.answer[currentRules]);
-            if (node.type === TypeNode.Reactive) {
-              if (node.value.type === ReactiveType.Oif) {
-                const htmlNode: any = OifWorker(root, node.value, true);
-                workedNode?.replaceWith(htmlNode);
-                workedNode = htmlNode;
-              } else if (node.value.type === ReactiveType.RefCComponent) {
-                const htmlNode: any = RefCComponentWorker(root, node.value);
-                if (htmlNode !== null) {
-                  workedNode?.replaceWith(htmlNode);
-                  workedNode = htmlNode;
-                }
-              }
-            } else if (node.node !== undefined) {
-              workedNode?.replaceWith(node.node);
-              workedNode = node.node;
-            }
+            workedNode = insertHTMLNode(workedNode, node, true);
+            // if (node.type === TypeNode.Reactive) {
+            //   if (node.value.type === ReactiveType.Oif) {
+            //     const htmlNode: any = OifWorker(root, node.value, true);
+            //     workedNode?.replaceWith(htmlNode);
+            //     workedNode = htmlNode;
+            //   } else if (node.value.type === ReactiveType.RefCComponent) {
+            //     const htmlNode: any = RefCComponentWorker(root, node.value);
+            //     if (htmlNode !== null) {
+            //       workedNode?.replaceWith(htmlNode);
+            //       workedNode = htmlNode;
+            //     }
+            //   }
+            // } else if (node.node !== undefined) {
+            //   workedNode?.replaceWith(node.node);
+            //   workedNode = node.node;
+            // }
           } else if (item.answer.else !== undefined) {
             const node = mounterInstance(item.answer["else"]);
-            if (node.node !== undefined) {
-              workedNode?.replaceWith(node.node);
-              workedNode = node.node;
-            }
+            workedNode = insertHTMLNode(workedNode === null ? root : workedNode, node, true);
           } else {
             const comment = document.createComment(" oif ");
-            workedNode?.replaceWith(comment);
-            workedNode = comment;
+            workedNode = removeAllAndInsertComment(workedNode, comment);
           }
           lastAnswer = currentRules;
         }

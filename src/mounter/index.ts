@@ -1,5 +1,5 @@
 import { InvokeHook } from "../helper/hookHelper";
-import { FRAGMENT } from "../keys";
+import { FRAGMENT, TEMPLATE } from "../keys";
 import { NodeOP } from "../parser/parser";
 import { mounterChildren } from "./children";
 import { propsWorker } from "./props";
@@ -19,11 +19,14 @@ function mounterNode(root: Element | null, tree: NodeOP) {
     return mounterChildren(root, tree.children!);
   }
 
+  if (tree.tag === TEMPLATE) {
+    return mounterChildren(root, tree.children);
+  }
+
   // before mount
   if (tree.hooks && !InvokeHook(tree, "beforeMount")) {
     console.warn(
-      `[${
-        tree.nameC ?? "-"
+      `[${tree.nameC ?? "-"
       }()] - hooks: "beforeMount" - Before mount hook error`,
     );
   }

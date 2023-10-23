@@ -1,6 +1,6 @@
 import { NodeChild, NodeHtml } from "../parser/type";
 import { Ref, RefFormater } from "../reactive/ref";
-import { distinct, startWith } from "rxjs";
+import { distinctUntilChanged, startWith } from "rxjs";
 import { EtypeComment } from "./helperType";
 
 function textNodeCreator(item: NodeChild) {
@@ -27,7 +27,12 @@ function RefChildCreator(
 
   const sub = item.$sub;
   // TODO при первом вызове обновления не приходит next
-  sub.pipe(startWith(item.value), distinct()).subscribe({
+  sub.pipe(
+    startWith(item.value),
+    distinctUntilChanged((prevHigh: any, temp: any) => {
+      return temp === prevHigh;
+    })
+  ).subscribe({
     next(after: string | number) {
       textNode.textContent = String(after);
     },
