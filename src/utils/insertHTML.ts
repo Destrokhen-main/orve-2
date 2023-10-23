@@ -15,7 +15,8 @@ export function insertHTMLNode(workItem: any | any[] | null, item: any | any[], 
           workItem[i].node.remove();
         }
       } else {
-        currentItem = workItem.nodeType === 8 ? workItem : workItem.node;
+        // TODO поломал обычное отображение но теперь работают template (
+        currentItem = (workItem?.nodeType ?? 0) === 8 ? workItem : workItem.node;
       }
       item.forEach((e, i) => {
         currentItem[i === 0 ? 'replaceWith' : 'appendChild'](e.node);
@@ -31,9 +32,17 @@ export function insertHTMLNode(workItem: any | any[] | null, item: any | any[], 
     }
 
     return item;
+  } else if (Array.isArray(workItem)) {
+    const currentItem = workItem[0].node;
+
+    for (let i = 1; i !== workItem.length; i++) {
+      workItem[i].node.remove();
+    }
+
+    currentItem[replace ? 'replaceWith' : 'appendChild'](item.node);
   } else {
     if (workItem !== null) {
-      workItem[replace ? 'replaceWith' : 'appendChild'](item.node);
+      workItem.node[replace ? 'replaceWith' : 'appendChild'](item.node);
     }
 
     return item;
