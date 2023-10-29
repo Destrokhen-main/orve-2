@@ -3,6 +3,7 @@ import { ReactiveType } from "../../reactive/type";
 import { singleMounterChildren } from "../children";
 import { RefCComponentWorker } from "./refC";
 import { insertHTMLNode, removeAllAndInsertComment } from '../../utils/insertHTML';
+import { NodeOP } from "../../parser/parser";
 
 // TODO
 // [ ] - o-fragment attribute
@@ -13,11 +14,10 @@ function OifWorker(
   item: Record<string, any>,
   needReturnRoot: boolean = false,
 ) {
-  let workedNode: Comment | HTMLElement | null | Element | any[] = null;
+  let workedNode: Comment | NodeOP | any[] | null = null;
   let lastAnswer: any = null;
 
   const mounterInstance = singleMounterChildren(null);
-
   const currentRules = item.rule();
   lastAnswer = currentRules;
   if (item.answer[currentRules] !== undefined) {

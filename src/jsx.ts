@@ -73,7 +73,7 @@ function Node(
   ...children: Children
 ): NodeB {
   if (typeof tag === "function" && tag.name === FRAGMENT) {
-    return Fragment({ children });
+    return Fragment(props, children);
   }
 
   const Node: NodeB = { tag };
@@ -168,11 +168,17 @@ function Node(
  * @param node Object
  * @returns Object of Node
  */
-function Fragment(node: FragmentT): NodeB {
-  return {
+function Fragment(props?: Props | null, ...children: any[]): NodeB {
+  const a = {
     tag: FRAGMENT,
-    children: node.children !== undefined ? node.children : [],
-  };
+    children: children,
+  } as NodeB;
+
+  if (props) {
+    a['props'] = props;
+  }
+
+  return a;
 }
 
 // function FragmentTemplate(node: { props: Props | null; children: Children }) {
