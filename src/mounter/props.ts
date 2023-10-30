@@ -1,4 +1,4 @@
-import { fromEvent, pairwise } from "rxjs";
+import { distinctUntilChanged, fromEvent, pairwise } from "rxjs";
 import { Props } from "../jsx";
 import { PropsItem, SPECIFIC_KEYS, objectToCss } from "../parser/props";
 import { TypeProps } from "../parser/type";
@@ -142,6 +142,22 @@ function propsWorker(root: HTMLElement, item: Props) {
               }
             });
         }
+      }
+    }
+
+    // TODO сейчас только для статики работает, нужно логику и для style и для остального
+    if (obj.type === TypeProps.ReactiveComputed) {
+      const item = obj.value;
+      if (item.value !== null && item.value !== "") {
+        root.setAttribute(key, item.value);
+
+        item.$sub.pipe(
+          distinctUntilChanged((prevHigh: any, temp: any) => {
+            return temp === prevHigh;
+          }),
+        ).subscribe(() => {
+          root.setAttribute(key, item.value);
+        });
       }
     }
   });

@@ -93,6 +93,10 @@ function specificProps(obj: any, key: string): [Record<string, any>, boolean] {
         value: value,
       };
       return [obj, true];
+    } else if (
+      typeof value === "object"
+    ) {
+      console.log(value);
     }
   }
 
@@ -171,6 +175,19 @@ function workWithStaticProps(obj: any, key: string) {
   ) {
     obj[key] = {
       type: TypeProps.StaticReactiveF,
+      value: value,
+    };
+
+    return [obj, true];
+  }
+
+  if (
+    typeof value === "object" &&
+    value.type !== undefined &&
+    value.type === ReactiveType.RefComputed
+  ) {
+    obj[key] = {
+      type: TypeProps.ReactiveComputed,
       value: value,
     };
 

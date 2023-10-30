@@ -15,6 +15,7 @@ export enum TypeProps {
   EventReactiveF = "EventReactiveF",
   StaticReactive = "StaticReactive",
   StaticReactiveF = "StaticReactiveF",
+  ReactiveComputed = "ReactiveComputed"
 }
 
 // Static Child Node
