@@ -8,6 +8,7 @@
 <div>test</div> === Node('div', {}, "test");
 
 <></> === Fragment(...children)
+<Fragment></Fragment> === Fragment(props, ...children);
 ```
 
 Вы можете использовать как Node, так и разрабатывать всё опираясь только на jsx
