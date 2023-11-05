@@ -1,60 +1,7 @@
+import { Children, DIRECTIVES_ORVE, NodeB, Props, Tag } from "./jsx-type";
 import { KEY_NEED_REWRITE } from "./keys";
 import { FRAGMENT, SLOT } from "./keys";
 import { ReactiveType } from "./reactive/type";
-
-type Tag = string | (() => any); // TODO изменить типы
-export type Props = Record<string, any>;
-export type Children = any;
-export type FragmentT = { children?: Children };
-
-export const HOOKS_STRING_NAME = [
-  "beforeCreate",
-  "created",
-  "beforeMount",
-  "mounted",
-  "beforeUpdate",
-  "updated",
-  "beforeUnmount",
-  "unmounted",
-];
-
-export interface NodeHooks {
-  beforeCreate: (instance?: any) => void;
-  created: (instance?: any) => void;
-  beforeMount: (instance?: any) => void;
-  mounted: (instance?: any) => void;
-  beforeUpdate: (instance?: any) => void;
-  updated: (instance?: any) => void;
-  beforeUnmount: (instance?: any) => void;
-  unmounted: (instance?: any) => void;
-}
-
-export const ACCESS_KEY = [
-  "tag",
-  "props",
-  "children",
-  "hooks",
-  "ref",
-  "keyNode",
-  "nameC",
-];
-
-export interface NodeB {
-  tag: Tag;
-  keyNode?: string | number;
-  props?: Props;
-  children?: Children[];
-  hooks?: NodeHooks;
-  nameC?: string;
-  ref?: any; // TODO fix this
-}
-
-export interface JSX {
-  Node: (tag: Tag, props: Props | null, ...children: Children) => NodeB;
-  Fragment: (node: FragmentT) => NodeB;
-}
-
-const DIRECTIVES_ORVE = ["o-hooks", "o-ref", "o-key"];
 
 /* TODO 
 [ ] - Если пользовать использует RefC slot тоже должен работать
@@ -85,15 +32,15 @@ function Node(
       if (KEY_NEED_REWRITE.includes(key)) {
         SetProps[`o${key}`] = props[key];
       } else if (DIRECTIVES_ORVE.includes(key)) {
-        const inseredKey = key
+        const insertedKey = key
           .replace("o-", "")
           .toLocaleLowerCase()
-          .trim() as keyof NodeB;
+          .trim() as any;
 
-        if ((inseredKey as string) === "key") {
+        if (insertedKey === "key") {
           Node.keyNode = String(props[key]);
         } else {
-          Node[inseredKey] = props[key];
+          Node[insertedKey as keyof NodeB] = props[key];
         }
       } else {
         SetProps[key] = props[key];
@@ -102,6 +49,7 @@ function Node(
 
     Node.props = SetProps;
   }
+
   if (
     children.length > 0 &&
     (typeof tag === "function" ||
@@ -157,9 +105,6 @@ function Node(
     }
   }
 
-  // if (tag === TEMPLATE) {
-  //   return FragmentTemplate({ props, children });
-  // }
   return Node;
 }
 
@@ -168,10 +113,10 @@ function Node(
  * @param node Object
  * @returns Object of Node
  */
-function Fragment(props?: Props | null, ...children: any[]): NodeB {
+function Fragment(props: Props | null, ...children: any[]): NodeB {
   const a = {
     tag: FRAGMENT,
-    children: children,
+    children: children.filter((e) => e !== null && e !== undefined),
   } as NodeB;
 
   if (props) {
@@ -180,13 +125,5 @@ function Fragment(props?: Props | null, ...children: any[]): NodeB {
 
   return a;
 }
-
-// function FragmentTemplate(node: { props: Props | null; children: Children }) {
-//   return {
-//     tag: FRAGMENT,
-//     props: node.props ? node.props : {},
-//     children: node.children !== undefined ? node.children : [],
-//   };
-// }
 
 export { Node, Fragment };

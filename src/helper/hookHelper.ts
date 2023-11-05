@@ -1,4 +1,4 @@
-import { NodeHooks } from "../jsx";
+import { NodeHooks } from "../jsx-type";
 import { NodeOP } from "../parser/parser";
 
 /* TODO

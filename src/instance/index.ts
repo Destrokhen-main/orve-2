@@ -1,4 +1,4 @@
-import { JSX } from "../jsx";
+import { JSX } from "../jsx-type";
 import { CreateApp, OptionsInstance, createApp } from "../parser";
 import { NodeOP } from "../parser/parser";
 import { cameCase } from "../utils/transformFunctions";

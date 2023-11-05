@@ -1,6 +1,6 @@
 import { BehaviorSubject, share } from "rxjs";
 
-interface refL {
+export interface refL {
   value: any;
   $sub: any;
 }

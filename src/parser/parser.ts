@@ -1,8 +1,8 @@
-import { Props, Children, NodeB } from "../jsx";
+import { Props, Children, NodeB } from "../jsx-type";
 import { validationNode } from "./helper";
 import { genUID } from "../helper/generation";
 import { parseChildren } from "./children";
-import { propsWorker } from "./props";
+import { PropsItem, propsWorker } from "./props";
 import { TypeNode } from "./type";
 import { InvokeHook } from "../helper/hookHelper";
 import {
@@ -172,6 +172,7 @@ function parserNodeF(
 
   const componentO: NodeOP = {
     ...component,
+    props: component.props as any,
     node: null,
     parent,
     type: TypeNode.Component,
@@ -244,6 +245,7 @@ function parserNodeO(node: NodeO, parent: NodeOP | null = null): NodeOP | null {
 
   const componentO: NodeOP = {
     ...workNode,
+    props: workNode.props as any,
     node: null,
     parent,
     type: TypeNode.Component,

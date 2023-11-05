@@ -1,5 +1,5 @@
-import { NodeB } from "../jsx";
-import { HOOKS_STRING_NAME, ACCESS_KEY } from "../jsx";
+import { NodeB } from "../jsx-type";
+import { HOOKS_STRING_NAME, ACCESS_KEY } from "../jsx-type";
 
 /**
  * Валидация компонента

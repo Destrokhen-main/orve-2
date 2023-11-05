@@ -11,4 +11,8 @@ describe("Тестовые кейсы", () => {
     (a as any).value += 10;
     expect(c?.value).toBe(40);
   });
+
+  test.only("SLOT", () => {
+
+  });
 });

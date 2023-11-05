@@ -72,7 +72,7 @@ describe("jsx", () => {
   });
 
   test("Fragment empty", () => {
-    const fragment = Fragment({ children: [] });
+    const fragment = Fragment(null, null);
 
     expect(fragment).toStrictEqual({
       tag: FRAGMENT,
@@ -81,9 +81,9 @@ describe("jsx", () => {
   });
 
   test("Fragment with div", () => {
-    const fragment = Fragment({
-      children: [{ tag: "div", children: ["test"] }],
-    });
+    const fragment = Fragment(null,
+      { tag: "div", children: ["test"] }
+    );
 
     expect(fragment).toStrictEqual({
       tag: FRAGMENT,
@@ -97,7 +97,7 @@ describe("jsx", () => {
   });
 
   test("Component with template", () => {
-    const Component = () => {};
+    const Component = () => { };
 
     const div = Node(Component, null, Node(SLOT, null, "test"));
     expect(div).toStrictEqual({
@@ -111,7 +111,7 @@ describe("jsx", () => {
   });
 
   test("Component with template default and custome", () => {
-    const Component = () => {};
+    const Component = () => { };
 
     const div = Node(
       Component,
@@ -133,7 +133,7 @@ describe("jsx", () => {
   });
 
   test("Component without template - just test", () => {
-    const Component = () => {};
+    const Component = () => { };
 
     const div = Node(Component, { test: "123" }, "test", "test-2");
     expect(div).toStrictEqual({
@@ -151,7 +151,7 @@ describe("jsx", () => {
   });
 
   test("Rewrite template in component", () => {
-    const Component = () => {};
+    const Component = () => { };
 
     const node = Node(
       Component,
