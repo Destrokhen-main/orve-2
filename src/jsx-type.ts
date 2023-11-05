@@ -16,15 +16,16 @@ export const HOOKS_STRING_NAME = [
   "unmounted",
 ];
 
+type hookCallback = (instance?: any) => void;
 export interface NodeHooks {
-  beforeCreate: (instance?: any) => void;
-  created: (instance?: any) => void;
-  beforeMount: (instance?: any) => void;
-  mounted: (instance?: any) => void;
-  beforeUpdate: (instance?: any) => void;
-  updated: (instance?: any) => void;
-  beforeUnmount: (instance?: any) => void;
-  unmounted: (instance?: any) => void;
+  beforeCreate: hookCallback;
+  created: hookCallback;
+  beforeMount: hookCallback;
+  mounted: hookCallback;
+  beforeUpdate: hookCallback;
+  updated: hookCallback;
+  beforeUnmount: hookCallback;
+  unmounted: hookCallback;
 }
 
 export const ACCESS_KEY = [
@@ -44,7 +45,7 @@ export interface NodeB {
   children?: Children[];
   hooks?: NodeHooks;
   nameC?: string;
-  ref?: refL; // TODO fix this
+  ref?: refL;
 }
 
 
