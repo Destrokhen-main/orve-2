@@ -2,7 +2,7 @@ import { Props, Children, NodeB } from "../jsx-type";
 import { validationNode } from "./helper";
 import { genUID } from "../helper/generation";
 import { parseChildren } from "./children";
-import { PropsItem, propsWorker } from "./props";
+import { propsWorker } from "./props";
 import { TypeNode } from "./type";
 import { InvokeHook } from "../helper/hookHelper";
 import {

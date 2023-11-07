@@ -1,6 +1,7 @@
 import { parserNodeF } from '../parser';
 import { Node } from "../../jsx";
 import { FRAGMENT } from '../../keys';
+import { OrveContext } from '../../instance';
 
 describe("parseNodeF children", () => {
   test("Default component", () => {
@@ -8,7 +9,7 @@ describe("parseNodeF children", () => {
       return Node('div', null, "HELLO WORLD");
     };
 
-    const res = parserNodeF.call({ __CTX_ID__: true }, App);
+    const res = parserNodeF.call({ __CTX_ID__: true } as OrveContext, App);
     expect(res).toStrictEqual({
       tag: 'div',
       children: [{ type: 'Static', value: 'HELLO WORLD', node: null }],
@@ -30,7 +31,7 @@ describe("parseNodeF children", () => {
       return Node('div', null, Node(component1, null));
     };
 
-    const res = parserNodeF.call({ __CTX_ID__: true, __CTX_PARENT__: true }, component);
+    const res = parserNodeF.call({ __CTX_ID__: true, __CTX_PARENT__: true } as OrveContext, component);
     expect(res).toStrictEqual(
       {
         tag: 'div',
@@ -65,7 +66,7 @@ describe("parseNodeF children", () => {
       return Node('div', null, Node(component1, null));
     };
 
-    const res = parserNodeF.call({ __CTX_ID__: true, __CTX_PARENT__: true }, component);
+    const res = parserNodeF.call({ __CTX_ID__: true, __CTX_PARENT__: true } as OrveContext, component);
     expect(res).toStrictEqual(
       {
         tag: 'div',
@@ -104,7 +105,7 @@ describe("parseNodeF children", () => {
     function component() {
       return Node('div', null, Node(component1, null));
     };
-    const res = parserNodeF.call({ __CTX_ID__: true, __CTX_PARENT__: true }, component);
+    const res = parserNodeF.call({ __CTX_ID__: true, __CTX_PARENT__: true } as OrveContext, component);
     expect(res).toStrictEqual(
       {
         tag: 'div',
@@ -141,7 +142,7 @@ describe("parseNodeF children", () => {
     function component() {
       return Node('div', null, Node(component1, null));
     };
-    const res = parserNodeF.call({ __CTX_ID__: true, __CTX_PARENT__: true }, component);
+    const res = parserNodeF.call({ __CTX_ID__: true, __CTX_PARENT__: true } as OrveContext, component);
     expect(res).toStrictEqual(
       {
         tag: 'div',
@@ -193,7 +194,7 @@ describe("parseNodeF props", () => {
       return Node('div', { id: "1", class: '2', onClick: fn }, "HELLO WORLD");
     };
 
-    const res = parserNodeF.call({ __CTX_ID__: true }, App);
+    const res = parserNodeF.call({ __CTX_ID__: true } as OrveContext, App);
     expect(res).toStrictEqual({
       tag: 'div',
       props: {

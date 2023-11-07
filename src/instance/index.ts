@@ -21,6 +21,12 @@ export interface OrveInstance {
   ) => void;
 }
 
+export interface OrveContext {
+  __CTX_ID__?: boolean
+  __CTX_PARENT__?: boolean
+  [x: string]: any
+}
+
 declare global {
   interface Window {
     Orve: Record<string, OrveInstance>;
