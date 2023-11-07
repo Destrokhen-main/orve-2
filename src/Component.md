@@ -183,13 +183,13 @@ function Modal({ slot }) {
     <div class="wrapper">
       <div class="modal>
         <div>
-          {slot?.header}
+          {slot.header}
         </div>
         <div>
-          {slot?.body}
+          {slot.body}
         </div>
         <div>
-          {slot?.footer}
+          {slot.footer}
         </div>
       </div>
     </div>
@@ -197,15 +197,13 @@ function Modal({ slot }) {
 }
 ```
 
-*Знаки вопроса, сделаны специально, чтобы не ломать приложение, не забывайте о них пожалуйста*
-
 В таком случаи slot будут работать
 
 Если есть необходимость задать значение по умолчанию:
 Тогда вы можете использовать "??":
 
 ```
-{ slot?.header ?? <...jsx> }
+{ slot.header ?? <...jsx> }
 ```
 
 #### Типизация пропсов.
