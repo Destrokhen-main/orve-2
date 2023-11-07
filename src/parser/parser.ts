@@ -174,11 +174,11 @@ function parserNodeF(
     ...component,
     props: component.props as any,
     node: null,
-    parent,
+    parent: !this.__CTX_PARENT__ ? parent : null,
     type: TypeNode.Component,
   };
   if (component.keyNode === undefined) {
-    componentO.keyNode = genUID(8);
+    componentO.keyNode = !this['__CTX_ID__'] ? genUID(8) : '1';
   }
 
   if (REACTIVE_COMPONENT.includes(String(componentO.tag))) {
@@ -247,13 +247,13 @@ function parserNodeO(node: NodeO, parent: NodeOP | null = null): NodeOP | null {
     ...workNode,
     props: workNode.props as any,
     node: null,
-    parent,
+    parent: !this.__CTX_PARENT__ ? parent : null,
     type: TypeNode.Component,
   };
   componentO.nameC = nameC ?? parent?.nameC;
 
   if (workNode.keyNode === undefined) {
-    componentO.keyNode = genUID(8);
+    componentO.keyNode = !this.__CTX_ID__ ? genUID(8) : '1';
   }
 
   if (REACTIVE_COMPONENT.includes(String(componentO.tag))) {

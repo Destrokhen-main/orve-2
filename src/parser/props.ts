@@ -39,7 +39,7 @@ function workWithEvent(obj: any, key: string) {
 
   obj[pKey] = {
     type: TypeProps.Event,
-    value: func.bind(this),
+    value: func, // TODO УБРАЛ ОТСЮДА bind
   };
 
   return obj;

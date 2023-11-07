@@ -206,4 +206,15 @@ describe("jsx", () => {
       }
     });
   });
+
+  test("class prop", () => {
+    const div = Node("div", { class: 1 }, "Hello");
+    expect(div).toStrictEqual({
+      tag: 'div',
+      props: {
+        oclass: 1,
+      },
+      children: ["Hello"]
+    });
+  });
 });
