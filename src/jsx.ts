@@ -19,7 +19,7 @@ function Node(
   props: Props | null = null,
   ...children: Children
 ): NodeB {
-  if (typeof tag === "function" && tag.name === FRAGMENT) {
+  if (typeof tag === "function" && tag.name === FRAGMENT || typeof tag === 'string' && tag === FRAGMENT.toLowerCase()) {
     return Fragment(props, ...children);
   }
 
