@@ -29,7 +29,7 @@ function isValidEntry(entry: unknown): boolean {
  * Обрабатывает массив настроек для функции createApp
  * @param options - объект с настройками
  */
-function optionsInstace(options: OptionsInstance) {
+function optionsInstance(options: OptionsInstance) {
   if (options.root !== undefined && options.root === true) {
     if (window.orve !== undefined) {
       window.orve["Node"] = Node;
@@ -52,9 +52,9 @@ function optionsInstace(options: OptionsInstance) {
 function createApp(
   entry: unknown = null,
   options: OptionsInstance | null = null,
-): CreateApp | null {
+): boolean | null {
   if (options !== null) {
-    optionsInstace(options);
+    optionsInstance(options);
   }
 
   if (!isValidEntry(entry)) {
@@ -68,13 +68,13 @@ function createApp(
   allContext.tree = parserNodeF.call(allContext.context, workFunction);
 
   if (allContext.tree !== null && window !== undefined) {
-    const beforeUnmounter = function () {
+    const beforeUnmounted = function () {
       if (allContext.tree) {
         InvokeAllNodeHook(allContext.tree, "beforeUnmount");
       }
     };
 
-    const unmounter = function () {
+    const unmounted = function () {
       if (allContext.tree) {
         InvokeAllNodeHook(allContext.tree, "unmounted");
       }
@@ -84,46 +84,43 @@ function createApp(
       typeof window !== "undefined" &&
       window.addEventListener !== undefined
     ) {
-      window?.addEventListener("beforeunload", beforeUnmounter);
+      window?.addEventListener("beforeunload", beforeUnmounted);
 
       //window.onbeforeunload = beforeUnmounter;
 
-      window?.addEventListener("unload", unmounter);
+      window?.addEventListener("unload", unmounted);
 
       //window.onunload = unmounter;
     }
   }
 
-  return {
-    mount: (
-      root: string | Element,
-      render?: (el: Element, tree: NodeOP) => unknown,
-    ) => {
-      let rootElement: Element | null = null;
-      if (typeof root === "string") {
-        const item = document.querySelector(root);
-        if (item === null) {
-          console.warn(`"${root}" not founted`);
-          return false;
-        }
-        rootElement = item;
-      } else if (typeof root === "object" && root.nodeType === 1) {
-        rootElement = root;
-      }
-      if (rootElement === null) {
-        console.warn(" root is null ");
+  allContext.mount = (
+    root: string | Element,
+    render?: (el: Element, tree: NodeOP) => unknown,
+  ) => {
+    let rootElement: Element | null = null;
+    if (typeof root === "string") {
+      const item = document.querySelector(root);
+      if (item === null) {
+        console.warn(`"${root}" not founted`);
         return false;
       }
-      if (allContext.tree !== null) {
-        allContext.tree =
-          render !== undefined
-            ? render(rootElement, allContext.tree)
-            : mounterNode(rootElement, allContext.tree);
-      }
-
-      return allContext;
-    },
+      rootElement = item;
+    } else if (typeof root === "object" && root.nodeType === 1) {
+      rootElement = root;
+    }
+    if (rootElement === null) {
+      console.warn(" root is null ");
+      return false;
+    }
+    if (allContext.tree !== null) {
+      allContext.tree =
+        render !== undefined
+          ? render(rootElement, allContext.tree)
+          : mounterNode(rootElement, allContext.tree);
+    }
   };
+  return true;
 }
 
 export { createApp };

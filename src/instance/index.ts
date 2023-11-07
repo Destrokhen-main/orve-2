@@ -1,5 +1,5 @@
 import { JSX } from "../jsx-type";
-import { CreateApp, OptionsInstance, createApp } from "../parser";
+import { OptionsInstance, createApp } from "../parser";
 import { NodeOP } from "../parser/parser";
 import { cameCase } from "../utils/transformFunctions";
 
@@ -14,7 +14,11 @@ export interface OrveInstance {
   createApp: (
     entry: unknown,
     options: OptionsInstance | null,
-  ) => CreateApp | null;
+  ) => boolean | null;
+  mount?: (
+    root: string | Element,
+    render?: (el: Element, tree: NodeOP) => unknown,
+  ) => void;
 }
 
 declare global {
@@ -96,7 +100,7 @@ function orveCreate() {
     context: {},
     component,
     use: use,
-    createApp: createApp,
+    createApp,
   };
 
   return instance;
