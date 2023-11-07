@@ -1,6 +1,6 @@
 import { Children, DIRECTIVES_ORVE, NodeB, Props, Tag } from "./jsx-type";
 import { KEY_NEED_REWRITE } from "./keys";
-import { FRAGMENT, SLOT } from "./keys";
+import { FRAGMENT } from "./keys";
 import { ReactiveType } from "./reactive/type";
 
 /* TODO 
@@ -20,7 +20,7 @@ function Node(
   ...children: Children
 ): NodeB {
   if (typeof tag === "function" && tag.name === FRAGMENT) {
-    return Fragment(props, children);
+    return Fragment(props, ...children);
   }
 
   const Node: NodeB = { tag };
@@ -67,11 +67,11 @@ function Node(
         return;
       }
 
-      if (e.tag !== undefined && e.tag === SLOT) {
+      if (e.tag !== undefined && e.tag === FRAGMENT) {
         if (e.props !== undefined && e.props.name !== undefined) {
           slot[e.props.name] = e.children;
         } else {
-          slot.default = e.children;
+          newChild.push(e);
         }
       }
     });
@@ -87,22 +87,9 @@ function Node(
     if (newChild.length > 0) {
       Node.children = newChild;
     }
-  } else if (children.length > 0) {
-    // На всякий случай, если остается тут slot
-    // но прошлое уловие не прошло, тогда надо удалить все slot
-    const prep = [];
-    for (let i = 0; i !== children.length; i++) {
-      if (
-        children[i] &&
-        (typeof children[i] !== "object" ||
-          (typeof children[i] === "object" && children[i].tag !== SLOT))
-      ) {
-        prep.push(children[i]);
-      }
-    }
-    if (prep.length > 0) {
-      Node.children = prep;
-    }
+  }
+  else if (children.length > 0) {
+    Node.children = children;
   }
 
   return Node;
