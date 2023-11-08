@@ -22,8 +22,8 @@ export interface OrveInstance {
 }
 
 export interface OrveContext {
-  __CTX_ID__?: boolean
-  __CTX_PARENT__?: boolean
+  __CTX_ID__?: boolean // Будет выставлять keynode всегда '1'
+  __CTX_PARENT__?: boolean // не подключает parent к компоненту.
   [x: string]: any
 }
 

@@ -199,12 +199,138 @@ describe("parseNodeF props", () => {
       tag: 'div',
       props: {
         id: { type: 'Static', value: '1' },
-        oclass: '2',
         class: { type: 'Static', value: '2' },
         click: { type: 'Event', value: fn }
       },
       children: [{ type: 'Static', value: 'HELLO WORLD', node: null }],
       nameC: 'App',
+      node: null,
+      parent: null,
+      type: 'Component',
+      keyNode: '1'
+    });
+  });
+
+  test("Two Component with props class", () => {
+    function Component2(props: any) {
+      return (
+        Node('div', props,
+          "HELLO"
+        )
+      );
+    }
+
+    function Component1() {
+      return (
+        Node('div', null,
+          Node(Component2, { class: '1' })
+        )
+      );
+    }
+
+    const res = parserNodeF.call({ __CTX_ID__: true, __CTX_PARENT__: true } as OrveContext, Component1);
+
+    expect(res).toStrictEqual({
+      tag: 'div',
+      children: [
+        {
+          tag: 'div',
+          props: { slot: {}, class: { type: 'Static', value: '1' } },
+          children: [{ type: 'Static', value: 'HELLO', node: null }],
+          node: null,
+          parent: null,
+          type: 'Component',
+          nameC: 'Component2',
+          keyNode: '1'
+        }
+      ],
+      nameC: 'Component1',
+      props: undefined,
+      node: null,
+      parent: null,
+      type: 'Component',
+      keyNode: '1'
+    });
+  });
+
+  test("Two Component with props style", () => {
+    function Component2(props: any) {
+      return (
+        Node('div', props,
+          "HELLO"
+        )
+      );
+    }
+
+    function Component1() {
+      return (
+        Node('div', { style: "font-size: 20px" },
+          Node(Component2, { style: { color: "white", fontSize: "20px" } })
+        )
+      );
+    }
+
+    const res = parserNodeF.call({ __CTX_ID__: true, __CTX_PARENT__: true } as OrveContext, Component1);
+
+    expect(res).toStrictEqual({
+      tag: 'div',
+      children: [
+        {
+          tag: 'div',
+          props: { slot: {}, style: { type: 'Static', value: 'color:white;font-size:20px;' } },
+          children: [{ type: 'Static', value: 'HELLO', node: null }],
+          node: null,
+          parent: null,
+          type: 'Component',
+          nameC: 'Component2',
+          keyNode: '1'
+        }
+      ],
+      nameC: 'Component1',
+      props: { style: { type: "Static", value: "font-size: 20px" } },
+      node: null,
+      parent: null,
+      type: 'Component',
+      keyNode: '1'
+    });
+  });
+
+  test("Two Component with props event", () => {
+    const func = () => { };
+
+    function Component2(props: any) {
+      return (
+        Node('div', props,
+          "HELLO"
+        )
+      );
+    }
+
+    function Component1() {
+      return (
+        Node('div', { onclick: func },
+          Node(Component2, { class: '1', onClick: func })
+        )
+      );
+    }
+
+    const res = parserNodeF.call({ __CTX_ID__: true, __CTX_PARENT__: true } as OrveContext, Component1);
+    expect(res).toStrictEqual({
+      tag: 'div',
+      children: [
+        {
+          tag: 'div',
+          props: { slot: {}, class: { type: 'Static', value: '1' }, click: { type: 'Event', value: func } },
+          children: [{ type: 'Static', value: 'HELLO', node: null }],
+          node: null,
+          parent: null,
+          type: 'Component',
+          nameC: 'Component2',
+          keyNode: '1'
+        }
+      ],
+      nameC: 'Component1',
+      props: { click: { type: 'Event', value: func } },
       node: null,
       parent: null,
       type: 'Component',

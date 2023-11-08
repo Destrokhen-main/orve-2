@@ -1,6 +1,6 @@
 import { refL } from "./reactive/refL";
 
-export type Tag = string | (() => any); // TODO изменить типы
+export type Tag = string | ((props: any) => any); // TODO изменить типы
 export type Props = Record<string, any>;
 export type Children = any;
 export type FragmentT = { props: Props | null, children: Children };

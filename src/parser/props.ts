@@ -131,6 +131,7 @@ function workWithStaticProps(obj: any, key: string) {
 
   if (KEY_NEED_REWRITE_WITH_O.includes(key)) {
     const fKey = key.slice(1, key.length);
+    delete obj[key];
     obj[fKey] = {
       type: TypeProps.Static,
       value: value,
