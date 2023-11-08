@@ -207,6 +207,20 @@ describe("jsx", () => {
     });
   });
 
+  test("Fragment-slot with component - 2", () => {
+    const Comp = () => { };
+
+    const div = Node(Comp, null, Node('fragment', { name: '1' }, "a"));
+    expect(div).toStrictEqual({
+      tag: Comp,
+      props: {
+        slot: {
+          "1": ["a"]
+        }
+      }
+    });
+  });
+
   test("class prop", () => {
     const div = Node("div", { class: 1 }, "Hello");
     expect(div).toStrictEqual({
