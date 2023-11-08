@@ -227,7 +227,7 @@ function parserNodeO(node: NodeO, parent: NodeOP | null = null): NodeOP | null {
       : workNode.tag;
 
     if (this.globalComponents[nameTag] !== undefined) {
-      workNode = prepareComponent.call(this, this.globalComponents[nameTag]);
+      workNode = prepareComponent.call(this, this.globalComponents[nameTag], workNode.props ?? null);
     }
   }
   if (workNode === null) {

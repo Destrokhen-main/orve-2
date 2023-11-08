@@ -115,7 +115,7 @@ const parseSingleChildren = function (parent: NodeOP | null) {
           const parse = parserNodeF.call(
             context,
             context.globalComponents[nameTag],
-            null,
+            component.props ?? null,
             parent,
           );
           return parse !== null ? parse : null;

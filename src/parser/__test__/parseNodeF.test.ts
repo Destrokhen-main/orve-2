@@ -184,6 +184,72 @@ describe("parseNodeF children", () => {
       }
     );
   });
+
+  test("Global Component", () => {
+    function globalComp() {
+      return Node("div", null, ["HELLO"]);
+    }
+
+    function comp() {
+      return Node('div', null, Node('global', null));
+    }
+
+    const res = parserNodeF.call({ __CTX_ID__: true, __CTX_PARENT__: true, globalComponents: { global: globalComp } } as OrveContext, comp);
+    expect(res).toStrictEqual({
+      tag: 'div',
+      children: [
+        {
+          tag: 'div',
+          children: [{ type: "Static", value: "HELLO", node: null }],
+          nameC: 'globalComp',
+          props: undefined,
+          node: null,
+          parent: null,
+          type: 'Component',
+          keyNode: '1'
+        }
+      ],
+      nameC: 'comp',
+      props: undefined,
+      node: null,
+      parent: null,
+      type: 'Component',
+      keyNode: '1'
+    });
+  });
+
+  test("Global Component props", () => {
+    function globalComp(props: any) {
+      return Node("div", props, ["HELLO"]);
+    }
+
+    function comp() {
+      return Node('div', null, Node('global', { id: '1' }));
+    }
+
+    const res = parserNodeF.call({ __CTX_ID__: true, __CTX_PARENT__: true, globalComponents: { global: globalComp } } as OrveContext, comp);
+    expect(res).toStrictEqual({
+      tag: 'div',
+      children: [
+        {
+          tag: 'div',
+          children: [{ type: "Static", value: "HELLO", node: null }],
+          nameC: 'globalComp',
+          props: { id: { type: 'Static', value: '1' }, "slot": {} },
+          node: null,
+          parent: null,
+          type: 'Component',
+          keyNode: '1'
+        }
+      ],
+      nameC: 'comp',
+      props: undefined,
+      node: null,
+      parent: null,
+      type: 'Component',
+      keyNode: '1'
+    });
+  });
 });
 
 describe("parseNodeF props", () => {
