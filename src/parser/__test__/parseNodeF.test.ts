@@ -1,4 +1,4 @@
-import { parserNodeF } from '../parser';
+import { parserNodeF, parserNodeO } from '../parser';
 import { Node } from "../../jsx";
 import { FRAGMENT } from '../../keys';
 import { OrveContext } from '../../instance';
@@ -335,6 +335,92 @@ describe("parseNodeF props", () => {
       parent: null,
       type: 'Component',
       keyNode: '1'
+    });
+  });
+});
+
+describe("parseNodeO", () => {
+  test("Default component", () => {
+    const fn = () => { };
+
+    const componentA = {
+      tag: "div",
+      props: { oclass: 1, id: 1, style: "font-size:20px", onClick: fn, oninput: fn },
+      children: [
+        "HELLO"
+      ]
+    };
+
+    const res = parserNodeO.call({ __CTX_ID__: true } as OrveContext, componentA, null);
+    expect(res).toStrictEqual({
+      tag: 'div',
+      props: {
+        id: { type: 'Static', value: 1 },
+        style: { type: 'Static', value: 'font-size:20px' },
+        class: { type: 'Static', value: 1 },
+        click: { type: 'Event', value: fn },
+        input: { type: 'Event', value: fn }
+      },
+      children: [{ type: 'Static', value: 'HELLO', node: null }],
+      node: null,
+      parent: null,
+      type: 'Component',
+      nameC: undefined,
+      keyNode: '1'
+    });
+  });
+
+  test("Component in component", () => {
+    const fn = () => { };
+
+    const component2 = ({ children, ...props }: { children: any }) => {
+      return {
+        tag: "div",
+        props: props,
+        children: children
+      };
+    };
+
+    const component1 = {
+      tag: "div",
+      children: [
+        {
+          tag: component2,
+          props: { oclass: 1, id: 1, style: "font-size:20px", onClick: fn, oninput: fn },
+          children: [
+            "Hello"
+          ]
+        }
+      ]
+    };
+    const res = parserNodeO.call({ __CTX_ID__: true, __CTX_PARENT__: true } as OrveContext, component1, null);
+    expect(res).toStrictEqual({
+      tag: "div",
+      children: [
+        {
+          tag: "div",
+          props: {
+            slot: {},
+            id: { type: 'Static', value: 1 },
+            style: { type: 'Static', value: 'font-size:20px' },
+            class: { type: 'Static', value: 1 },
+            click: { type: 'Event', value: fn },
+            input: { type: 'Event', value: fn }
+          },
+          children: [{ type: "Static", value: "Hello", node: null }],
+          node: null,
+          parent: null,
+          type: 'Component',
+          nameC: 'component2',
+          keyNode: '1'
+        }
+      ],
+      node: null,
+      parent: null,
+      type: 'Component',
+      nameC: undefined,
+      keyNode: '1',
+      props: undefined,
     });
   });
 });
