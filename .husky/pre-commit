@@ -3,5 +3,3 @@
 
 echo "[1️⃣ ] - run lint"
 npm run lint;
-echo "--PUSH--"
-git push origin HEAD
