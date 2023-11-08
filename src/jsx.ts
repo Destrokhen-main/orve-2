@@ -73,6 +73,8 @@ function Node(
         } else {
           newChild.push(e);
         }
+      } else {
+        newChild.push(e);
       }
     });
 
