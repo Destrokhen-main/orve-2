@@ -41,6 +41,9 @@ const TYPE_REF = ["string", "number", "function", "undefined", "boolean"];
  * @returns ref переменную.
  */
 function ref(value: unknown) {
+  let context = this;
+  if (context === undefined) context = {};
+
   const typeValue = typeof value;
   if (TYPE_REF.includes(typeValue)) {
     const val = value as refInput;
@@ -50,14 +53,16 @@ function ref(value: unknown) {
     const obj: Ref = {
       type: ReactiveType.Ref,
       value: val,
-      $sub: subject.pipe(share()),
-      formate: function (func): RefFormater {
-        return {
-          type: ReactiveType.RefFormater,
-          value: func,
-          parent: this,
-        };
-      },
+      $sub: !context.__CTX_TEST__ ? subject.pipe(share()) : {},
+      formate: !context.__CTX_TEST__
+        ? function (func): RefFormater {
+            return {
+              type: ReactiveType.RefFormater,
+              value: func,
+              parent: this,
+            };
+          }
+        : ({} as any),
     };
 
     return new Proxy(obj, {
