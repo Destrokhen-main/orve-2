@@ -6,9 +6,15 @@ import { camelToSnakeCase } from "../utils/transformFunctions";
 import { TypeProps } from "./type";
 
 export interface PropsItem {
-  type: TypeProps;
+  type: TypeProps | ReactiveType;
   value: any;
 }
+
+export interface ParsedProps {
+  [key: string]: PropsItem;
+}
+
+export const SPECIFIC_KEYS = ["style"];
 
 /**
  * Функция помогающая работать с событиями
@@ -16,7 +22,7 @@ export interface PropsItem {
  * @param key - ключ
  * @returns обновлённый объект props
  */
-function workWithEvent(obj: any, key: string) {
+function workWithEvent(obj: Props, key: string): Props {
   const func = obj[key];
   const pKey = key.replace("on", "").toLowerCase().trim();
 
@@ -50,7 +56,7 @@ function workWithEvent(obj: any, key: string) {
  * @param obj - Объект стилей.
  * @returns - строку
  */
-export function objectToCss(obj: Record<string, any>): string {
+export function objectToCss(obj: Props): string {
   let o = "";
 
   Object.keys(obj).forEach((k) => {
@@ -67,7 +73,7 @@ export function objectToCss(obj: Record<string, any>): string {
  * @param key - аттрибут
  * @returns объект props и ключ изменений. true - что-то сделали
  */
-function specificProps(obj: any, key: string): [Record<string, any>, boolean] {
+function specificProps(obj: Props, key: string): boolean {
   const value = obj[key];
 
   if (key === "style") {
@@ -77,13 +83,13 @@ function specificProps(obj: any, key: string): [Record<string, any>, boolean] {
         value: objectToCss(value),
       };
 
-      return [obj, true];
+      return true;
     } else if (typeof value === "string") {
       obj[key] = {
         type: TypeProps.Static,
         value: value,
       };
-      return [obj, true];
+      return true;
     } else if (
       typeof value === "object" &&
       value.type === ReactiveType.RefFormater
@@ -92,10 +98,11 @@ function specificProps(obj: any, key: string): [Record<string, any>, boolean] {
         type: TypeProps.StaticReactiveF,
         value: value,
       };
-      return [obj, true];
-    } else if (typeof value === "object") {
-      console.log(value);
+      return true;
     }
+    // else if (typeof value === "object") {
+    //   console.log(value);
+    // }
   }
 
   if (key === "src") {
@@ -110,13 +117,11 @@ function specificProps(obj: any, key: string): [Record<string, any>, boolean] {
         value: value,
       };
     }
-    return [obj, true];
+    return true;
   }
 
-  return [obj, false];
+  return false;
 }
-
-export const SPECIFIC_KEYS = ["style"];
 
 /**
  * Работа с props которые не являютя event. Необходимо чтобы правильно работать с реактивными переменными и так далее.
@@ -124,7 +129,7 @@ export const SPECIFIC_KEYS = ["style"];
  * @param key
  * @returns
  */
-function workWithStaticProps(obj: any, key: string) {
+function workWithStaticProps(obj: ParsedProps, key: string): boolean {
   const value = obj[key];
 
   if (KEY_NEED_REWRITE_WITH_O.includes(key)) {
@@ -134,7 +139,7 @@ function workWithStaticProps(obj: any, key: string) {
       type: TypeProps.Static,
       value: value,
     };
-    return [obj, true];
+    return true;
   }
 
   if (SPECIFIC_KEYS.includes(key)) {
@@ -151,7 +156,7 @@ function workWithStaticProps(obj: any, key: string) {
       value: obj[key],
     };
 
-    return [obj, true];
+    return true;
   }
 
   if (
@@ -164,7 +169,7 @@ function workWithStaticProps(obj: any, key: string) {
       value: value,
     };
 
-    return [obj, true];
+    return true;
   }
 
   if (
@@ -177,7 +182,7 @@ function workWithStaticProps(obj: any, key: string) {
       value: value,
     };
 
-    return [obj, true];
+    return true;
   }
 
   if (
@@ -190,12 +195,12 @@ function workWithStaticProps(obj: any, key: string) {
       value: value,
     };
 
-    return [obj, true];
+    return true;
   }
 
   if (typeof value === "object" && key === `$${SLOT}`) {
     obj[key] = value;
-    return [obj, true];
+    return true;
   }
 
   if (typeof value === "object" || typeof value === "function") {
@@ -203,10 +208,10 @@ function workWithStaticProps(obj: any, key: string) {
       type: TypeProps.Static,
       value: value,
     };
-    return [obj, true];
+    return true;
   }
 
-  return [obj, false];
+  return false;
 }
 
 /**
@@ -214,19 +219,18 @@ function workWithStaticProps(obj: any, key: string) {
  * @param insertoObj - Объект props
  * @returns обновленный объект props
  */
-function propsWorker(insertoObj: Props): Props {
-  let obj: any = { ...insertoObj };
+function propsWorker(insertoObj: Props): ParsedProps {
+  const obj: ParsedProps = { ...insertoObj };
 
   Object.keys(obj).forEach((key: string) => {
     if (key.startsWith("on")) {
-      obj = workWithEvent(obj, key);
+      workWithEvent(obj, key);
       return;
     }
 
-    const [object, stat] = workWithStaticProps(obj, key);
+    const stat = workWithStaticProps(obj, key);
 
     if (stat) {
-      obj = object;
       return;
     }
     console.warn(`"${key}" this key is not supported`);
