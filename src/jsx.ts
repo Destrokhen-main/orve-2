@@ -19,7 +19,10 @@ function Node(
   props: Props | null = null,
   ...children: Children
 ): NodeB {
-  if (typeof tag === "function" && tag.name === FRAGMENT || typeof tag === 'string' && tag === FRAGMENT.toLowerCase()) {
+  if (
+    (typeof tag === "function" && tag.name === FRAGMENT) ||
+    (typeof tag === "string" && tag === FRAGMENT.toLowerCase())
+  ) {
     return Fragment(props, ...children);
   }
 
@@ -80,17 +83,16 @@ function Node(
 
     if (Object.keys(slot).length > 0) {
       if (Node.props !== undefined && Node.props !== null) {
-        Node.props.slot = slot;
+        Node.props.$slot = slot;
       } else {
-        Node.props = { slot };
+        Node.props = { $slot: slot };
       }
     }
 
     if (newChild.length > 0) {
       Node.children = newChild;
     }
-  }
-  else if (children.length > 0) {
+  } else if (children.length > 0) {
     Node.children = children;
   }
 
@@ -109,7 +111,7 @@ function Fragment(props: Props | null, ...children: any[]): NodeB {
   } as NodeB;
 
   if (props) {
-    a['props'] = props;
+    a["props"] = props;
   }
 
   return a;

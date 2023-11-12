@@ -178,18 +178,18 @@ function App() {
 Данные slot буду объявлены в props
 
 ```
-function Modal({ slot }) {
+function Modal({ $slot }) {
   return (
     <div class="wrapper">
       <div class="modal>
         <div>
-          {slot.header}
+          {$slot.header}
         </div>
         <div>
-          {slot.body}
+          {$slot.body}
         </div>
         <div>
-          {slot.footer}
+          {$slot.footer}
         </div>
       </div>
     </div>
@@ -203,7 +203,7 @@ function Modal({ slot }) {
 Тогда вы можете использовать "??":
 
 ```
-{ slot.header ?? <...jsx> }
+{ $slot.header ?? <...jsx> }
 ```
 
 #### Типизация пропсов.

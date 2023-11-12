@@ -39,8 +39,8 @@ function prepareComponent(
   let component: unknown | null = null;
 
   const propsW = props !== null ? props : {};
-  if (propsW.slot === undefined) {
-    propsW.slot = {};
+  if (propsW.$slot === undefined) {
+    propsW.$slot = {};
   }
 
   try {
@@ -86,8 +86,8 @@ function recursiveNode(node: NodeO): NodeO | null {
         object["children"] = ch;
       }
 
-      if (object.slot === undefined) {
-        object.slot = {};
+      if (object.$slot === undefined) {
+        object.$slot = {};
       }
 
       let component: unknown | null = null;
@@ -178,7 +178,7 @@ function parserNodeF(
     type: TypeNode.Component,
   };
   if (component.keyNode === undefined) {
-    componentO.keyNode = !this['__CTX_ID__'] ? genUID(8) : '1';
+    componentO.keyNode = !this["__CTX_ID__"] ? genUID(8) : "1";
   }
 
   if (REACTIVE_COMPONENT.includes(String(componentO.tag))) {
@@ -227,7 +227,11 @@ function parserNodeO(node: NodeO, parent: NodeOP | null = null): NodeOP | null {
       : workNode.tag;
 
     if (this.globalComponents[nameTag] !== undefined) {
-      workNode = prepareComponent.call(this, this.globalComponents[nameTag], workNode.props ?? null);
+      workNode = prepareComponent.call(
+        this,
+        this.globalComponents[nameTag],
+        workNode.props ?? null,
+      );
     }
   }
   if (workNode === null) {
@@ -253,7 +257,7 @@ function parserNodeO(node: NodeO, parent: NodeOP | null = null): NodeOP | null {
   componentO.nameC = nameC ?? parent?.nameC;
 
   if (workNode.keyNode === undefined) {
-    componentO.keyNode = !this.__CTX_ID__ ? genUID(8) : '1';
+    componentO.keyNode = !this.__CTX_ID__ ? genUID(8) : "1";
   }
 
   if (REACTIVE_COMPONENT.includes(String(componentO.tag))) {

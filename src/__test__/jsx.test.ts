@@ -80,9 +80,7 @@ describe("jsx", () => {
   });
 
   test("Fragment with div", () => {
-    const fragment = Fragment(null,
-      { tag: "div", children: ["test"] }
-    );
+    const fragment = Fragment(null, { tag: "div", children: ["test"] });
 
     expect(fragment).toStrictEqual({
       tag: FRAGMENT,
@@ -96,14 +94,18 @@ describe("jsx", () => {
   });
 
   test("Component with template", () => {
-    const Component = () => { };
+    const Component = () => {};
 
-    const div = Node(Component, null, Node(FRAGMENT, { name: "default" }, "test"));
+    const div = Node(
+      Component,
+      null,
+      Node(FRAGMENT, { name: "default" }, "test"),
+    );
 
     expect(div).toStrictEqual({
       tag: Component,
       props: {
-        slot: {
+        $slot: {
           default: ["test"],
         },
       },
@@ -111,7 +113,7 @@ describe("jsx", () => {
   });
 
   test("Component with template default and custome", () => {
-    const Component = () => { };
+    const Component = () => {};
 
     const div = Node(
       Component,
@@ -123,7 +125,7 @@ describe("jsx", () => {
       tag: Component,
       props: {
         id: "123",
-        slot: {
+        $slot: {
           default: ["test"],
           test: ["test"],
         },
@@ -132,7 +134,7 @@ describe("jsx", () => {
   });
 
   test("Component without template - just test", () => {
-    const Component = () => { };
+    const Component = () => {};
 
     const div = Node(Component, { test: "123" }, "test", "test-2");
     expect(div).toStrictEqual({
@@ -149,14 +151,14 @@ describe("jsx", () => {
       children: [
         {
           tag: FRAGMENT,
-          children: ["test"]
-        }
-      ]
+          children: ["test"],
+        },
+      ],
     });
   });
 
   test("Rewrite template in component", () => {
-    const Component = () => { };
+    const Component = () => {};
 
     const node = Node(
       Component,
@@ -168,7 +170,7 @@ describe("jsx", () => {
     expect(node).toStrictEqual({
       tag: Component,
       props: {
-        slot: {
+        $slot: {
           default: ["after"],
         },
       },
@@ -176,59 +178,57 @@ describe("jsx", () => {
   });
 
   test("Component with simple fragment", () => {
-    const Component = () => { };
+    const Component = () => {};
 
-    const node = Node(
-      Component,
-      null,
-      Node(FRAGMENT, null, "before"),
-    );
+    const node = Node(Component, null, Node(FRAGMENT, null, "before"));
 
     expect(node).toStrictEqual({
       tag: Component,
-      children: [{
-        tag: FRAGMENT,
-        children: ["before"]
-      }]
+      children: [
+        {
+          tag: FRAGMENT,
+          children: ["before"],
+        },
+      ],
     });
   });
 
   test("Fragment-slot with component", () => {
-    const Comp = () => { };
+    const Comp = () => {};
 
-    const div = Node(Comp, null, Fragment({ name: '1' }, "a"));
+    const div = Node(Comp, null, Fragment({ name: "1" }, "a"));
     expect(div).toStrictEqual({
       tag: Comp,
       props: {
-        slot: {
-          "1": ["a"]
-        }
-      }
+        $slot: {
+          "1": ["a"],
+        },
+      },
     });
   });
 
   test("Fragment-slot with component - 2", () => {
-    const Comp = () => { };
+    const Comp = () => {};
 
-    const div = Node(Comp, null, Node('fragment', { name: '1' }, "a"));
+    const div = Node(Comp, null, Node("fragment", { name: "1" }, "a"));
     expect(div).toStrictEqual({
       tag: Comp,
       props: {
-        slot: {
-          "1": ["a"]
-        }
-      }
+        $slot: {
+          "1": ["a"],
+        },
+      },
     });
   });
 
   test("class prop", () => {
     const div = Node("div", { class: 1 }, "Hello");
     expect(div).toStrictEqual({
-      tag: 'div',
+      tag: "div",
       props: {
         oclass: 1,
       },
-      children: ["Hello"]
+      children: ["Hello"],
     });
   });
 });

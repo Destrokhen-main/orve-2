@@ -93,9 +93,7 @@ function specificProps(obj: any, key: string): [Record<string, any>, boolean] {
         value: value,
       };
       return [obj, true];
-    } else if (
-      typeof value === "object"
-    ) {
+    } else if (typeof value === "object") {
       console.log(value);
     }
   }
@@ -195,7 +193,7 @@ function workWithStaticProps(obj: any, key: string) {
     return [obj, true];
   }
 
-  if (typeof value === "object" && key === SLOT) {
+  if (typeof value === "object" && key === `$${SLOT}`) {
     obj[key] = value;
     return [obj, true];
   }
