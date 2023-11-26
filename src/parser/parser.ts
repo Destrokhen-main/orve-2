@@ -48,6 +48,7 @@ function prepareComponent(
       // TODO +1 непроверенный код
       const propFunction = (func as Record<string, any>).props;
       delete (func as Record<string, any>).props;
+      // TODO может быть ошибка тут , надо её проверять.
       const prepFunc = definedProps(func, propFunction);
       component = prepFunc.call(this, propsW);
     } else {
@@ -96,6 +97,7 @@ function recursiveNode(node: NodeO): NodeO | null {
           // TODO Не тестированный код!!
           const prop = (node.tag as Record<string, any>).props;
           delete (node.tag as Record<string, any>).props;
+          // TODO может были ошибка тут надо её проверять
           const prepComp = definedProps(node.tag, prop);
           component = prepComp.call(this, object);
         } else {
