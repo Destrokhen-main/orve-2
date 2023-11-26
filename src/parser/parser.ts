@@ -45,7 +45,7 @@ function checkPropsBeforeCall(func: () => unknown, propsW: Props) {
  * @param props - объект props с комопнента выше
  * @returns Или объект или null
  */
-function prepareComponent(
+export function prepareComponent(
   func: (props?: Props) => unknown,
   props: Props | null = null,
 ): NodeO | null {
