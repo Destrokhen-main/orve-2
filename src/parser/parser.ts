@@ -25,6 +25,19 @@ export interface NodeOP extends NodeO {
   type: TypeNode;
 }
 
+function checkPropsBeforeCall(func: () => unknown, propsW: Props) {
+  const propFunction = (func as Record<string, any>).props;
+  delete (func as Record<string, any>).props;
+  let prepFunc = null;
+  try {
+    prepFunc = definedProps(func, propFunction);
+  } catch (error) {
+    console.warn(`[${func.name ?? "-"}()] defineProps `, error);
+  }
+
+  return prepFunc !== null ? prepFunc.call(this, propsW) : null;
+}
+
 /**
  * Так как мы не знаем, что мы получим после вызова функции,
  * то необходимо перед работой с объектом вызвать её и проверить всё ли окей.
@@ -45,12 +58,7 @@ function prepareComponent(
 
   try {
     if ((func as Record<string, any>).props !== undefined) {
-      // TODO +1 непроверенный код
-      const propFunction = (func as Record<string, any>).props;
-      delete (func as Record<string, any>).props;
-      // TODO может быть ошибка тут , надо её проверять.
-      const prepFunc = definedProps(func, propFunction);
-      component = prepFunc.call(this, propsW);
+      component = checkPropsBeforeCall(func, propsW);
     } else {
       component = func.call(this, propsW);
     }
@@ -58,6 +66,10 @@ function prepareComponent(
     console.error(`[${func.name ?? "-"}()] - [Parser error]:`, error);
   }
   if (component && validationNode(component, func.name) === true) {
+    if ((func as Record<string, any>).hooks !== undefined) {
+      (component as any).hooks = (func as Record<string, any>).hooks;
+    }
+
     return component as NodeO;
   }
 
@@ -94,12 +106,7 @@ function recursiveNode(node: NodeO): NodeO | null {
       let component: unknown | null = null;
       try {
         if ((node.tag as Record<string, any>).props !== undefined) {
-          // TODO Не тестированный код!!
-          const prop = (node.tag as Record<string, any>).props;
-          delete (node.tag as Record<string, any>).props;
-          // TODO может были ошибка тут надо её проверять
-          const prepComp = definedProps(node.tag, prop);
-          component = prepComp.call(this, object);
+          component = checkPropsBeforeCall(node.tag, object);
         } else {
           component = node.tag.call(this, object);
         }
@@ -108,6 +115,10 @@ function recursiveNode(node: NodeO): NodeO | null {
       }
 
       if (component && validationNode(component, node.tag.name) === true) {
+        if ((node.tag as Record<string, any>).hooks !== undefined) {
+          (component as any).hooks = (node.tag as Record<string, any>).hooks;
+        }
+
         returnedNode = component as NodeO;
         quee.push(returnedNode);
       } else if (component === null) {
@@ -179,6 +190,7 @@ function parserNodeF(
     parent: !this.__CTX_PARENT__ ? parent : null,
     type: TypeNode.Component,
   };
+
   if (component.keyNode === undefined) {
     componentO.keyNode = !this["__CTX_ID__"] ? genUID(8) : "1";
   }
