@@ -223,6 +223,10 @@ function propsWorker(insertoObj: Props): ParsedProps {
   const obj: ParsedProps = { ...insertoObj };
 
   Object.keys(obj).forEach((key: string) => {
+    if (key.startsWith("_") || key.startsWith("__")) {
+      return;
+    }
+
     if (key.startsWith("on")) {
       workWithEvent(obj, key);
       return;
