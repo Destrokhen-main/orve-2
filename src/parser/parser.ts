@@ -263,7 +263,7 @@ function parserNodeO(node: NodeO, parent: NodeOP | null = null): NodeOP | null {
 
   const componentO: NodeOP = {
     ...workNode,
-    props: workNode.props as any,
+    props: workNode.props as any ?? null,
     node: null,
     parent: !this.__CTX_PARENT__ ? parent : null,
     type: TypeNode.Component,
