@@ -81,7 +81,7 @@ export function prepareComponent(
  * @param node - Component
  * @returns Или объект или null
  */
-function recursiveNode(node: NodeO): NodeO | null {
+export function recursiveNode(node: NodeO): NodeO | null {
   const quee: NodeO[] = [node];
   let returnedNode: NodeO = node;
 
