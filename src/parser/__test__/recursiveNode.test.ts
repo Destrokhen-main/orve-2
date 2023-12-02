@@ -1,4 +1,4 @@
-import { Node } from '../../jsx'
+import { Node } from '../../jsx';
 import { recursiveNode } from '../parser';
 
 describe('recursiveNode', () => {
