@@ -21,7 +21,7 @@ export enum TypeProps {
 // Static Child Node
 export interface NodeChild {
   type: TypeNode;
-  value: string | number;
+  value: string | number | boolean;
   node: Element | null | Text;
 }
 

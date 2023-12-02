@@ -12,7 +12,7 @@ import { snakeToCamel } from "../utils/transformFunctions";
  * @param item
  * @returns
  */
-function compareStatic(item: string | number): NodeChild {
+function compareStatic(item: string | number | boolean): NodeChild {
   return {
     type: TypeNode.Static,
     value: item,
@@ -139,7 +139,7 @@ const parseSingleChildren = function (parent: NodeOP | null) {
       return compareHTML(item);
     }
 
-    if (typeof item === "string" || typeof item === "number") {
+    if (typeof item === "string" || typeof item === "number" || typeof item === 'boolean') {
       return compareStatic(item);
     }
 
