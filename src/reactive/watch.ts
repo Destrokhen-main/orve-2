@@ -28,7 +28,18 @@ function watch(func: (n: any, o: any) => void, dep: Dep | Dep[]) {
       if (dep[i].$sub !== undefined) {
         const cur: any = dep[i].$sub
           .pipe(pairwise())
-          .subscribe(([b, c]: any) => func(c, b));
+          .subscribe(([b, c]: any) => {
+            let prev = b;
+            const next = c;
+
+            if (dep[i].type === ReactiveType.RefA) {
+              if (next.type === EtypeRefRequest.delete) return;
+              if (prev.type === EtypeRefRequest.delete) {
+                prev = null;
+              }
+            }
+            return func(c, b);
+          });
         depArrayDisconnect.push(() => cur.complete());
       } else {
         showD = true;
