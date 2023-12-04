@@ -23,3 +23,5 @@
 
 [ ] - hook update и beforeUpdate
   [ ] - Создать Subject внутри компанента, следить за изменениями.
+
+[ ] - !!!! Array для computed
