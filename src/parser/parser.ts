@@ -192,7 +192,7 @@ function parserNodeF(
   };
 
   if (component.keyNode === undefined) {
-    componentO.keyNode = !this["__CTX_ID__"] ? genUID(8) : "1";
+    // componentO.keyNode = !this["__CTX_ID__"] ? genUID(8) : "1";
   }
 
   if (REACTIVE_COMPONENT.includes(String(componentO.tag))) {
@@ -271,7 +271,7 @@ function parserNodeO(node: NodeO, parent: NodeOP | null = null): NodeOP | null {
   componentO.nameC = nameC ?? parent?.nameC;
 
   if (workNode.keyNode === undefined) {
-    componentO.keyNode = !this.__CTX_ID__ ? genUID(8) : "1";
+    // componentO.keyNode = !this.__CTX_ID__ ? genUID(8) : "1";
   }
 
   if (REACTIVE_COMPONENT.includes(String(componentO.tag))) {
