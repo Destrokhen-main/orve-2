@@ -18,7 +18,6 @@ describe("parseNodeF children", () => {
       node: null,
       parent: null,
       type: "Component",
-      keyNode: "1",
     });
   });
 
@@ -41,12 +40,11 @@ describe("parseNodeF children", () => {
         {
           tag: "div",
           children: [{ type: "Static", value: "HELLO WORLD", node: null }],
-          props: undefined,
+          props: {},
           node: null,
           parent: null,
           type: "Component",
           nameC: "component1",
-          keyNode: "1",
         },
       ],
       nameC: "component",
@@ -54,7 +52,6 @@ describe("parseNodeF children", () => {
       node: null,
       parent: null,
       type: "Component",
-      keyNode: "1",
     });
   });
 
@@ -77,12 +74,11 @@ describe("parseNodeF children", () => {
         {
           tag: "Fragment",
           children: [{ type: "Static", value: "HELLO WORLD", node: null }],
-          props: undefined,
+          props: {},
           node: null,
           parent: null,
           type: "Component",
           nameC: "component1",
-          keyNode: "1",
         },
       ],
       nameC: "component",
@@ -90,7 +86,6 @@ describe("parseNodeF children", () => {
       node: null,
       parent: null,
       type: "Component",
-      keyNode: "1",
     });
   });
 
@@ -115,12 +110,11 @@ describe("parseNodeF children", () => {
         {
           tag: "div",
           children: [{ type: "Static", value: "HELLO WORLD", node: null }],
-          props: undefined,
+          props: {},
           node: null,
           parent: null,
           type: "Component",
           nameC: "component1",
-          keyNode: "1",
         },
       ],
       nameC: "component",
@@ -128,7 +122,6 @@ describe("parseNodeF children", () => {
       node: null,
       parent: null,
       type: "Component",
-      keyNode: "1",
     });
   });
 
@@ -161,21 +154,19 @@ describe("parseNodeF children", () => {
                   value: "HELLO WORLD",
                 },
               ],
-              keyNode: "1",
               nameC: "component2",
               node: null,
               parent: null,
-              props: undefined,
+              props: {},
               tag: "div",
               type: "Component",
             },
           ],
-          props: undefined,
+          props: {},
           node: null,
           parent: null,
           type: "Component",
           nameC: "component1",
-          keyNode: "1",
         },
       ],
       nameC: "component",
@@ -183,7 +174,6 @@ describe("parseNodeF children", () => {
       node: null,
       parent: null,
       type: "Component",
-      keyNode: "1",
     });
   });
 
@@ -215,7 +205,6 @@ describe("parseNodeF children", () => {
           node: null,
           parent: null,
           type: "Component",
-          keyNode: "1",
         },
       ],
       nameC: "comp",
@@ -223,7 +212,6 @@ describe("parseNodeF children", () => {
       node: null,
       parent: null,
       type: "Component",
-      keyNode: "1",
     });
   });
 
@@ -255,7 +243,6 @@ describe("parseNodeF children", () => {
           node: null,
           parent: null,
           type: "Component",
-          keyNode: "1",
         },
       ],
       nameC: "comp",
@@ -263,7 +250,6 @@ describe("parseNodeF children", () => {
       node: null,
       parent: null,
       type: "Component",
-      keyNode: "1",
     });
   });
 });
@@ -289,7 +275,6 @@ describe("parseNodeF props", () => {
       node: null,
       parent: null,
       type: "Component",
-      keyNode: "1",
     });
   });
 
@@ -318,7 +303,6 @@ describe("parseNodeF props", () => {
           parent: null,
           type: "Component",
           nameC: "Component2",
-          keyNode: "1",
         },
       ],
       nameC: "Component1",
@@ -326,7 +310,6 @@ describe("parseNodeF props", () => {
       node: null,
       parent: null,
       type: "Component",
-      keyNode: "1",
     });
   });
 
@@ -362,7 +345,6 @@ describe("parseNodeF props", () => {
           parent: null,
           type: "Component",
           nameC: "Component2",
-          keyNode: "1",
         },
       ],
       nameC: "Component1",
@@ -370,12 +352,11 @@ describe("parseNodeF props", () => {
       node: null,
       parent: null,
       type: "Component",
-      keyNode: "1",
     });
   });
 
   test("Two Component with props event", () => {
-    const func = () => {};
+    const func = () => { };
 
     function Component2(props: any) {
       return Node("div", props, "HELLO");
@@ -408,7 +389,6 @@ describe("parseNodeF props", () => {
           parent: null,
           type: "Component",
           nameC: "Component2",
-          keyNode: "1",
         },
       ],
       nameC: "Component1",
@@ -416,14 +396,13 @@ describe("parseNodeF props", () => {
       node: null,
       parent: null,
       type: "Component",
-      keyNode: "1",
     });
   });
 });
 
 describe("parseNodeO", () => {
   test("Default component", () => {
-    const fn = () => {};
+    const fn = () => { };
 
     const componentA = {
       tag: "div",
@@ -456,12 +435,11 @@ describe("parseNodeO", () => {
       parent: null,
       type: "Component",
       nameC: undefined,
-      keyNode: "1",
     });
   });
 
   test("Component in component", () => {
-    const fn = () => {};
+    const fn = () => { };
 
     const component2 = ({ children, ...props }: { children: any }) => {
       return {
@@ -510,15 +488,13 @@ describe("parseNodeO", () => {
           parent: null,
           type: "Component",
           nameC: "component2",
-          keyNode: "1",
         },
       ],
       node: null,
       parent: null,
       type: "Component",
       nameC: undefined,
-      keyNode: "1",
-      props: undefined,
+      props: {},
     });
   });
 });

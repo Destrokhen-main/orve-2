@@ -35,7 +35,6 @@ describe('парсинг children', () => {
       parent: null,
       type: 'Component',
       nameC: undefined,
-      keyNode: '1'
     }]);
   });
 
@@ -56,7 +55,6 @@ describe('парсинг children', () => {
       parent: null,
       type: 'Component',
       nameC: 'Component',
-      keyNode: '1'
     }]);
   });
 });
