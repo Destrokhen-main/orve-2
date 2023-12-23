@@ -4,6 +4,22 @@ import { NodeOP } from "../parser/parser";
 import { mounterChildren } from "./children";
 import { propsWorker } from "./props";
 
+function upperHooksWorker(tree: any, nameHook: string) {
+  const quee = [tree];
+
+  while (quee.length > 0) {
+    const item = quee.shift();
+
+    if (item.hooks !== undefined && item.hooks[nameHook] !== undefined) {
+      item.hooks[nameHook]();
+    }
+
+    if (item.parent) {
+      quee.push(item.parent);
+    }
+  }
+}
+
 /**
  * Монтирование node
  * @param root - HTMLElement родителя
@@ -42,6 +58,11 @@ function mounterNode(root: Element | null, tree: NodeOP) {
   }
 
   tree.node = elem;
+
+  tree.$sub?.subscribe((n) => {
+    // beforeUpdate updated
+    upperHooksWorker(tree, n);
+  });
 
   if (root !== null) {
     root.appendChild(elem);

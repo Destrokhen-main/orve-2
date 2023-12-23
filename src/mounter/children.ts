@@ -33,7 +33,10 @@ function singleMounterChildren(root: Element | null, parent?: childrenParent) {
       return null;
     }
 
-    if (item.type === TypeNode.Component) {
+    if (
+      item.type === TypeNode.Component ||
+      item.type === TypeNode.RebuildComponent
+    ) {
       const knowItem = item as NodeOP;
 
       if (knowItem.tag !== FRAGMENT) {
@@ -41,7 +44,7 @@ function singleMounterChildren(root: Element | null, parent?: childrenParent) {
       }
 
       if (knowItem.tag === FRAGMENT && knowItem.children.length > 0) {
-        return mounterChildren(root, knowItem.children);
+        return mounterChildren(root, knowItem.children, parent);
       }
     }
 
@@ -67,7 +70,7 @@ function singleMounterChildren(root: Element | null, parent?: childrenParent) {
     if (item.type === TypeNode.Reactive) {
       const reactiveObject: Ref = (item as any).value;
       if (reactiveObject.type === ReactiveType.Ref) {
-        RefChildCreator(root, reactiveObject);
+        RefChildCreator(root, reactiveObject, undefined, parent);
         return item;
       }
 
@@ -138,7 +141,7 @@ function mounterChildren(
 
   const finaly = listNode.map(prepaireFunction);
 
-  return finaly.filter((x) => x !== null);
+  return finaly.filter((x) => x !== undefined && x !== null);
 }
 
 export { mounterChildren, singleMounterChildren };
