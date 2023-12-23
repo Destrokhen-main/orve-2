@@ -1,3 +1,4 @@
+import { Subject } from "rxjs";
 import { FRAGMENT } from "../keys";
 import { NodeOP } from "../parser/parser";
 import { NodeHtml, NodeChild } from "../parser/type";
@@ -26,7 +27,7 @@ export type InsertType = NodeOP | NodeChild | NodeHtml;
  * @param root - HTMLElement
  * @returns - переработанный node
  */
-function singleMounterChildren(root: Element | null) {
+function singleMounterChildren(root: Element | null, parent?: childrenParent) {
   return (item: InsertType) => {
     if (item === undefined || item === null) {
       return null;
@@ -120,14 +121,20 @@ function singleMounterChildren(root: Element | null) {
   };
 }
 
+type childrenParent = { type: TypeNode; $sub: Subject<any> | null | undefined };
+
 /**
  * Монтирование node
  * @param root - HTMLElement
  * @param listNode - массив node
  * @returns - обработанные массив node
  */
-function mounterChildren(root: Element | null, listNode: InsertType[]): any {
-  const prepaireFunction = singleMounterChildren(root);
+function mounterChildren(
+  root: Element | null,
+  listNode: InsertType[],
+  parent?: childrenParent,
+): any {
+  const prepaireFunction = singleMounterChildren(root, parent);
 
   const finaly = listNode.map(prepaireFunction);
 

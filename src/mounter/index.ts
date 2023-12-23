@@ -35,7 +35,10 @@ function mounterNode(root: Element | null, tree: NodeOP) {
   }
 
   if (tree.children !== undefined) {
-    tree.children = mounterChildren(elem, tree.children);
+    tree.children = mounterChildren(elem, tree.children, {
+      type: tree.type,
+      $sub: tree.$sub,
+    });
   }
 
   tree.node = elem;
