@@ -9,10 +9,14 @@ describe("parseNodeF children", () => {
       return Node("div", null, "HELLO WORLD");
     }
 
-    const res = parserNodeF.call({ __CTX_ID__: true } as OrveContext, App);
+    const res = parserNodeF.call(
+      { __CTX_ID__: true, __SUB__: true } as OrveContext,
+      App,
+    );
     expect(res).toStrictEqual({
       tag: "div",
       children: [{ type: "Static", value: "HELLO WORLD", node: null }],
+      $sub: null,
       nameC: "App",
       props: undefined,
       node: null,
@@ -31,7 +35,7 @@ describe("parseNodeF children", () => {
     }
 
     const res = parserNodeF.call(
-      { __CTX_ID__: true, __CTX_PARENT__: true } as OrveContext,
+      { __CTX_ID__: true, __CTX_PARENT__: true, __SUB__: true } as OrveContext,
       component,
     );
     expect(res).toStrictEqual({
@@ -42,6 +46,7 @@ describe("parseNodeF children", () => {
           children: [{ type: "Static", value: "HELLO WORLD", node: null }],
           props: {},
           node: null,
+          $sub: null,
           parent: null,
           type: "Component",
           nameC: "component1",
@@ -50,6 +55,7 @@ describe("parseNodeF children", () => {
       nameC: "component",
       props: undefined,
       node: null,
+      $sub: null,
       parent: null,
       type: "Component",
     });
@@ -65,7 +71,7 @@ describe("parseNodeF children", () => {
     }
 
     const res = parserNodeF.call(
-      { __CTX_ID__: true, __CTX_PARENT__: true } as OrveContext,
+      { __CTX_ID__: true, __CTX_PARENT__: true, __SUB__: true } as OrveContext,
       component,
     );
     expect(res).toStrictEqual({
@@ -78,6 +84,7 @@ describe("parseNodeF children", () => {
           node: null,
           parent: null,
           type: "Component",
+          $sub: null,
           nameC: "component1",
         },
       ],
@@ -85,6 +92,7 @@ describe("parseNodeF children", () => {
       props: undefined,
       node: null,
       parent: null,
+      $sub: null,
       type: "Component",
     });
   });
@@ -101,7 +109,7 @@ describe("parseNodeF children", () => {
       return Node("div", null, Node(component1, null));
     }
     const res = parserNodeF.call(
-      { __CTX_ID__: true, __CTX_PARENT__: true } as OrveContext,
+      { __CTX_ID__: true, __CTX_PARENT__: true, __SUB__: true } as OrveContext,
       component,
     );
     expect(res).toStrictEqual({
@@ -114,6 +122,7 @@ describe("parseNodeF children", () => {
           node: null,
           parent: null,
           type: "Component",
+          $sub: null,
           nameC: "component1",
         },
       ],
@@ -121,6 +130,7 @@ describe("parseNodeF children", () => {
       props: undefined,
       node: null,
       parent: null,
+      $sub: null,
       type: "Component",
     });
   });
@@ -137,7 +147,7 @@ describe("parseNodeF children", () => {
       return Node("div", null, Node(component1, null));
     }
     const res = parserNodeF.call(
-      { __CTX_ID__: true, __CTX_PARENT__: true } as OrveContext,
+      { __CTX_ID__: true, __CTX_PARENT__: true, __SUB__: true } as OrveContext,
       component,
     );
     expect(res).toStrictEqual({
@@ -159,6 +169,7 @@ describe("parseNodeF children", () => {
               parent: null,
               props: {},
               tag: "div",
+              $sub: null,
               type: "Component",
             },
           ],
@@ -166,6 +177,7 @@ describe("parseNodeF children", () => {
           node: null,
           parent: null,
           type: "Component",
+          $sub: null,
           nameC: "component1",
         },
       ],
@@ -173,6 +185,7 @@ describe("parseNodeF children", () => {
       props: undefined,
       node: null,
       parent: null,
+      $sub: null,
       type: "Component",
     });
   });
@@ -191,6 +204,7 @@ describe("parseNodeF children", () => {
         __CTX_ID__: true,
         __CTX_PARENT__: true,
         globalComponents: { global: globalComp },
+        __SUB__: true,
       } as OrveContext,
       comp,
     );
@@ -204,12 +218,14 @@ describe("parseNodeF children", () => {
           props: undefined,
           node: null,
           parent: null,
+          $sub: null,
           type: "Component",
         },
       ],
       nameC: "comp",
       props: undefined,
       node: null,
+      $sub: null,
       parent: null,
       type: "Component",
     });
@@ -229,6 +245,7 @@ describe("parseNodeF children", () => {
         __CTX_ID__: true,
         __CTX_PARENT__: true,
         globalComponents: { global: globalComp },
+        __SUB__: true,
       } as OrveContext,
       comp,
     );
@@ -242,6 +259,7 @@ describe("parseNodeF children", () => {
           props: { id: { type: "Static", value: "1" }, $slot: {} },
           node: null,
           parent: null,
+          $sub: null,
           type: "Component",
         },
       ],
@@ -249,6 +267,7 @@ describe("parseNodeF children", () => {
       props: undefined,
       node: null,
       parent: null,
+      $sub: null,
       type: "Component",
     });
   });
@@ -262,7 +281,10 @@ describe("parseNodeF props", () => {
       return Node("div", { id: "1", class: "2", onClick: fn }, "HELLO WORLD");
     }
 
-    const res = parserNodeF.call({ __CTX_ID__: true } as OrveContext, App);
+    const res = parserNodeF.call(
+      { __CTX_ID__: true, __SUB__: true } as OrveContext,
+      App,
+    );
     expect(res).toStrictEqual({
       tag: "div",
       props: {
@@ -274,6 +296,7 @@ describe("parseNodeF props", () => {
       nameC: "App",
       node: null,
       parent: null,
+      $sub: null,
       type: "Component",
     });
   });
@@ -288,7 +311,7 @@ describe("parseNodeF props", () => {
     }
 
     const res = parserNodeF.call(
-      { __CTX_ID__: true, __CTX_PARENT__: true } as OrveContext,
+      { __CTX_ID__: true, __CTX_PARENT__: true, __SUB__: true } as OrveContext,
       Component1,
     );
 
@@ -301,6 +324,7 @@ describe("parseNodeF props", () => {
           children: [{ type: "Static", value: "HELLO", node: null }],
           node: null,
           parent: null,
+          $sub: null,
           type: "Component",
           nameC: "Component2",
         },
@@ -309,6 +333,7 @@ describe("parseNodeF props", () => {
       props: undefined,
       node: null,
       parent: null,
+      $sub: null,
       type: "Component",
     });
   });
@@ -327,7 +352,7 @@ describe("parseNodeF props", () => {
     }
 
     const res = parserNodeF.call(
-      { __CTX_ID__: true, __CTX_PARENT__: true } as OrveContext,
+      { __CTX_ID__: true, __CTX_PARENT__: true, __SUB__: true } as OrveContext,
       Component1,
     );
 
@@ -344,19 +369,21 @@ describe("parseNodeF props", () => {
           node: null,
           parent: null,
           type: "Component",
+          $sub: null,
           nameC: "Component2",
         },
       ],
       nameC: "Component1",
       props: { style: { type: "Static", value: "font-size: 20px" } },
       node: null,
+      $sub: null,
       parent: null,
       type: "Component",
     });
   });
 
   test("Two Component with props event", () => {
-    const func = () => { };
+    const func = () => {};
 
     function Component2(props: any) {
       return Node("div", props, "HELLO");
@@ -371,7 +398,7 @@ describe("parseNodeF props", () => {
     }
 
     const res = parserNodeF.call(
-      { __CTX_ID__: true, __CTX_PARENT__: true } as OrveContext,
+      { __CTX_ID__: true, __CTX_PARENT__: true, __SUB__: true } as OrveContext,
       Component1,
     );
     expect(res).toStrictEqual({
@@ -388,6 +415,7 @@ describe("parseNodeF props", () => {
           node: null,
           parent: null,
           type: "Component",
+          $sub: null,
           nameC: "Component2",
         },
       ],
@@ -395,6 +423,7 @@ describe("parseNodeF props", () => {
       props: { click: { type: "Event", value: func } },
       node: null,
       parent: null,
+      $sub: null,
       type: "Component",
     });
   });
@@ -402,7 +431,7 @@ describe("parseNodeF props", () => {
 
 describe("parseNodeO", () => {
   test("Default component", () => {
-    const fn = () => { };
+    const fn = () => {};
 
     const componentA = {
       tag: "div",
@@ -417,7 +446,7 @@ describe("parseNodeO", () => {
     };
 
     const res = parserNodeO.call(
-      { __CTX_ID__: true } as OrveContext,
+      { __CTX_ID__: true, __SUB__: true } as OrveContext,
       componentA,
       null,
     );
@@ -432,6 +461,7 @@ describe("parseNodeO", () => {
       },
       children: [{ type: "Static", value: "HELLO", node: null }],
       node: null,
+      $sub: null,
       parent: null,
       type: "Component",
       nameC: undefined,
@@ -439,7 +469,7 @@ describe("parseNodeO", () => {
   });
 
   test("Component in component", () => {
-    const fn = () => { };
+    const fn = () => {};
 
     const component2 = ({ children, ...props }: { children: any }) => {
       return {
@@ -466,7 +496,7 @@ describe("parseNodeO", () => {
       ],
     };
     const res = parserNodeO.call(
-      { __CTX_ID__: true, __CTX_PARENT__: true } as OrveContext,
+      { __CTX_ID__: true, __CTX_PARENT__: true, __SUB__: true } as OrveContext,
       component1,
       null,
     );
@@ -485,11 +515,13 @@ describe("parseNodeO", () => {
           },
           children: [{ type: "Static", value: "Hello", node: null }],
           node: null,
+          $sub: null,
           parent: null,
           type: "Component",
           nameC: "component2",
         },
       ],
+      $sub: null,
       node: null,
       parent: null,
       type: "Component",

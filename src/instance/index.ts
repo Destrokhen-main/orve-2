@@ -22,9 +22,10 @@ export interface OrveInstance {
 }
 
 export interface OrveContext {
-  __CTX_ID__?: boolean // Будет выставлять keynode всегда '1'
-  __CTX_PARENT__?: boolean // не подключает parent к компоненту.
-  [x: string]: any
+  __CTX_ID__?: boolean; // Будет выставлять keynode всегда '1'
+  __CTX_PARENT__?: boolean; // не подключает parent к компоненту.
+  __SUB__?: boolean; // не создаёт Subject
+  [x: string]: any;
 }
 
 declare global {
