@@ -5,6 +5,7 @@ export enum TypeNode {
   Static = "Static",
   HTML = "HTML",
   Component = "Component",
+  RebuildComponent = "RebuildComponent",
   Reactive = "Reactive",
 }
 
@@ -15,7 +16,7 @@ export enum TypeProps {
   EventReactiveF = "EventReactiveF",
   StaticReactive = "StaticReactive",
   StaticReactiveF = "StaticReactiveF",
-  ReactiveComputed = "ReactiveComputed"
+  ReactiveComputed = "ReactiveComputed",
 }
 
 // Static Child Node

@@ -1,4 +1,4 @@
-import { NodeChild, NodeHtml } from "../parser/type";
+import { NodeChild, NodeHtml, TypeNode } from "../parser/type";
 import { Ref, RefFormater } from "../reactive/ref";
 import { distinct, startWith } from "rxjs";
 import { EtypeComment } from "./helperType";
@@ -22,14 +22,21 @@ function RefChildCreator(
   root: Element | null,
   item: Ref,
   replaceItem?: Element | Comment,
+  parent?: any,
 ) {
   const textNode = document.createTextNode(String(item.value));
 
   const sub = item.$sub;
   // TODO при первом вызове обновления не приходит next
-  sub.pipe(startWith(item.value), distinct()).subscribe({
+  sub.subscribe({
     next(after: string | number) {
+      if (parent) {
+        parent.$sub.next("beforeUpdate");
+      }
       textNode.textContent = String(after);
+      if (parent) {
+        parent.$sub.next("updated");
+      }
     },
   } as any);
 

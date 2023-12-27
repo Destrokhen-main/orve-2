@@ -1,3 +1,4 @@
+import { Subject } from "rxjs";
 import { FRAGMENT } from "../keys";
 import { NodeOP } from "../parser/parser";
 import { NodeHtml, NodeChild } from "../parser/type";
@@ -26,13 +27,16 @@ export type InsertType = NodeOP | NodeChild | NodeHtml;
  * @param root - HTMLElement
  * @returns - переработанный node
  */
-function singleMounterChildren(root: Element | null) {
+function singleMounterChildren(root: Element | null, parent?: childrenParent) {
   return (item: InsertType) => {
     if (item === undefined || item === null) {
       return null;
     }
 
-    if (item.type === TypeNode.Component) {
+    if (
+      item.type === TypeNode.Component ||
+      item.type === TypeNode.RebuildComponent
+    ) {
       const knowItem = item as NodeOP;
 
       if (knowItem.tag !== FRAGMENT) {
@@ -40,7 +44,7 @@ function singleMounterChildren(root: Element | null) {
       }
 
       if (knowItem.tag === FRAGMENT && knowItem.children.length > 0) {
-        return mounterChildren(root, knowItem.children);
+        return mounterChildren(root, knowItem.children, parent);
       }
     }
 
@@ -66,7 +70,7 @@ function singleMounterChildren(root: Element | null) {
     if (item.type === TypeNode.Reactive) {
       const reactiveObject: Ref = (item as any).value;
       if (reactiveObject.type === ReactiveType.Ref) {
-        RefChildCreator(root, reactiveObject);
+        RefChildCreator(root, reactiveObject, undefined, parent);
         return item;
       }
 
@@ -120,18 +124,24 @@ function singleMounterChildren(root: Element | null) {
   };
 }
 
+type childrenParent = { type: TypeNode; $sub: Subject<any> | null | undefined };
+
 /**
  * Монтирование node
  * @param root - HTMLElement
  * @param listNode - массив node
  * @returns - обработанные массив node
  */
-function mounterChildren(root: Element | null, listNode: InsertType[]): any {
-  const prepaireFunction = singleMounterChildren(root);
+function mounterChildren(
+  root: Element | null,
+  listNode: InsertType[],
+  parent?: childrenParent,
+): any {
+  const prepaireFunction = singleMounterChildren(root, parent);
 
   const finaly = listNode.map(prepaireFunction);
 
-  return finaly.filter((x) => x !== null);
+  return finaly.filter((x) => x !== undefined && x !== null);
 }
 
 export { mounterChildren, singleMounterChildren };

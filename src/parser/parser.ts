@@ -1,6 +1,5 @@
 import { Props, Children, NodeB } from "../jsx-type";
 import { validationNode } from "./helper";
-import { genUID } from "../helper/generation";
 import { parseChildren } from "./children";
 import { propsWorker } from "./props";
 import { TypeNode } from "./type";
@@ -11,6 +10,7 @@ import {
 } from "./reactiveComponentWorker";
 import { definedProps } from "../utils";
 import { snakeToCamel } from "../utils/transformFunctions";
+import { Subject } from "rxjs";
 
 export interface NodeO extends NodeB {
   tag: string | ((props?: Record<string, any>) => unknown);
@@ -23,6 +23,7 @@ export interface NodeOP extends NodeO {
   node: Element | null;
   parent: NodeOP | null;
   type: TypeNode;
+  $sub?: Subject<any> | null;
 }
 
 function checkPropsBeforeCall(func: () => unknown, propsW: Props) {
@@ -73,6 +74,20 @@ export function prepareComponent(
     return component as NodeO;
   }
 
+  if (component && typeof component === "function") {
+    const rebuild = component();
+
+    if (rebuild && validationNode(rebuild, func.name)) {
+      if ((func as Record<string, any>).hooks !== undefined) {
+        rebuild.hooks = (func as Record<string, any>).hooks;
+      }
+
+      rebuild.type = TypeNode.RebuildComponent;
+
+      return rebuild;
+    }
+  }
+
   return null;
 }
 
@@ -121,6 +136,18 @@ export function recursiveNode(node: NodeO): NodeO | null {
 
         returnedNode = component as NodeO;
         quee.push(returnedNode);
+      } else if (component && typeof component === "function") {
+        const rebuild = component();
+
+        if (rebuild && validationNode(rebuild, node.tag.name)) {
+          if ((node.tag as Record<string, any>).hooks !== undefined) {
+            rebuild.hooks = (node.tag as Record<string, any>).hooks;
+          }
+
+          rebuild.type = TypeNode.RebuildComponent;
+
+          return rebuild;
+        }
       } else if (component === null) {
         return null;
       }
@@ -183,12 +210,13 @@ function parserNodeF(
     return null;
   }
 
-  const componentO: NodeOP = {
+  const componentO = {
+    type: TypeNode.Component,
+    $sub: !this.__SUB__ ? new Subject() : null,
     ...component,
     props: component.props as any,
     node: null,
     parent: !this.__CTX_PARENT__ ? parent : null,
-    type: TypeNode.Component,
   };
 
   if (component.keyNode === undefined) {
@@ -262,11 +290,12 @@ function parserNodeO(node: NodeO, parent: NodeOP | null = null): NodeOP | null {
   }
 
   const componentO: NodeOP = {
+    type: TypeNode.Component,
+    $sub: !this.__SUB__ ? new Subject() : null,
     ...workNode,
-    props: workNode.props as any ?? null,
+    props: (workNode.props as any) ?? null,
     node: null,
     parent: !this.__CTX_PARENT__ ? parent : null,
-    type: TypeNode.Component,
   };
   componentO.nameC = nameC ?? parent?.nameC;
 
