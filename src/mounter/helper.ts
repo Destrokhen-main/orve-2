@@ -2,6 +2,8 @@ import { NodeChild, NodeHtml, TypeNode } from "../parser/type";
 import { Ref, RefFormater } from "../reactive/ref";
 import { distinct, startWith } from "rxjs";
 import { EtypeComment } from "./helperType";
+import { isHtmlNode } from "../parser/childrenHelper";
+import { ReactiveType } from "../reactive/type";
 
 function textNodeCreator(item: NodeChild) {
   const textNode = document.createTextNode(String(item.value));
@@ -18,33 +20,122 @@ function htmlNodeCreate(item: NodeHtml) {
   return item;
 }
 
+function toString(value: unknown): string {
+  if (typeof value === "object" && value !== undefined && value !== null) {
+    return JSON.stringify(value);
+  }
+  return String(value);
+}
+
 function RefChildCreator(
   root: Element | null,
   item: Ref,
   replaceItem?: Element | Comment,
   parent?: any,
 ) {
-  const textNode = document.createTextNode(String(item.value));
+  let textNode = document.createTextNode("");
 
   const sub = item.$sub;
+  let firstRender = true;
+  let isHTML = false;
   // TODO при первом вызове обновления не приходит next
   sub.subscribe({
     next(after: string | number) {
-      if (parent) {
+      if (parent && !firstRender) {
+        // TODO посылает запрос если 2 и больше реактивных переменных
+        // будет слать столько сколько переменных
+        // так не должно быть.
         parent.$sub.next("beforeUpdate");
       }
-      textNode.textContent = String(after);
-      if (parent) {
+      if (typeof after === "string" && isHtmlNode(after)) {
+        isHTML = true;
+        const node = htmlNodeCreate({
+          type: TypeNode.HTML,
+          value: after,
+          node: null,
+        });
+        if (node.node !== null) {
+          textNode.replaceWith(node.node);
+          textNode = node.node as any;
+        } else {
+          console.warn("[ ref ] - HTML code can't be parsed");
+        }
+      } else if (
+        (isHTML && typeof after === "string" && !isHtmlNode(after)) ||
+        (isHTML && typeof after !== "string")
+      ) {
+        const n = document.createTextNode(toString(after));
+        textNode.replaceWith(n);
+        textNode = n;
+        isHTML = false;
+      } else {
+        textNode.textContent = toString(after);
+      }
+      if (parent && !firstRender) {
         parent.$sub.next("updated");
       }
+      firstRender = false;
     },
-  } as any);
+  });
 
   if (replaceItem !== undefined) {
     replaceItem.replaceWith(textNode);
     return textNode;
   } else if (root !== null) {
     root.appendChild(textNode);
+  }
+}
+
+function RefChildCreatorObject(
+  root: Element | null,
+  item: any,
+  replaceItem?: Element | Comment,
+  parent?: any,
+) {
+  let isExist = item.isExistValue;
+  let element = isExist
+    ? document.createTextNode("")
+    : document.createComment(` obj - ${item.key}`);
+  let isFirstRender = true;
+
+  item.proxy.$sub.subscribe({
+    next(value: any) {
+      if (parent && !isFirstRender) {
+        parent.$sub.next("beforeUpdate");
+      }
+      const valueByKey = value[item.key];
+      if (isExist) {
+        if (
+          typeof valueByKey === "object" &&
+          valueByKey.type === ReactiveType.Ref
+        ) {
+          // TODO сюда может прийти реактивный объект это надо обработать
+          // RefChildCreator(root, valueByKey, element, parent);
+        } else if (
+          typeof valueByKey === "object" &&
+          valueByKey.type === ReactiveType.RefO
+        ) {
+          // TODO сюда может прийти реактивный объект это надо обработать
+          // RefChildCreatorObject(root, valueByKey, element, parent);
+        } else {
+          element.textContent = toString(valueByKey);
+        }
+      } else if (!isFirstRender) {
+        isExist = true;
+        const n = document.createTextNode(value);
+        element.replaceWith(n);
+        element = n;
+      }
+
+      isFirstRender = false;
+      if (parent && !isFirstRender) {
+        parent.$sub.next("updated");
+      }
+    },
+  });
+
+  if (root !== null) {
+    root.appendChild(element);
   }
 }
 
@@ -110,4 +201,5 @@ export {
   htmlNodeCreate,
   RefChildCreator,
   RefFormateChildCreator,
+  RefChildCreatorObject,
 };

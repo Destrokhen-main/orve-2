@@ -74,20 +74,6 @@ export function prepareComponent(
     return component as NodeO;
   }
 
-  if (component && typeof component === "function") {
-    const rebuild = component();
-
-    if (rebuild && validationNode(rebuild, func.name)) {
-      if ((func as Record<string, any>).hooks !== undefined) {
-        rebuild.hooks = (func as Record<string, any>).hooks;
-      }
-
-      rebuild.type = TypeNode.RebuildComponent;
-
-      return rebuild;
-    }
-  }
-
   return null;
 }
 
@@ -136,18 +122,6 @@ export function recursiveNode(node: NodeO): NodeO | null {
 
         returnedNode = component as NodeO;
         quee.push(returnedNode);
-      } else if (component && typeof component === "function") {
-        const rebuild = component();
-
-        if (rebuild && validationNode(rebuild, node.tag.name)) {
-          if ((node.tag as Record<string, any>).hooks !== undefined) {
-            rebuild.hooks = (node.tag as Record<string, any>).hooks;
-          }
-
-          rebuild.type = TypeNode.RebuildComponent;
-
-          return rebuild;
-        }
       } else if (component === null) {
         return null;
       }

@@ -65,7 +65,38 @@ export const compareObjects = (a: any, b: any) => {
 [ ] - Можно словить pipe
 */
 function RefArray(
-  root: Element | null,
+  root: Element | Comment | null,
+  item: RefA,
+  parent: any = null,
+  callback: ((a: any, b: number) => any) | null = null,
+) {
+  if (!Array.isArray(item.value)) {
+    const comment =
+      root !== null && root.nodeType === 8
+        ? root
+        : document.createComment(` - refA - ${parent.keyNode} - `);
+
+    const sub = item.$sub.subscribe({
+      next(after: any) {
+        if (Array.isArray(after)) {
+          sub.unsubscribe();
+          refaAfteAprove(comment, item, parent, callback);
+        }
+      },
+    });
+
+    // 8 - Comment
+    if (root !== null) {
+      root.appendChild(comment);
+    }
+    return;
+  }
+
+  refaAfteAprove(root, item, parent, callback);
+}
+
+function refaAfteAprove(
+  root: Element | Comment | null,
   item: RefA,
   parent: any = null,
   callback: ((a: any, b: number) => any) | null = null,
@@ -92,6 +123,13 @@ function RefArray(
         const insertNode = m.mount.node;
 
         if (startNode !== null) {
+          // комент это
+          if (startNode.nodeType === 8) {
+            startNode.replaceWith(insertNode);
+            startNode = insertNode;
+            return m;
+          }
+
           startNode[index === 0 ? "appendChild" : "after"](insertNode);
           startNode = insertNode;
         }
@@ -109,6 +147,7 @@ function RefArray(
     }
   }
 
+  // TODO переделка из null -> array -> null ломается при переходе 2 раз в array надо фиксануть
   item.$sub.subscribe((next: refaSubscribe) => {
     if (Array.isArray(next)) return;
 
@@ -126,8 +165,8 @@ function RefArray(
         const prepaire =
           callback !== null
             ? workObject.value.map((item: any, i: number) =>
-              callback(item, startIndex + i),
-            )
+                callback(item, startIndex + i),
+              )
             : workObject.value;
 
         const parserInstance = parseSingleChildren.call(null, null);

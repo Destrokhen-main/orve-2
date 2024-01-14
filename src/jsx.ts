@@ -26,6 +26,14 @@ function Node(
     return Fragment(props, ...children);
   }
 
+  if (typeof tag === "string" && tag === "o-for") {
+    return {
+      type: ReactiveType.RefArrFor,
+      value: children[0],
+      parent: props?.items,
+    } as any;
+  }
+
   const Node: NodeB = { tag };
 
   if (props !== null) {

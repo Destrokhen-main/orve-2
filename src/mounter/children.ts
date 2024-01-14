@@ -15,6 +15,7 @@ import {
   OifWorker,
   RefCWorker,
   RefCComponentWorker,
+  RefChildCreatorObject,
 } from "./helper";
 
 import { mounterNode } from "./index";
@@ -33,10 +34,7 @@ function singleMounterChildren(root: Element | null, parent?: childrenParent) {
       return null;
     }
 
-    if (
-      item.type === TypeNode.Component ||
-      item.type === TypeNode.RebuildComponent
-    ) {
+    if (item.type === TypeNode.Component) {
       const knowItem = item as NodeOP;
 
       if (knowItem.tag !== FRAGMENT) {
@@ -74,17 +72,22 @@ function singleMounterChildren(root: Element | null, parent?: childrenParent) {
         return item;
       }
 
-      if (reactiveObject.type === ReactiveType.RefFormater) {
-        RefFormateChildCreator(root, reactiveObject as any);
+      if (reactiveObject.type === ReactiveType.RefO) {
+        RefChildCreatorObject(root, reactiveObject, undefined, parent);
         return item;
       }
 
-      if (reactiveObject.type === ReactiveType.RefA) {
-        console.warn(
-          'Пожалуйста, используйте "for" для отображения массива правильно',
-        );
-        return item;
-      }
+      // if (reactiveObject.type === ReactiveType.RefFormater) {
+      //   RefFormateChildCreator(root, reactiveObject as any);
+      //   return item;
+      // }
+
+      // if (reactiveObject.type === ReactiveType.RefA) {
+      //   console.warn(
+      //     'Пожалуйста, используйте "for" для отображения массива правильно',
+      //   );
+      //   return item;
+      // }
 
       if (reactiveObject.type === ReactiveType.RefArrFor) {
         RefArray(
@@ -96,20 +99,20 @@ function singleMounterChildren(root: Element | null, parent?: childrenParent) {
         return item;
       }
 
-      if (reactiveObject.type === ReactiveType.RefO) {
-        RefOWorker(root, item as any);
-        return item;
-      }
+      // if (reactiveObject.type === ReactiveType.RefO) {
+      //   RefOWorker(root, item as any);
+      //   return item;
+      // }
 
       if (reactiveObject.type === ReactiveType.Oif) {
         OifWorker(root, reactiveObject);
         return item;
       }
 
-      if (reactiveObject.type === ReactiveType.RefC) {
-        RefCWorker(root, reactiveObject);
-        return item;
-      }
+      // if (reactiveObject.type === ReactiveType.RefC) {
+      //   RefCWorker(root, reactiveObject);
+      //   return item;
+      // }
 
       if (reactiveObject.type === ReactiveType.RefCComponent) {
         RefCComponentWorker(root, reactiveObject);

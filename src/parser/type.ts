@@ -5,7 +5,6 @@ export enum TypeNode {
   Static = "Static",
   HTML = "HTML",
   Component = "Component",
-  RebuildComponent = "RebuildComponent",
   Reactive = "Reactive",
 }
 
