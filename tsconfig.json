@@ -11,7 +11,13 @@
     "newLine": "LF",
     "removeComments": false,
     "resolveJsonModule": true,
-    "noImplicitThis": false
+    "noImplicitThis": false,
+    "rootDir": ".",
+    "paths": {
+      "@/src/*": [
+        "./src/"
+      ]
+    }
   },
   "include": [
     "./src/**/*"

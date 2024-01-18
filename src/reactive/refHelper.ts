@@ -18,7 +18,7 @@ export enum Dir {
  * @param obj - реактивная переменная массива
  * @returns Реактивную переменную массива
  */
-export function refArrayBuilder(arr: any[], obj: RefA) {
+export function refArrayBuilder(arr: any[], obj: any) {
   return new Proxy(arr, {
     get(t: any[], p: any) {
       const val = t[p];

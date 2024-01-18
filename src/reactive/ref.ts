@@ -1,15 +1,15 @@
-import { BehaviorSubject, share } from "rxjs";
+import { BehaviorSubject, Subject, share } from "rxjs";
 import { Reactive, ReactiveType } from "./type";
 import { EtypeRefRequest, refArrayBuilder } from "./refHelper";
 
 type refInput = string | number | (() => any);
 
-interface Ref extends Reactive {
-  value: refInput;
-  $sub: any;
-  formate: (func: (e: any) => any) => any;
-  node?: any;
-}
+// interface Ref extends Reactive {
+//   value: refInput;
+//   $sub: any;
+//   formate: (func: (e: any) => any) => any;
+//   node?: any;
+// }
 
 export interface RefA extends Reactive {
   value: any;
@@ -221,46 +221,53 @@ function returnType(v: unknown): string {
     ? Array.isArray(v)
       ? "array"
       : v === null
-      ? "null"
-      : "object"
+        ? "null"
+        : "object"
     : v === undefined
-    ? "undefined"
-    : "primitive";
+      ? "undefined"
+      : "primitive";
+}
+
+type Ref<T> = {
+  type: ReactiveType,
+  value: T,
+  $sub: BehaviorSubject<T> | Record<string, any>
 }
 
 function ref<T>(value: T) {
   const context = this ?? {};
 
-  const subject: BehaviorSubject<T> = new BehaviorSubject(value);
+  const subject = new BehaviorSubject<T>(value);
 
-  const reactive = {
+  const reactive: Ref<T> = {
     type: ReactiveType.Ref,
     value,
     $sub: !context.__CTX_TEST__ ? subject : {},
-  } as any;
+  };
 
   reactive.value = Array.isArray(value)
     ? refArrayBuilder(value, reactive)
     : value && typeof value === "object"
-    ? createReactiveObject(value, reactive)
-    : value;
+      ? createReactiveObject(value, reactive)
+      : value;
 
   let type = returnType(value);
   const reactiveObject = new Proxy(reactive, {
-    set(t, p, value) {
+    set(t: Ref<T>, p, value) {
       if (p === "value") {
         const newType = returnType(value);
         if (newType !== type) {
           if (type === "array" && newType !== "array") {
+            const item = t.value as unknown[];
             t.$sub.next({
               type: EtypeRefRequest.delete,
               start: 0,
-              count: t.value.length,
+              count: item.length,
             });
           }
           type = newType;
           if (newType === "array") {
-            t.value = refArrayBuilder(value, reactive);
+            t.value = refArrayBuilder(value, reactive) as any;
           } else if (value && typeof value === "object") {
             t.value = createReactiveObject(value, reactive);
           } else {
@@ -280,11 +287,11 @@ function ref<T>(value: T) {
       if (type === "object") {
         if (Object.keys(reactive).includes(p)) return Reflect.get(t, p);
 
-        const allKeys = Object.keys(t.value);
+        const allKeys = Object.keys(t.value as any);
         return {
           type: ReactiveType.RefO,
           isExistValue: allKeys.includes(p as string), // Хуйня конечно, но вдруг значени null или undefined что мне тогда проверять
-          value: allKeys.includes(p as string) ? t.value[p] : null,
+          value: allKeys.includes(p as string) ? (t.value as any)[p] : null,
           key: p,
           proxy: t,
         };
