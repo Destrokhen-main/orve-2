@@ -1,4 +1,4 @@
-import { isEqual } from "../utils/isEqual";
+import { isEqual } from "../isEqual";
 import { Call } from "./type";
 
 export class ULine {

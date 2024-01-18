@@ -60,20 +60,22 @@ import { ref } from "./ref";
 import { ReactiveType } from "./type";
 import { logger } from "../utils/logger";
 import { isEqual } from "../utils/isEqual";
+
+type Computed<T> = {
+  type: ReactiveType;
+  $sub: Subject<T>;
+  value: T;
+  _value?: unknown;
+}
+
 function computed<T>(func: () => T, deps: any[]) {
   let acc = func();
   const pack = ref(acc);
 
-  const startObj: {
-    type: ReactiveType;
-    $sub: Subject<T>;
-    value: T;
-    _value: unknown;
-  } = {
+  const startObj: Computed<T> = {
     type: ReactiveType.Ref,
     $sub: pack.$sub,
     value: pack.value,
-    _value: undefined,
   };
 
   const obj = new Proxy(startObj, {
@@ -94,7 +96,7 @@ function computed<T>(func: () => T, deps: any[]) {
           const call = func();
           if (!isEqual(acc, call)) {
             acc = call;
-            (obj as any)._value = call;
+            obj._value = call;
           }
         },
       });
