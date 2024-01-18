@@ -1,1 +1,1 @@
-export type Call = (value: any) => void;
+export type Call = (value: unknown) => void;

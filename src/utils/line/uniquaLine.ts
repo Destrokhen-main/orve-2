@@ -19,4 +19,7 @@ export class ULine {
       });
     }
   }
+  getAllDep() {
+    return this._dep;
+  }
 }

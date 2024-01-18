@@ -9,9 +9,12 @@ export class Line {
       this._dep = this._dep.filter((item) => item !== call);
     };
   }
-  next(value: any) {
+  next(value: unknown) {
     this._dep.forEach((dep) => {
       dep(value);
     });
+  }
+  getAllDep() {
+    return this._dep;
   }
 }
