@@ -70,8 +70,6 @@ const areArraysEqual = (firstArray: any[], secondArray: any[]) => {
 export function isEqual(a: any, b: any): boolean {
   if (typeof a !== typeof b) return false;
 
-  if (a !== b) return false;
-
   if (
     (Array.isArray(a) && !Array.isArray(b)) ||
     (Array.isArray(b) && !Array.isArray(a))
@@ -87,6 +85,6 @@ export function isEqual(a: any, b: any): boolean {
   if (typeof a === "object" && typeof b === "object") {
     return compareObjects(a, b);
   }
-
+  if (a !== b) return false;
   return true;
 }

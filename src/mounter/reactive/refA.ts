@@ -2,6 +2,7 @@ import { parseSingleChildren } from "../../parser/children";
 import { RefA } from "../../reactive/ref";
 import { EtypeRefRequest, Dir } from "../../reactive/refHelper";
 import { ReactiveType } from "../../reactive/type";
+import { isEqual } from "../../utils/isEqual";
 import { singleMounterChildren, InsertType } from "../children";
 import { createCommentAndInsert } from "../helper";
 import {
@@ -13,48 +14,6 @@ import {
   EtypeComment,
   RefAInsertByIndex,
 } from "../helperType";
-
-export const compareObjects = (a: any, b: any) => {
-  if (a === b) return true;
-
-  if (
-    typeof a !== "object" ||
-    typeof b !== "object" ||
-    a === null ||
-    b === null
-  )
-    return false;
-
-  const keysA = Object.keys(a),
-    keysB = Object.keys(b);
-
-  if (keysA.length !== keysB.length) {
-    return false;
-  }
-
-  if (a.type !== undefined && Object.values(ReactiveType).includes(a.type))
-    return true;
-
-  for (const key of keysA) {
-    if (key.startsWith("$")) continue;
-
-    if (!keysB.includes(key)) {
-      return false;
-    }
-
-    if (typeof a[key] === "function" || typeof b[key] === "function") {
-      if (a[key].toString() !== b[key].toString()) {
-        return false;
-      }
-    } else {
-      if (!compareObjects(a[key], b[key])) {
-        return false;
-      }
-    }
-  }
-
-  return true;
-};
 
 /* TODO 
 [] - fragment - там больно, надо доработать
@@ -218,10 +177,7 @@ function refaAfteAprove(
 
         rebuildAllNode.forEach((item: Record<string, any>, index: number) => {
           if (
-            !compareObjects(
-              item,
-              (allInstruction as SettingNode[])[index].prepaire,
-            )
+            !isEqual(item, (allInstruction as SettingNode[])[index].prepaire)
           ) {
             console.log(
               item,
@@ -282,7 +238,7 @@ function refaAfteAprove(
             ? callback(workObject.value, key)
             : workObject.value;
 
-        if (!compareObjects(prepaire, beforeInstriction.prepaire)) {
+        if (!isEqual(prepaire, beforeInstriction.prepaire)) {
           const parserInstance = parseSingleChildren.call(null, null);
           const mounterInsance = singleMounterChildren(null);
 
@@ -397,12 +353,7 @@ function refaAfteAprove(
         const mounterInsance = singleMounterChildren(null);
 
         prepaire.forEach((e: Record<string, any>, index: number) => {
-          if (
-            !compareObjects(
-              e,
-              (allInstruction as SettingNode[])[index].prepaire,
-            )
-          ) {
+          if (!isEqual(e, (allInstruction as SettingNode[])[index].prepaire)) {
             const newItem = {
               prepaire: e,
               mount: mounterInsance(parserInstance(e) as InsertType),
@@ -470,10 +421,7 @@ function refaAfteAprove(
 
           prepaire.forEach((e: Record<string, any>, index: number) => {
             if (
-              !compareObjects(
-                e,
-                (allInstruction as SettingNode[])[index].prepaire,
-              )
+              !isEqual(e, (allInstruction as SettingNode[])[index].prepaire)
             ) {
               const newItem = {
                 prepaire: e,
