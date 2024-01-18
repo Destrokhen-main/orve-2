@@ -25,14 +25,14 @@ describe("Uniqua Line", () => {
     const mock = jest.fn();
     line.subscribe(mock);
 
-    line.next(() => {});
-    line.next(() => {});
+    line.next(() => { });
+    line.next(() => { });
     line.next(() => {
       console.log();
     });
 
     // TODO что-то не нравится мне это
-    expect(mock).toBeCalledTimes(3);
+    expect(mock).toBeCalledTimes(2);
   });
 
   test("line {}", () => {
@@ -46,7 +46,7 @@ describe("Uniqua Line", () => {
     line.next({ x: 1 });
 
     // TODO что-то не нравится мне это
-    expect(mock).toBeCalledTimes(3);
+    expect(mock).toBeCalledTimes(2);
   });
 
   test("line []", () => {
@@ -60,6 +60,6 @@ describe("Uniqua Line", () => {
     line.next([2]);
 
     // TODO что-то не нравится мне это
-    expect(mock).toBeCalledTimes(3);
+    expect(mock).toBeCalledTimes(2);
   });
 });

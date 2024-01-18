@@ -46,20 +46,7 @@ const areArraysEqual = (firstArray: any[], secondArray: any[]) => {
   if (
     firstArray.length === secondArray.length &&
     firstArray.every((element, index) => {
-      if (element !== secondArray[index]) return false;
-
-      if (
-        (Array.isArray(element) && !Array.isArray(secondArray[index])) ||
-        (Array.isArray(secondArray[index]) && !Array.isArray(element))
-      )
-        return false;
-
-      if (Array.isArray(element) && Array.isArray(secondArray[index])) {
-        return areArraysEqual(element, secondArray[index]);
-      }
-
-      if (typeof element === "object" && typeof secondArray[index] === "object")
-        return compareObjects(element, secondArray[index]);
+      return isEqual(element, secondArray[index]);
     })
   ) {
     return true;
@@ -69,6 +56,10 @@ const areArraysEqual = (firstArray: any[], secondArray: any[]) => {
 
 export function isEqual(a: any, b: any): boolean {
   if (typeof a !== typeof b) return false;
+
+  if (typeof a === 'function') {
+    return a.toString() === b.toString();
+  }
 
   if (
     (Array.isArray(a) && !Array.isArray(b)) ||

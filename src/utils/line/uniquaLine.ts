@@ -12,7 +12,7 @@ export class ULine {
     };
   }
   next(value: any) {
-    if (isEqual(value, this._lastValue)) {
+    if (!isEqual(value, this._lastValue)) {
       this._lastValue = value;
       this._dep.forEach((dep) => {
         dep(value);
