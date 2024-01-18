@@ -1,6 +1,5 @@
 import { NodeChild, NodeHtml, TypeNode } from "../parser/type";
 import { Ref, RefFormater } from "../reactive/ref";
-import { distinct, startWith } from "rxjs";
 import { EtypeComment } from "./helperType";
 import { isHtmlNode } from "../parser/childrenHelper";
 import { ReactiveType } from "../reactive/type";
@@ -20,7 +19,7 @@ function htmlNodeCreate(item: NodeHtml) {
   return item;
 }
 
-function toString(value: unknown): string {
+export function toString(value: unknown): string {
   if (typeof value === "object" && value !== undefined && value !== null) {
     return JSON.stringify(value);
   }
