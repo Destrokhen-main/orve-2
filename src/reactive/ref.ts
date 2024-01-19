@@ -93,7 +93,21 @@ function ref<T>(value: T) {
         if (Object.keys(reactive).includes(p)) return Reflect.get(t, p);
         const vl = t.value[p];
         if (vl && typeof vl === "object" && vl.type === ReactiveType.Ref) {
-          return vl;
+          // TODO тут теряется реактивность если объект был изначально
+          if (typeof vl.value === "object" && !Array.isArray(vl.value)) {
+            return vl;
+          } else {
+            vl.$sub.subscribe(() => {
+              t.$sub.next(t);
+            });
+
+            return {
+              type: ReactiveType.RefO,
+              key: p,
+              $sub: t.$sub,
+              parent: t.value,
+            };
+          }
         }
 
         return {

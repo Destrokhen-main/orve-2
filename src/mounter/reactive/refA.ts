@@ -31,8 +31,6 @@ function RefArray(
       !Array.isArray(val) &&
       val.type === ReactiveType.Ref
     ) {
-      console.log(i);
-
       value = val.value;
     } else {
       value = val;

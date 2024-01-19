@@ -3,7 +3,6 @@ import { Ref } from "../reactive/ref";
 import { EtypeComment } from "./helperType";
 import { isHtmlNode } from "../parser/childrenHelper";
 import { ReactiveType } from "../reactive/type";
-import { returnNewClone } from "../utils/returnClone";
 
 function textNodeCreator(item: NodeChild) {
   const textNode = document.createTextNode(String(item.value));
@@ -23,10 +22,10 @@ function htmlNodeCreate(item: NodeHtml) {
 function removeAllSub(obj: Record<string, any>) {
   if (Array.isArray(obj) || typeof obj !== "object") return obj;
 
-  const newObj: Record<string, any> = {};
+  let newObj: Record<string, any> = {};
 
   if (obj.$sub !== undefined) {
-    newObj[0] = removeAllSub(obj.value);
+    newObj = removeAllSub(obj.value);
   } else {
     const keys = Object.keys(obj);
     keys.forEach((key: string) => {
