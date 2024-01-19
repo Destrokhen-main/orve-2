@@ -1,4 +1,10 @@
-import { isEqual } from "../../utils/isEqual";
+import { isEqual } from "./isEqual";
+
+export enum DiffType {
+  Modify = "Modify",
+  Delete = "Delete",
+  New = "New",
+}
 
 export function DifferentItems(a: any[], b: any[]): number[] {
   const items: any[] = [];
@@ -7,14 +13,14 @@ export function DifferentItems(a: any[], b: any[]): number[] {
     if (b[index] !== undefined) {
       if (!isEqual(item, b[index])) {
         items.push({
-          type: "modify",
-          index
+          type: DiffType.Modify,
+          index,
         });
       }
     } else {
       items.push({
-        type: "Delete",
-        index
+        type: DiffType.Delete,
+        index,
       });
     }
   });
@@ -23,8 +29,8 @@ export function DifferentItems(a: any[], b: any[]): number[] {
     const ar = b.slice(a.length, b.length);
     ar.forEach((_, index) => {
       items.push({
-        type: "new",
-        index: a.length + index
+        type: DiffType.New,
+        index: a.length + index,
       });
     });
   }

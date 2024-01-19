@@ -15,7 +15,7 @@ import { snakeToCamel } from "../utils/transformFunctions";
 function compareStatic(item: string | number | boolean): NodeChild {
   return {
     type: TypeNode.Static,
-    value: item,
+    value: typeof item === "object" ? JSON.stringify(item) : item,
     node: null,
   };
 }
@@ -87,6 +87,7 @@ const parseSingleChildren = function (parent: NodeOP | null) {
       return {
         type: TypeNode.Reactive,
         keyNode: genUID(8),
+        context: { ...this },
         value: item,
       };
     }
@@ -135,11 +136,19 @@ const parseSingleChildren = function (parent: NodeOP | null) {
       return parse !== null ? parse : null;
     }
 
+    if (typeof item === "object" && !isComponent(item as any)) {
+      return compareStatic(item as any);
+    }
+
     if (typeof item === "string" && isHtmlNode(item)) {
       return compareHTML(item);
     }
 
-    if (typeof item === "string" || typeof item === "number" || typeof item === 'boolean') {
+    if (
+      typeof item === "string" ||
+      typeof item === "number" ||
+      typeof item === "boolean"
+    ) {
       return compareStatic(item);
     }
 

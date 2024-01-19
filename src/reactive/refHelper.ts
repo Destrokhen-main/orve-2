@@ -26,107 +26,38 @@ export function refArrayBuilder(arr: any[], obj: any) {
         if (["push", "unshift"].includes(p)) {
           if (p === "push") {
             return function (...args: any[]) {
-              if (args.length > 0) {
-                obj.$sub.next({
-                  type: EtypeRefRequest.insert,
-                  dir: Dir.right,
-                  value: args,
-                });
-              }
-
-              return Array.prototype[p].apply(t, args);
+              const result = Array.prototype[p].apply(t, args);
+              obj.$sub.next(t);
+              return result;
             };
           } else {
             // unshift
             return function (...args: any[]) {
-              if (args.length > 0) {
-                obj.$sub.next({
-                  type: EtypeRefRequest.insert,
-                  dir: Dir.left,
-                  value: args,
-                });
-              }
-
-              return Array.prototype[p].apply(t, args);
+              const result = Array.prototype[p].apply(t, args);
+              obj.$sub.next(t);
+              return result;
             };
           }
         }
         if (["shift"].includes(p)) {
           return function () {
-            const before = t.length;
-            const s = Array.prototype[p].apply(t);
-
-            if (before > 0) {
-              obj.$sub.next({
-                type: EtypeRefRequest.delete,
-                dir: Dir.left,
-              });
-            }
-
-            return s;
+            const result = Array.prototype[p].apply(t);
+            obj.$sub.next(t);
+            return result;
           };
         }
         if (["pop"].includes(p)) {
           return function () {
-            const before = t.length;
-            const s = Array.prototype[p].apply(t);
-
-            if (before > 0) {
-              obj.$sub.next({
-                type: EtypeRefRequest.delete,
-                dir: Dir.right,
-                needCheck: false,
-              });
-            }
-            return s;
+            const result = Array.prototype[p].apply(t);
+            obj.$sub.next(t);
+            return result;
           };
         }
         if (["splice"].includes(p)) {
           return function (A: string, B: string, ...args: any[]) {
-            const before = t.length;
-            const s = Array.prototype[p].apply(t, [A, B, ...args]);
-
-            const a = parseInt(A, 10);
-            const b = parseInt(B, 10);
-
-            if (before > 0) {
-              if (b !== 0) {
-                obj.$sub.next({
-                  type: EtypeRefRequest.delete,
-                  start: a,
-                  count: b,
-                  ...(args.length > 0 ? { needCheck: false } : {}),
-                });
-
-                if (args.length > 0) {
-                  obj.$sub.next({
-                    type: EtypeRefRequest.insertByIndex,
-                    start: a,
-                    value: args,
-                  });
-                }
-                return;
-              }
-
-              if (b === 0 && args.length > 0) {
-                obj.$sub.next({
-                  type: EtypeRefRequest.insertByIndex,
-                  start: a,
-                  value: args,
-                });
-                return;
-              }
-            }
-
-            if (args.length > 0) {
-              obj.$sub.next({
-                type: EtypeRefRequest.insert,
-                dir: Dir.right,
-                value: args,
-              });
-            }
-
-            return s;
+            const result = Array.prototype[p].apply(t, [A, B, ...args]);
+            obj.$sub.next(t);
+            return result;
           };
         }
         return val.bind(t);
@@ -137,14 +68,9 @@ export function refArrayBuilder(arr: any[], obj: any) {
       const s = Reflect.set(t, p, v);
       const num = parseInt(p, 10);
 
-      if (!Number.isNaN(num) && num < t.length) {
-        obj.$sub.next({
-          type: EtypeRefRequest.edit,
-          key: p,
-          value: v,
-        });
-      } else {
-        // addNew item;
+      if (!Number.isNaN(num)) {
+        t[parseInt(p, 10)] = v;
+        obj.$sub.next(t);
       }
 
       return s;

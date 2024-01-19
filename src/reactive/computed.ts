@@ -68,6 +68,16 @@ type Computed<T> = {
   _value?: unknown;
 };
 
+function returnNewClone(a: any) {
+  if (typeof a === "object") {
+    if (Array.isArray(a)) {
+      return [...a];
+    } else if (a !== null) {
+      return { ...a };
+    }
+  } else return a;
+}
+
 function computed<T>(func: () => T, deps: any[]) {
   let acc = func();
   const pack = ref(acc);
@@ -89,14 +99,30 @@ function computed<T>(func: () => T, deps: any[]) {
     },
   });
 
+  const recall = () => {
+    const call = func();
+    if (!isEqual(acc, call)) {
+      acc = call;
+      obj._value = call;
+    }
+  };
+
   if (deps.length > 0) {
     deps.forEach((dep) => {
+      console.log(dep);
+      let lastValue: any;
+      if (dep.type === ReactiveType.RefO) {
+        lastValue = returnNewClone(dep.parent[dep.key]);
+      }
       dep.$sub.subscribe({
         next() {
-          const call = func();
-          if (!isEqual(acc, call)) {
-            acc = call;
-            obj._value = call;
+          if (dep.type === ReactiveType.RefO) {
+            if (!isEqual(dep.parent[dep.key], lastValue)) {
+              recall();
+              lastValue = returnNewClone(dep.parent[dep.key]);
+            }
+          } else {
+            recall();
           }
         },
       });

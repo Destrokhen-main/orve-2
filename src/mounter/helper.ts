@@ -23,6 +23,7 @@ export function toString(value: unknown): string {
   if (typeof value === "object" && value !== undefined && value !== null) {
     return JSON.stringify(value);
   }
+  if (value === undefined) return "";
   return String(value);
 }
 
@@ -33,19 +34,24 @@ function RefChildCreator(
   parent?: any,
 ) {
   let textNode = document.createTextNode("");
-
   const sub = item.$sub;
   let firstRender = true;
   let isHTML = false;
   // TODO при первом вызове обновления не приходит next
   sub.subscribe({
-    next(after: string | number) {
+    next(_after: string | number) {
       if (parent && !firstRender) {
         // TODO посылает запрос если 2 и больше реактивных переменных
         // будет слать столько сколько переменных
         // так не должно быть.
         parent.$sub.next("beforeUpdate");
       }
+      let after = _after;
+      if (item.type === ReactiveType.RefO) {
+        const i = item as any;
+        after = i.parent[i.key];
+      }
+
       if (typeof after === "string" && isHtmlNode(after)) {
         isHTML = true;
         const node = htmlNodeCreate({
@@ -81,76 +87,6 @@ function RefChildCreator(
     replaceItem.replaceWith(textNode);
     return textNode;
   } else if (root !== null) {
-    root.appendChild(textNode);
-  }
-}
-
-function RefChildCreatorObject(
-  root: Element | null,
-  item: any,
-  replaceItem?: Element | Comment,
-  parent?: any,
-) {
-  let isExist = item.isExistValue;
-  let element = isExist
-    ? document.createTextNode("")
-    : document.createComment(` obj - ${item.key}`);
-  let isFirstRender = true;
-
-  item.proxy.$sub.subscribe({
-    next(value: any) {
-      if (parent && !isFirstRender) {
-        parent.$sub.next("beforeUpdate");
-      }
-      const valueByKey = value[item.key];
-      if (isExist) {
-        if (
-          typeof valueByKey === "object" &&
-          valueByKey.type === ReactiveType.Ref
-        ) {
-          // TODO сюда может прийти реактивный объект это надо обработать
-          // RefChildCreator(root, valueByKey, element, parent);
-        } else if (
-          typeof valueByKey === "object" &&
-          valueByKey.type === ReactiveType.RefO
-        ) {
-          // TODO сюда может прийти реактивный объект это надо обработать
-          // RefChildCreatorObject(root, valueByKey, element, parent);
-        } else {
-          element.textContent = toString(valueByKey);
-        }
-      } else if (!isFirstRender) {
-        isExist = true;
-        const n = document.createTextNode(value);
-        element.replaceWith(n);
-        element = n;
-      }
-
-      isFirstRender = false;
-      if (parent && !isFirstRender) {
-        parent.$sub.next("updated");
-      }
-    },
-  });
-
-  if (root !== null) {
-    root.appendChild(element);
-  }
-}
-
-function RefFormateChildCreator(root: Element | null, item: RefFormater) {
-  const formItem = item.value(item.parent.value);
-
-  const textNode = document.createTextNode(String(formItem));
-
-  item.parent.$sub.subscribe({
-    next(after: string | number) {
-      const formatedItem = item.value(after);
-      textNode.textContent = String(formatedItem);
-    },
-  });
-
-  if (root !== null) {
     root.appendChild(textNode);
   }
 }
@@ -195,10 +131,4 @@ export * from "./reactive/oif";
 export * from "./reactive/refO";
 export * from "./reactive/refA";
 
-export {
-  textNodeCreator,
-  htmlNodeCreate,
-  RefChildCreator,
-  RefFormateChildCreator,
-  RefChildCreatorObject,
-};
+export { textNodeCreator, htmlNodeCreate, RefChildCreator };

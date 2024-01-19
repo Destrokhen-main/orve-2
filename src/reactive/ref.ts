@@ -221,18 +221,18 @@ function returnType(v: unknown): string {
     ? Array.isArray(v)
       ? "array"
       : v === null
-        ? "null"
-        : "object"
+      ? "null"
+      : "object"
     : v === undefined
-      ? "undefined"
-      : "primitive";
+    ? "undefined"
+    : "primitive";
 }
 
 type Ref<T> = {
-  type: ReactiveType,
-  value: T,
-  $sub: BehaviorSubject<T> | Record<string, any>
-}
+  type: ReactiveType;
+  value: T;
+  $sub: BehaviorSubject<T> | Record<string, any>;
+};
 
 function ref<T>(value: T) {
   const context = this ?? {};
@@ -248,8 +248,8 @@ function ref<T>(value: T) {
   reactive.value = Array.isArray(value)
     ? refArrayBuilder(value, reactive)
     : value && typeof value === "object"
-      ? createReactiveObject(value, reactive)
-      : value;
+    ? createReactiveObject(value, reactive)
+    : value;
 
   let type = returnType(value);
   const reactiveObject = new Proxy(reactive, {
@@ -257,16 +257,8 @@ function ref<T>(value: T) {
       if (p === "value") {
         const newType = returnType(value);
         if (newType !== type) {
-          if (type === "array" && newType !== "array") {
-            const item = t.value as unknown[];
-            t.$sub.next({
-              type: EtypeRefRequest.delete,
-              start: 0,
-              count: item.length,
-            });
-          }
           type = newType;
-          if (newType === "array") {
+          if (newType === "array" || Array.isArray(value)) {
             t.value = refArrayBuilder(value, reactive) as any;
           } else if (value && typeof value === "object") {
             t.value = createReactiveObject(value, reactive);
@@ -274,7 +266,11 @@ function ref<T>(value: T) {
             t.value = value;
           }
         } else {
-          t.value = value;
+          if (Array.isArray(value)) {
+            t.value = refArrayBuilder(value, reactive) as any;
+          } else {
+            t.value = value;
+          }
         }
 
         t.$sub.next(value);
@@ -287,13 +283,11 @@ function ref<T>(value: T) {
       if (type === "object") {
         if (Object.keys(reactive).includes(p)) return Reflect.get(t, p);
 
-        const allKeys = Object.keys(t.value as any);
         return {
           type: ReactiveType.RefO,
-          isExistValue: allKeys.includes(p as string), // Хуйня конечно, но вдруг значени null или undefined что мне тогда проверять
-          value: allKeys.includes(p as string) ? (t.value as any)[p] : null,
           key: p,
-          proxy: t,
+          $sub: t.$sub,
+          parent: t.value,
         };
       }
 
