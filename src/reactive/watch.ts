@@ -1,6 +1,8 @@
 import { BehaviorSubject, pairwise } from "rxjs";
 import { ReactiveType } from "./type";
 import { EtypeRefRequest } from "./refHelper";
+import { returnNewClone } from "../utils/returnClone";
+import { isEqual } from "../utils/isEqual";
 
 interface Dep {
   [T: string]: any;
@@ -26,20 +28,20 @@ function watch(func: (n: any, o: any) => void, dep: Dep | Dep[]) {
 
     for (let i = 0; i !== dep.length; i++) {
       if (dep[i].$sub !== undefined) {
-        const cur: any = dep[i].$sub
-          .pipe(pairwise())
-          .subscribe(([b, c]: any) => {
-            let prev = b;
-            const next = c;
-
-            if (dep[i].type === ReactiveType.RefA) {
-              if (next.type === EtypeRefRequest.delete) return;
-              if (prev.type === EtypeRefRequest.delete) {
-                prev = null;
-              }
-            }
-            return func(c, b);
-          });
+        let lastValue: any = null;
+        const cur: any = dep[i].$sub.subscribe((_value: any) => {
+          let value = _value;
+          if (dep[i].type === ReactiveType.RefO) {
+            const ti = dep[i] as any;
+            value = ti.parent[ti.key];
+          }
+          if (lastValue === null) {
+            lastValue = returnNewClone(value);
+          } else if (!isEqual(value, lastValue)) {
+            func(value, lastValue);
+            lastValue = returnNewClone(value);
+          }
+        });
         depArrayDisconnect.push(() => cur.complete());
       } else {
         showD = true;
@@ -57,19 +59,19 @@ function watch(func: (n: any, o: any) => void, dep: Dep | Dep[]) {
     if (d.$sub === undefined) {
       return false;
     }
-
-    const cur: any = d.$sub.pipe(pairwise()).subscribe(([b, c]: any) => {
-      let prev = b;
-      const next = c;
-
-      if (d.type === ReactiveType.RefA) {
-        if (next.type === EtypeRefRequest.delete) return;
-        if (prev.type === EtypeRefRequest.delete) {
-          prev = null;
-        }
+    let lastValue: any = null;
+    const cur: any = d.$sub.subscribe((_value: any) => {
+      let value = _value;
+      if (d.type === ReactiveType.RefO) {
+        const i = d as any;
+        value = i.parent[i.key];
       }
-
-      return func(next, prev);
+      if (lastValue === null) {
+        lastValue = returnNewClone(value);
+      } else if (!isEqual(value, lastValue)) {
+        func(value, lastValue);
+        lastValue = returnNewClone(value);
+      }
     });
     return () => cur.complete();
   }

@@ -60,6 +60,7 @@ import { ref } from "./ref";
 import { ReactiveType } from "./type";
 import { logger } from "../utils/logger";
 import { isEqual } from "../utils/isEqual";
+import { returnNewClone } from "../utils/returnClone";
 
 type Computed<T> = {
   type: ReactiveType;
@@ -67,16 +68,6 @@ type Computed<T> = {
   value: T;
   _value?: unknown;
 };
-
-function returnNewClone(a: any) {
-  if (typeof a === "object") {
-    if (Array.isArray(a)) {
-      return [...a];
-    } else if (a !== null) {
-      return { ...a };
-    }
-  } else return a;
-}
 
 function computed<T>(func: () => T, deps: any[]) {
   let acc = func();
