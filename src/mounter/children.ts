@@ -66,7 +66,7 @@ function singleMounterChildren(root: Element | null, parent?: childrenParent) {
     }
 
     if (item.type === TypeNode.Reactive) {
-      const reactiveObject: Ref = (item as any).value;
+      const reactiveObject: Ref<any> = (item as any).value;
       if (reactiveObject.type === ReactiveType.Ref) {
         RefChildCreator(root, reactiveObject, undefined, parent);
         return item;

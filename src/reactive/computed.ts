@@ -74,7 +74,7 @@ function computed<T>(func: () => T, deps: any[]) {
 
   const startObj: Computed<T> = {
     type: ReactiveType.Ref,
-    $sub: pack.$sub,
+    $sub: pack.$sub as any,
     value: pack.value,
   };
 
