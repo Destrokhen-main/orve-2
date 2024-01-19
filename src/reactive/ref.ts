@@ -6,6 +6,14 @@ function createReactiveObject(obj: any, reactive: any) {
   return new Proxy(obj, {
     set(t, p, v) {
       const res = Reflect.set(t, p, v);
+
+      if (typeof v === "object" && v.type === ReactiveType.Ref) {
+        v.$sub.subscribe(() => {
+          reactive.$sub.next(t);
+        });
+        return true;
+      }
+
       reactive.$sub.next(t);
       return res;
     },
@@ -80,9 +88,13 @@ function ref<T>(value: T) {
 
       return Reflect.set(t, p, value);
     },
-    get(t, p: string) {
+    get(t: any, p: string) {
       if (type === "object") {
         if (Object.keys(reactive).includes(p)) return Reflect.get(t, p);
+        const vl = t.value[p];
+        if (vl && typeof vl === "object" && vl.type === ReactiveType.Ref) {
+          return vl;
+        }
 
         return {
           type: ReactiveType.RefO,
@@ -91,7 +103,6 @@ function ref<T>(value: T) {
           parent: t.value,
         };
       }
-
       return Reflect.get(t, p);
     },
   });

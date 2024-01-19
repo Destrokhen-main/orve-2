@@ -1,17 +1,3 @@
-import { RefA } from "./ref";
-
-export enum EtypeRefRequest {
-  insert = "Insert",
-  delete = "Delete",
-  insertByIndex = "InsertByIndex",
-  edit = "Edit",
-}
-
-export enum Dir {
-  right = "Right",
-  left = "Left",
-}
-
 /**
  * Функция помогающая правильно отрисовывать реактивные массивы
  * @param arr - массив

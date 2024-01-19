@@ -1,5 +1,7 @@
 import { TypeNode } from "../../parser/type";
 import { ReactiveType } from "../../reactive/type";
+import { isEqual } from "../../utils/isEqual";
+import { returnNewClone } from "../../utils/returnClone";
 import { singleMounterChildren } from "../children";
 import { RefCComponentWorker } from "./refC";
 
@@ -46,17 +48,16 @@ function OifWorker(
 
   if (item.dep !== undefined) {
     item.dep.forEach((e: any) => {
-      e.$sub.subscribe((next: unknown) => {
-        // не хочу дублировать функционал, поэтому всё проверку поставлю тут.
-        // эти условия работают только для refO
-        if (
-          (e.type === ReactiveType.RefO && typeof next !== "object") ||
-          (next !== undefined &&
-            next !== null &&
-            (next as Record<string, any>).key !== undefined &&
-            (next as Record<string, any>).key !== e.key)
-        ) {
-          return;
+      let lastValue: any;
+      e.$sub.subscribe(() => {
+        if (e.type === ReactiveType.RefO) {
+          const i = e as any;
+          const value = i.parent[i.key];
+
+          if (isEqual(value, lastValue)) {
+            return;
+          }
+          lastValue = returnNewClone(value);
         }
 
         const currentRules = item.rule();

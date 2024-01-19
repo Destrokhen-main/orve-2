@@ -14,14 +14,20 @@ function validationPropsParent(
   props: Record<string, any>,
 ): Record<string, any> | null {
   if (props["rule"] === undefined) {
-    logger('warn', '%c[o-if]%c: "rule" Не указано');
+    logger("warn", '%c[o-if]%c: "rule" Не указано');
     return null;
   } else if (typeof props["rule"] !== "function") {
-    logger('warn', '%c[o-if]%c: Для правильной работы необходимо передавать в "rule" функцию');
+    logger(
+      "warn",
+      '%c[o-if]%c: Для правильной работы необходимо передавать в "rule" функцию',
+    );
   }
 
   if (props["dep"] === undefined) {
-    logger('warn', '%c[o-if]%c: "dep" - Чтобы реактивно следить за изменения в функции. Необходимо передать dep');
+    logger(
+      "warn",
+      '%c[o-if]%c: "dep" - Чтобы реактивно следить за изменения в функции. Необходимо передать dep',
+    );
   } else {
     const check = (req: any) => {
       if (req.$sub !== undefined) return true;
@@ -33,30 +39,16 @@ function validationPropsParent(
         if (check(e)) {
           workerDep.push(e);
         } else {
-          logger('warn', `%c[o-if]%c: "dep" - ${JSON.stringify(
-            e,
-          )} - не могу работать с такой зависимостью`);
+          logger(
+            "warn",
+            `%c[o-if]%c: "dep" - ${JSON.stringify(
+              e,
+            )} - не могу работать с такой зависимостью`,
+          );
         }
       });
     } else {
-      const prop = props["dep"];
-      if (
-        typeof prop === "object" &&
-        prop.type !== undefined &&
-        prop.type === ReactiveType.RefO
-      ) {
-        workerDep.push({
-          type: ReactiveType.RefO,
-          $sub: props["dep"].proxy.$sub,
-          key: props["dep"].key,
-        });
-      } else if (check(props["dep"])) {
-        workerDep.push(props["dep"]);
-      } else {
-        logger('warn', `%c[o-if]%c: "dep" - ${JSON.stringify(
-          props["dep"],
-        )} - не могу работать с такой зависимостью`);
-      }
+      logger("warn", `%c[o-if]%c: "dep" - need array`);
     }
 
     props.dep = workerDep;
@@ -98,14 +90,14 @@ function validationChildren(children: Array<any>) {
       Object.keys(e.props).forEach((key) => {
         if (["o-else", "v-else"].includes(key)) {
           if (key.startsWith("v")) {
-            logger('warn', `%c[v-else]%c: We called it another)`);
+            logger("warn", `%c[v-else]%c: We called it another)`);
           }
 
           ChildNode.else = true;
           isLegal = true;
         } else if (["o-if", "v-if"].includes(key)) {
           if (key.startsWith("v")) {
-            logger('warn', `%c[v-if]%c: We called it another)`);
+            logger("warn", `%c[v-if]%c: We called it another)`);
           }
 
           ChildNode.ans = e.props[key];

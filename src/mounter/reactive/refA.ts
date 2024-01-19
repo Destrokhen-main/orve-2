@@ -1,20 +1,7 @@
 import { parseSingleChildren } from "../../parser/children";
-import { RefA } from "../../reactive/ref";
-import { EtypeRefRequest, Dir } from "../../reactive/refHelper";
 import { ReactiveType } from "../../reactive/type";
 import { DiffType, DifferentItems } from "../../utils/DiffArray";
-import { isEqual } from "../../utils/isEqual";
-import { singleMounterChildren, InsertType } from "../children";
-import { createCommentAndInsert } from "../helper";
-import {
-  SettingNode,
-  refaSubscribe,
-  RefAInsert,
-  RefAEdit,
-  RefADelete,
-  EtypeComment,
-  RefAInsertByIndex,
-} from "../helperType";
+import { singleMounterChildren } from "../children";
 
 /* TODO 
 [] - fragment - там больно, надо доработать
@@ -22,10 +9,11 @@ import {
 [ ] - При огромном количестве перерисовок ( использовал 1000000 ) - начинает жестко тротлить
       Надо подумать, может получиться сделать так, чтоб алгос понимал что его дрочат и не проверял пока его дрочат 
       наверно поможет debounce ток хз как его сюда пока вставить
+[  ] - ref внутри ref неправильно ловит обновления
 */
 function RefArray(
   root: Element | Comment | null,
-  item: RefA,
+  item: any,
   parent: any = null,
   callback: ((a: any, b: number) => any) | null = null,
 ) {
@@ -34,10 +22,21 @@ function RefArray(
   const mainComment = document.createComment("ref-a");
   const parserInstance = parseSingleChildren.call(this, parent);
   const mounterInsance = singleMounterChildren(null);
-  let value;
+  let value = item.value;
   if (item.type === ReactiveType.RefO) {
     const i = item as any;
-    value = i.parent[i.key];
+    const val = i.parent[i.key];
+    if (
+      typeof val === "object" &&
+      !Array.isArray(val) &&
+      val.type === ReactiveType.Ref
+    ) {
+      console.log(i);
+
+      value = val.value;
+    } else {
+      value = val;
+    }
   }
   // first render
   if (Array.isArray(value) && value.length > 0) {
@@ -75,7 +74,16 @@ function RefArray(
       let value = _value;
       if (item.type === ReactiveType.RefO) {
         const i = item as any;
-        value = i.parent[i.key];
+        const val = i.parent[i.key];
+        if (
+          typeof val === "object" &&
+          !Array.isArray(val) &&
+          val.type === ReactiveType.Ref
+        ) {
+          value = val.value;
+        } else {
+          value = val;
+        }
       }
 
       if (!Array.isArray(value)) {

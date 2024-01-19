@@ -1,8 +1,9 @@
 import { NodeChild, NodeHtml, TypeNode } from "../parser/type";
-import { Ref, RefFormater } from "../reactive/ref";
+import { Ref } from "../reactive/ref";
 import { EtypeComment } from "./helperType";
 import { isHtmlNode } from "../parser/childrenHelper";
 import { ReactiveType } from "../reactive/type";
+import { returnNewClone } from "../utils/returnClone";
 
 function textNodeCreator(item: NodeChild) {
   const textNode = document.createTextNode(String(item.value));
@@ -19,9 +20,26 @@ function htmlNodeCreate(item: NodeHtml) {
   return item;
 }
 
+function removeAllSub(obj: Record<string, any>) {
+  if (Array.isArray(obj) || typeof obj !== "object") return obj;
+
+  const newObj: Record<string, any> = {};
+
+  if (obj.$sub !== undefined) {
+    newObj[0] = removeAllSub(obj.value);
+  } else {
+    const keys = Object.keys(obj);
+    keys.forEach((key: string) => {
+      newObj[key] = removeAllSub(obj[key]);
+    });
+  }
+
+  return newObj;
+}
+
 export function toString(value: unknown): string {
   if (typeof value === "object" && value !== undefined && value !== null) {
-    return JSON.stringify(value);
+    return JSON.stringify(removeAllSub(value));
   }
   if (value === undefined) return "";
   return String(value);

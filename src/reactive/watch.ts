@@ -1,6 +1,5 @@
-import { BehaviorSubject, pairwise } from "rxjs";
+import { BehaviorSubject } from "rxjs";
 import { ReactiveType } from "./type";
-import { EtypeRefRequest } from "./refHelper";
 import { returnNewClone } from "../utils/returnClone";
 import { isEqual } from "../utils/isEqual";
 

@@ -6,6 +6,7 @@ import { isComponent, isHtmlNode, isReactiveObject } from "./childrenHelper";
 import { genUID } from "../helper/generation";
 import { ReactiveType } from "../reactive/type";
 import { snakeToCamel } from "../utils/transformFunctions";
+import { returnNewClone } from "../utils/returnClone";
 
 /**
  * Надстройка для статики.
@@ -55,7 +56,7 @@ function hasUnreformateArray(nodes: unknown[]): boolean {
  * @param parse
  * @returns
  */
-function setupRefCAsComponent(parse: NodeO) {
+function setupRefCAsComponent(parse: NodeO, parent: any) {
   const ObjectForWork: IRefCSetup = {
     type: ReactiveType.RefCComponent,
     proxy: parse.tag,
@@ -73,6 +74,8 @@ function setupRefCAsComponent(parse: NodeO) {
     type: TypeNode.Reactive,
     keyNode: genUID(8),
     value: ObjectForWork,
+    parent,
+    context: returnNewClone(this),
   };
 }
 
@@ -91,7 +94,6 @@ const parseSingleChildren = function (parent: NodeOP | null) {
         value: item,
       };
     }
-
     if (
       typeof item === "object" &&
       item !== null &&
@@ -129,7 +131,7 @@ const parseSingleChildren = function (parent: NodeOP | null) {
         (component.tag as Record<string, any>).type !== undefined &&
         (component.tag as Record<string, any>).type === ReactiveType.RefC
       ) {
-        return setupRefCAsComponent(component);
+        return setupRefCAsComponent.call(this, component, parent);
       }
       const parse = parserNodeO.call(context, component, parent);
 
