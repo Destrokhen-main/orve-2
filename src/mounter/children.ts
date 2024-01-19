@@ -10,9 +10,7 @@ import {
   htmlNodeCreate,
   RefChildCreator,
   RefArray,
-  RefOWorker,
   OifWorker,
-  RefCWorker,
   RefCComponentWorker,
 } from "./helper";
 
@@ -88,11 +86,6 @@ function singleMounterChildren(root: Element | null, parent?: childrenParent) {
         OifWorker(root, reactiveObject);
         return item;
       }
-
-      // if (reactiveObject.type === ReactiveType.RefC) {
-      //   RefCWorker(root, reactiveObject);
-      //   return item;
-      // }
 
       if (reactiveObject.type === ReactiveType.RefCComponent) {
         RefCComponentWorker(root, reactiveObject);
