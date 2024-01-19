@@ -28,7 +28,7 @@ export function toString(value: unknown): string {
 
 function RefChildCreator(
   root: Element | null,
-  item: Ref,
+  item: Ref<any>,
   replaceItem?: Element | Comment,
   parent?: any,
 ) {

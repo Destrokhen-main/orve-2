@@ -33,7 +33,7 @@ export interface NodeHtml {
 
 export interface ReactiveNode {
   type: TypeNode;
-  value: Ref;
+  value: Ref<any>;
   node: HTMLElement | null;
 }
 

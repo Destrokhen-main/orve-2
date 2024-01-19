@@ -12,12 +12,6 @@
     "removeComments": false,
     "resolveJsonModule": true,
     "noImplicitThis": false,
-    "rootDir": ".",
-    "paths": {
-      "@/src/*": [
-        "./src/"
-      ]
-    }
   },
   "include": [
     "./src/**/*"
