@@ -3,6 +3,7 @@ import { Props } from "../jsx-type";
 import { PropsItem, SPECIFIC_KEYS, objectToCss } from "../parser/props";
 import { TypeProps } from "../parser/type";
 import { changerAttributes } from "./propHelper";
+import { ReactiveType } from "../reactive/type";
 
 /**
  * Функция для работы с реактивными props
@@ -91,58 +92,29 @@ function propsWorker(root: HTMLElement, item: Props) {
     }
 
     if (obj.type === TypeProps.StaticReactive) {
-      changerAttributes(root, key, obj.value.value);
+      const reactiveItem = obj.value;
+
+      let value = reactiveItem.value;
+      if (reactiveItem.type === ReactiveType.RefO) {
+        const i = reactiveItem as any;
+        value = i.parent[i.key];
+      }
+
+      changerAttributes(root, key, value);
 
       obj.value.$sub
         .pipe(pairwise())
-        .subscribe(([before, after]: [string | number, string | number]) => {
+        .subscribe(([before, _after]: [string | number, string | number]) => {
+          let after = _after;
+          if (reactiveItem.type === ReactiveType.RefO) {
+            const i = reactiveItem as any;
+            after = i.parent[i.key];
+          }
+
           if (before !== after) {
             changerAttributes(root, key, after);
           }
         });
-    }
-
-    if (obj.type === TypeProps.StaticReactiveF) {
-      const item = obj.value;
-      const value = prepaireStaticRectF(item, key);
-
-      if (value !== null && value !== "") {
-        const insertValue = value;
-
-        if (SPECIFIC_KEYS.includes(key)) {
-          if (key === "style") {
-            let insertV: string = String(insertValue);
-            if (typeof insertValue === "object") {
-              insertV = objectToCss(insertValue);
-            }
-
-            root.setAttribute(key, insertV);
-
-            item.parent.$sub
-              .pipe(pairwise())
-              .subscribe(([before, after]: [any, any]) => {
-                const newKey = prepaireStaticRectF(item, key, after);
-                const st = prepaireClass(newKey);
-
-                if (st !== null && before !== st) {
-                  root.setAttribute(key, st);
-                }
-              });
-          }
-        } else {
-          root.setAttribute(key, insertValue);
-
-          item.parent.$sub
-            .pipe(pairwise())
-            .subscribe(([before, after]: [any, any]) => {
-              const newKey = prepaireStaticRectF(item, key, after);
-
-              if (newKey !== null && before !== newKey) {
-                root.setAttribute(key, String(newKey));
-              }
-            });
-        }
-      }
     }
 
     // TODO сейчас только для статики работает, нужно логику и для style и для остального
@@ -151,13 +123,15 @@ function propsWorker(root: HTMLElement, item: Props) {
       if (item.value !== null && item.value !== "") {
         root.setAttribute(key, item.value);
 
-        item.$sub.pipe(
-          distinctUntilChanged((prevHigh: any, temp: any) => {
-            return temp === prevHigh;
-          }),
-        ).subscribe(() => {
-          root.setAttribute(key, item.value);
-        });
+        item.$sub
+          .pipe(
+            distinctUntilChanged((prevHigh: any, temp: any) => {
+              return temp === prevHigh;
+            }),
+          )
+          .subscribe(() => {
+            root.setAttribute(key, item.value);
+          });
       }
     }
   });

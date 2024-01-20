@@ -90,15 +90,6 @@ function specificProps(obj: Props, key: string): boolean {
         value: value,
       };
       return true;
-    } else if (
-      typeof value === "object" &&
-      value.type === ReactiveType.RefFormater
-    ) {
-      obj[key] = {
-        type: TypeProps.StaticReactiveF,
-        value: value,
-      };
-      return true;
     }
     // else if (typeof value === "object") {
     //   console.log(value);
@@ -131,7 +122,6 @@ function specificProps(obj: Props, key: string): boolean {
  */
 function workWithStaticProps(obj: ParsedProps, key: string): boolean {
   const value = obj[key];
-
   if (KEY_NEED_REWRITE_WITH_O.includes(key)) {
     const fKey = key.slice(1, key.length);
     delete obj[key];
@@ -160,25 +150,13 @@ function workWithStaticProps(obj: ParsedProps, key: string): boolean {
   }
 
   if (
-    typeof value === "object" &&
-    value.type !== undefined &&
-    value.type === ReactiveType.Ref
+    (typeof value === "object" &&
+      value.type !== undefined &&
+      value.type === ReactiveType.Ref) ||
+    value.type === ReactiveType.RefO
   ) {
     obj[key] = {
       type: TypeProps.StaticReactive,
-      value: value,
-    };
-
-    return true;
-  }
-
-  if (
-    typeof value === "object" &&
-    value.type !== undefined &&
-    value.type === ReactiveType.RefFormater
-  ) {
-    obj[key] = {
-      type: TypeProps.StaticReactiveF,
       value: value,
     };
 

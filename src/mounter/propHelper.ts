@@ -10,7 +10,9 @@ const changerAttributes = (root: HTMLElement, key: string, value: any) => {
   if (key === "value") {
     (root as HTMLInputElement).value = toString(value);
   } else {
-    root.setAttribute(key, String(value));
+    if (value !== undefined) {
+      root.setAttribute(key, String(value));
+    }
   }
 };
 

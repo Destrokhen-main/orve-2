@@ -14,7 +14,6 @@ export enum TypeProps {
   EventReactive = "EventReactive",
   EventReactiveF = "EventReactiveF",
   StaticReactive = "StaticReactive",
-  StaticReactiveF = "StaticReactiveF",
   ReactiveComputed = "ReactiveComputed",
 }
 

@@ -49,12 +49,4 @@ describe("props", () => {
       },
     });
   });
-
-  test("ref - formate", () => {
-    const a = ref(1)!;
-    const fn = () => {};
-    const res = propsWorker({ id: (a as any).formate(fn) });
-    expect(res.id.type).toBe("StaticReactiveF");
-    expect(res.id.value.value).toBe(fn);
-  });
 });
