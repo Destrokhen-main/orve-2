@@ -48,7 +48,17 @@ function propsWorker(root: HTMLElement, item: Props) {
     const obj: PropsItem = item[key] as any;
 
     if (obj.type === TypeProps.Static) {
-      changerAttributes(root, key, obj.value);
+      const value = obj.value;
+      // COMPUTED
+      if (typeof value === "object" && value.type === ReactiveType.Ref) {
+        changerAttributes(root, key, value.value);
+
+        value.$sub.subscribe((next: any) => {
+          changerAttributes(root, key, next);
+        });
+      } else {
+        changerAttributes(root, key, value);
+      }
     }
 
     if (obj.type === TypeProps.Event) {
