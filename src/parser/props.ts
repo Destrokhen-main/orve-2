@@ -90,6 +90,15 @@ function specificProps(obj: Props, key: string): boolean {
         value: value,
       };
       return true;
+    } else if (
+      (typeof value === "object" && value.type === ReactiveType.Ref) ||
+      value.type === ReactiveType.RefO
+    ) {
+      obj[key] = {
+        type: TypeProps.StaticReactive,
+        value: value,
+      };
+      return true;
     }
     // else if (typeof value === "object") {
     //   console.log(value);

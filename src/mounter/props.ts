@@ -99,8 +99,12 @@ function propsWorker(root: HTMLElement, item: Props) {
         const i = reactiveItem as any;
         value = i.parent[i.key];
       }
-
-      changerAttributes(root, key, value);
+      if (typeof value === "object" && key === "style") {
+        const cssInline = objectToCss(value);
+        changerAttributes(root, key, cssInline);
+      } else {
+        changerAttributes(root, key, value);
+      }
 
       obj.value.$sub
         .pipe(pairwise())
@@ -112,7 +116,12 @@ function propsWorker(root: HTMLElement, item: Props) {
           }
 
           if (before !== after) {
-            changerAttributes(root, key, after);
+            if (typeof after === "object" && key === "style") {
+              const cssInline = objectToCss(after);
+              changerAttributes(root, key, cssInline);
+            } else {
+              changerAttributes(root, key, after);
+            }
           }
         });
     }
