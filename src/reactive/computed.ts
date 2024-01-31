@@ -100,7 +100,6 @@ function computed<T>(func: () => T, deps: any[]) {
 
   if (deps.length > 0) {
     deps.forEach((dep) => {
-      console.log(dep);
       let lastValue: any;
       if (dep.type === ReactiveType.RefO) {
         lastValue = returnNewClone(dep.parent[dep.key]);

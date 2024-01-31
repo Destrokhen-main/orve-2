@@ -1,18 +1,20 @@
 import { BehaviorSubject } from "rxjs";
 import { ReactiveType } from "./type";
 import { refArrayBuilder } from "./refHelper";
+import { buffer } from "../utils/buffer";
 
 function createReactiveObject(obj: any, reactive: any) {
   return new Proxy(obj, {
-    set(t, p, v) {
+    set(t, p, v, r) {
       const res = Reflect.set(t, p, v);
+      console.log(r, reactive);
 
-      if (typeof v === "object" && v.type === ReactiveType.Ref) {
-        v.$sub.subscribe(() => {
-          reactive.$sub.next(t);
-        });
-        return true;
-      }
+      // if (typeof v === "object" && v.type === ReactiveType.Ref) {
+      //   v.$sub.subscribe(() => {
+      //     reactive.$sub.next(t);
+      //   });
+      //   return true;
+      // }
 
       reactive.$sub.next(t);
       return res;
@@ -89,26 +91,28 @@ function ref<T>(value: T) {
       return Reflect.set(t, p, value);
     },
     get(t: any, p: string) {
+      if (p === "value" && buffer !== null) {
+        buffer.push(t);
+      }
       if (type === "object") {
         if (Object.keys(reactive).includes(p)) return Reflect.get(t, p);
         const vl = t.value[p];
-        if (vl && typeof vl === "object" && vl.type === ReactiveType.Ref) {
-          if (typeof vl.value === "object" && !Array.isArray(vl.value)) {
-            return vl;
-          } else {
-            vl.$sub.subscribe(() => {
-              t.$sub.next(t);
-            });
+        // if (vl && typeof vl === "object" && vl.type === ReactiveType.Ref) {
+        //   if (typeof vl.value === "object" && !Array.isArray(vl.value)) {
+        //     return vl;
+        //   } else {
+        //     vl.$sub.subscribe(() => {
+        //       t.$sub.next(t);
+        //     });
 
-            return {
-              type: ReactiveType.RefO,
-              key: p,
-              $sub: t.$sub,
-              parent: t.value,
-            };
-          }
-        }
-
+        //     return {
+        //       type: ReactiveType.RefO,
+        //       key: p,
+        //       $sub: t.$sub,
+        //       parent: t.value,
+        //     };
+        //   }
+        // }
         return {
           type: ReactiveType.RefO,
           key: p,
