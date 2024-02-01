@@ -69,10 +69,10 @@ function effect<T>(func: () => T) {
 
     if (deps.length > 0) {
       listFollow = deps.map((dep: any) => {
-        let lastValue: any;
-        if (dep.type === ReactiveType.RefO) {
-          lastValue = returnNewClone(dep.parent[dep.key]);
-        }
+        // let lastValue: any;
+        // if (dep.type === ReactiveType.RefO) {
+        //   lastValue = returnNewClone(dep.parent[dep.key]);
+        // }
         let f = true;
         return dep.$sub.subscribe({
           next() {
