@@ -69,20 +69,8 @@ function effect<T>(func: () => T) {
 
     if (deps.length > 0) {
       listFollow = deps.map((dep: any) => {
-        // let lastValue: any;
-        // if (dep.type === ReactiveType.RefO) {
-        //   lastValue = returnNewClone(dep.parent[dep.key]);
-        // }
         return dep.$sub.subscribe(() => {
           recall();
-          // if (dep.type === ReactiveType.RefO) {
-          //   if (!isEqual(dep.parent[dep.key], lastValue)) {
-          //     recall();
-          //     lastValue = returnNewClone(dep.parent[dep.key]);
-          //   }
-          // } else {
-          //   recall();
-          // }
         });
       });
     }

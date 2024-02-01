@@ -1,12 +1,12 @@
 import { Call } from "./type";
 
 export class Line {
-  private _dep: Call[] = [];
+  private _dep = new Set<Call>();
   subscribe(call: Call) {
-    this._dep.push(call);
+    this._dep.add(call);
 
     return () => {
-      this._dep = this._dep.filter((item) => item !== call);
+      this._dep.delete(call);
     };
   }
   next(value: unknown) {

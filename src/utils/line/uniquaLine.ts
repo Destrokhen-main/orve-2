@@ -2,7 +2,7 @@ import { isEqual } from "../isEqual";
 import { Call } from "./type";
 
 export class ULine {
-  private _dep: Call[] = [];
+  private _dep = new Set<Call>();
   private _lastValue: any = null;
 
   constructor(initValue?: any) {
@@ -10,10 +10,10 @@ export class ULine {
   }
 
   subscribe(call: Call) {
-    this._dep.push(call);
+    this._dep.add(call);
 
     return () => {
-      this._dep = this._dep.filter((item) => item !== call);
+      this._dep.delete(call);
     };
   }
   next(value: any) {
