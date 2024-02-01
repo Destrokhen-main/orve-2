@@ -1,5 +1,6 @@
 import { TypeNode } from "../../parser/type";
 import { ReactiveType } from "../../reactive/type";
+import { updateBuffer } from "../../utils/buffer";
 import { isEqual } from "../../utils/isEqual";
 import { returnNewClone } from "../../utils/returnClone";
 import { singleMounterChildren } from "../children";
@@ -19,7 +20,17 @@ function OifWorker(
 
   const mounterInstance = singleMounterChildren(null);
 
-  const currentRules = item.rule();
+  let deps = item.deps;
+
+  let currentRules;
+  if (item.deps === undefined || item.deps.length === 0) {
+    deps = [];
+    updateBuffer(deps);
+    currentRules = item.rule();
+    updateBuffer(null);
+  } else {
+    currentRules = item.rule();
+  }
   lastAnswer = currentRules;
   if (item.answer[currentRules] !== undefined) {
     const node = mounterInstance(item.answer[currentRules]);
@@ -45,9 +56,8 @@ function OifWorker(
     workedNode = document.createComment(" o-if ");
     root?.appendChild(workedNode);
   }
-
-  if (item.dep !== undefined) {
-    item.dep.forEach((e: any) => {
+  if (deps !== undefined) {
+    deps.forEach((e: any) => {
       let lastValue: any;
       e.$sub.subscribe(() => {
         if (e.type === ReactiveType.RefO) {
