@@ -21,7 +21,7 @@ function() {
 ```
 {
   value: undefined, а после уже элемент,
-  $sub: rxjs переменная
+  $sub: Line переменная
 }
 ```
 

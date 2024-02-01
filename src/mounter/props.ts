@@ -1,4 +1,3 @@
-import { distinctUntilChanged, fromEvent, pairwise } from "rxjs";
 import { Props } from "../jsx-type";
 import { PropsItem, SPECIFIC_KEYS, objectToCss } from "../parser/props";
 import { TypeProps } from "../parser/type";
@@ -77,18 +76,15 @@ function propsWorker(root: HTMLElement, item: Props) {
       const value = prepaireStaticRectF(item, key);
 
       if (value !== null && typeof value === "function") {
-        let event = fromEvent(root, key).subscribe(value);
+        document.addEventListener(key, value);
 
-        item.parent.$sub
-          .pipe(pairwise())
-          .subscribe(([before, after]: [any, any]) => {
-            const newKey = prepaireStaticRectF(item, key, after);
+        item.parent.$sub.subscribe((value: any) => {
+          const newKey = prepaireStaticRectF(item, key, value);
 
-            if (newKey !== null && before !== newKey) {
-              event.unsubscribe();
-              event = fromEvent(root, key).subscribe(newKey);
-            }
-          });
+          if (newKey !== null) {
+            document.addEventListener(key, newKey);
+          }
+        });
       } else {
         if (typeof value !== "function") {
           console.error("value return not a function");
@@ -111,24 +107,20 @@ function propsWorker(root: HTMLElement, item: Props) {
         changerAttributes(root, key, value);
       }
 
-      obj.value.$sub
-        .pipe(pairwise())
-        .subscribe(([before, _after]: [string | number, string | number]) => {
-          let after = _after;
-          if (reactiveItem.type === ReactiveType.RefO) {
-            const i = reactiveItem as any;
-            after = i.parent[i.key];
-          }
+      obj.value.$sub.subscribe((_after: any) => {
+        let after = _after;
+        if (reactiveItem.type === ReactiveType.RefO) {
+          const i = reactiveItem as any;
+          after = i.parent[i.key];
+        }
 
-          if (before !== after) {
-            if (typeof after === "object" && key === "style") {
-              const cssInline = objectToCss(after);
-              changerAttributes(root, key, cssInline);
-            } else {
-              changerAttributes(root, key, after);
-            }
-          }
-        });
+        if (typeof after === "object" && key === "style") {
+          const cssInline = objectToCss(after);
+          changerAttributes(root, key, cssInline);
+        } else {
+          changerAttributes(root, key, after);
+        }
+      });
     }
 
     // TODO сейчас только для статики работает, нужно логику и для style и для остального
@@ -137,15 +129,9 @@ function propsWorker(root: HTMLElement, item: Props) {
       if (item.value !== null && item.value !== "") {
         root.setAttribute(key, item.value);
 
-        item.$sub
-          .pipe(
-            distinctUntilChanged((prevHigh: any, temp: any) => {
-              return temp === prevHigh;
-            }),
-          )
-          .subscribe(() => {
-            root.setAttribute(key, item.value);
-          });
+        item.$sub.subscribe(() => {
+          root.setAttribute(key, item.value);
+        });
       }
     }
   });

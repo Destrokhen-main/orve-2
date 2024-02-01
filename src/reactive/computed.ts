@@ -52,7 +52,7 @@
 // }
 
 // Запретить изменять ref сверху.
-import { Subject } from "rxjs";
+import { Line } from "../utils/line";
 import { ref } from "./ref";
 import { ReactiveType } from "./type";
 import { logger } from "../utils/logger";
@@ -61,7 +61,7 @@ import { returnNewClone } from "../utils/returnClone";
 
 type Computed<T> = {
   type: ReactiveType;
-  $sub: Subject<T>;
+  $sub: Line;
   value: T;
   _value?: unknown;
 };
