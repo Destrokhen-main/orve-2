@@ -59,7 +59,7 @@ function mounterNode(root: Element | null, tree: NodeOP) {
 
   tree.node = elem;
 
-  tree.$sub?.subscribe((n) => {
+  tree.$sub?.subscribe((n: any) => {
     // beforeUpdate updated
     upperHooksWorker(tree, n);
   });

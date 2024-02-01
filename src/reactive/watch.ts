@@ -1,11 +1,11 @@
-import { BehaviorSubject } from "rxjs";
+import { Line } from "../utils/line";
 import { ReactiveType } from "./type";
 import { returnNewClone } from "../utils/returnClone";
 import { isEqual } from "../utils/isEqual";
 
 interface Dep {
   [T: string]: any;
-  $sub: BehaviorSubject<any>;
+  $sub: Line;
 }
 
 /**

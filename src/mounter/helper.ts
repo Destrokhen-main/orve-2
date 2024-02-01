@@ -44,6 +44,41 @@ export function toString(value: unknown): string {
   return String(value);
 }
 
+function worker(_after: any, item: any, isHTML: any, textNode: any) {
+  let after = _after;
+  if (item.type === ReactiveType.RefO) {
+    const i = item as any;
+    after = i.parent[i.key];
+  }
+
+  if (typeof after === "string" && isHtmlNode(after)) {
+    isHTML = true;
+    const node = htmlNodeCreate({
+      type: TypeNode.HTML,
+      value: after,
+      node: null,
+    });
+    if (node.node !== null) {
+      textNode.replaceWith(node.node);
+      textNode = node.node as any;
+    } else {
+      console.warn("[ ref ] - HTML code can't be parsed");
+    }
+  } else if (
+    (isHTML && typeof after === "string" && !isHtmlNode(after)) ||
+    (isHTML && typeof after !== "string")
+  ) {
+    const n = document.createTextNode(toString(after));
+    textNode.replaceWith(n);
+    textNode = n;
+    isHTML = false;
+  } else {
+    textNode.textContent = toString(after);
+  }
+
+  return [isHTML, textNode];
+}
+
 function RefChildCreator(
   root: Element | null,
   item: Ref<any>,
@@ -52,52 +87,17 @@ function RefChildCreator(
 ) {
   let textNode = document.createTextNode("");
   const sub = item.$sub;
-  let firstRender = true;
   let isHTML = false;
-  // TODO при первом вызове обновления не приходит next
-  sub.subscribe({
-    next(_after: string | number) {
-      if (parent && !firstRender) {
-        // TODO посылает запрос если 2 и больше реактивных переменных
-        // будет слать столько сколько переменных
-        // так не должно быть.
-        parent.$sub.next("beforeUpdate");
-      }
-      let after = _after;
-      if (item.type === ReactiveType.RefO) {
-        const i = item as any;
-        after = i.parent[i.key];
-      }
 
-      if (typeof after === "string" && isHtmlNode(after)) {
-        isHTML = true;
-        const node = htmlNodeCreate({
-          type: TypeNode.HTML,
-          value: after,
-          node: null,
-        });
-        if (node.node !== null) {
-          textNode.replaceWith(node.node);
-          textNode = node.node as any;
-        } else {
-          console.warn("[ ref ] - HTML code can't be parsed");
-        }
-      } else if (
-        (isHTML && typeof after === "string" && !isHtmlNode(after)) ||
-        (isHTML && typeof after !== "string")
-      ) {
-        const n = document.createTextNode(toString(after));
-        textNode.replaceWith(n);
-        textNode = n;
-        isHTML = false;
-      } else {
-        textNode.textContent = toString(after);
-      }
-      if (parent && !firstRender) {
-        parent.$sub.next("updated");
-      }
-      firstRender = false;
-    },
+  [isHTML, textNode] = worker(item.value, item, isHTML, textNode);
+  // TODO при первом вызове обновления не приходит next
+  sub.subscribe((_after: string | number) => {
+    // TODO посылает запрос если 2 и больше реактивных переменных
+    // будет слать столько сколько переменных
+    // так не должно быть.
+    parent.$sub.next("beforeUpdate");
+    [isHTML, textNode] = worker(_after, item, isHTML, textNode);
+    parent.$sub.next("updated");
   });
 
   if (replaceItem !== undefined) {

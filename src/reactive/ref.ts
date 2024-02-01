@@ -1,4 +1,4 @@
-import { BehaviorSubject } from "rxjs";
+import { Line } from "../utils/line";
 import { ReactiveType } from "./type";
 import { refArrayBuilder } from "./refHelper";
 import { buffer } from "../utils/buffer";
@@ -37,7 +37,7 @@ function returnType(v: unknown): string {
 type Ref<T> = {
   type: ReactiveType;
   value: T;
-  $sub: BehaviorSubject<T> | Record<string, any>;
+  $sub: Line | Record<string, any>;
 };
 
 /**
@@ -48,7 +48,7 @@ type Ref<T> = {
 function ref<T>(value: T) {
   const context = this ?? {};
 
-  const subject = new BehaviorSubject<T>(value);
+  const subject = new Line();
 
   const reactive: Ref<T> = {
     type: ReactiveType.Ref,

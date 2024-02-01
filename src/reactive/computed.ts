@@ -1,6 +1,3 @@
-// import { BehaviorSubject, distinctUntilChanged } from "rxjs";
-// import { ReactiveType } from "./type";
-
 // function computed(func: () => unknown, dep: unknown[] = []) {
 //   if (typeof func !== "function") {
 //     console.error("Первым параметром ожидается функция");
@@ -104,17 +101,15 @@ function computed<T>(func: () => T, deps: any[]) {
       if (dep.type === ReactiveType.RefO) {
         lastValue = returnNewClone(dep.parent[dep.key]);
       }
-      dep.$sub.subscribe({
-        next() {
-          if (dep.type === ReactiveType.RefO) {
-            if (!isEqual(dep.parent[dep.key], lastValue)) {
-              recall();
-              lastValue = returnNewClone(dep.parent[dep.key]);
-            }
-          } else {
+      dep.$sub.subscribe(() => {
+        if (dep.type === ReactiveType.RefO) {
+          if (!isEqual(dep.parent[dep.key], lastValue)) {
             recall();
+            lastValue = returnNewClone(dep.parent[dep.key]);
           }
-        },
+        } else {
+          recall();
+        }
       });
     });
   }

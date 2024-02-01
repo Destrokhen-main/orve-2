@@ -10,7 +10,7 @@ import {
 } from "./reactiveComponentWorker";
 import { definedProps } from "../utils";
 import { snakeToCamel } from "../utils/transformFunctions";
-import { Subject } from "rxjs";
+import { Line } from "../utils/line";
 
 export interface NodeO extends NodeB {
   tag: string | ((props?: Record<string, any>) => unknown);
@@ -23,7 +23,7 @@ export interface NodeOP extends NodeO {
   node: Element | null;
   parent: NodeOP | null;
   type: TypeNode;
-  $sub?: Subject<any> | null;
+  $sub?: Line | null;
 }
 
 function checkPropsBeforeCall(func: () => unknown, propsW: Props) {
@@ -186,7 +186,7 @@ function parserNodeF(
 
   const componentO = {
     type: TypeNode.Component,
-    $sub: !this.__SUB__ ? new Subject() : null,
+    $sub: !this.__SUB__ ? new Line() : null,
     ...component,
     props: component.props as any,
     node: null,
@@ -265,7 +265,7 @@ function parserNodeO(node: NodeO, parent: NodeOP | null = null): NodeOP | null {
 
   const componentO: NodeOP = {
     type: TypeNode.Component,
-    $sub: !this.__SUB__ ? new Subject() : null,
+    $sub: !this.__SUB__ ? new Line() : null,
     ...workNode,
     props: (workNode.props as any) ?? null,
     node: null,

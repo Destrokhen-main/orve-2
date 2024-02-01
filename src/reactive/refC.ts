@@ -1,4 +1,4 @@
-import { BehaviorSubject, share } from "rxjs";
+import { Line } from "../utils/line";
 import { Reactive, ReactiveType } from "./type";
 
 interface IRefC extends Reactive {
@@ -12,10 +12,10 @@ interface IRefC extends Reactive {
  * @returns - Реактивный компонент
  */
 function refC(startComponent: any) {
-  const subject: BehaviorSubject<any> = new BehaviorSubject(startComponent);
+  const subject = new Line();
   const component: IRefC = {
     type: ReactiveType.RefC,
-    $sub: subject.pipe(share()),
+    $sub: subject,
     value: startComponent,
   };
 

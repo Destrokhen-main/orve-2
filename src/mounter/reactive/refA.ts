@@ -63,83 +63,81 @@ function RefArray(
 
   // игнорирую первый next
   let f = true;
-  item.$sub.subscribe({
-    next(_value: any) {
-      if (f) {
-        f = false;
-        return;
+  item.$sub.subscribe((_value: any) => {
+    if (f) {
+      f = false;
+      return;
+    }
+    let value = _value;
+    if (item.type === ReactiveType.RefO) {
+      const i = item as any;
+      const val = i.parent[i.key];
+      if (
+        typeof val === "object" &&
+        !Array.isArray(val) &&
+        val.type === ReactiveType.Ref
+      ) {
+        value = val.value;
+      } else {
+        value = val;
       }
-      let value = _value;
-      if (item.type === ReactiveType.RefO) {
-        const i = item as any;
-        const val = i.parent[i.key];
-        if (
-          typeof val === "object" &&
-          !Array.isArray(val) &&
-          val.type === ReactiveType.Ref
-        ) {
-          value = val.value;
-        } else {
-          value = val;
-        }
-      }
+    }
 
-      if (!Array.isArray(value)) {
-        if (allInstruction.length > 0) {
-          while (allInstruction.length > 0) {
-            const i = allInstruction.shift();
-            if (allInstruction.length === 1) {
-              i.replaceWith(mainComment);
-            } else {
-              i.remove();
-            }
+    if (!Array.isArray(value)) {
+      if (allInstruction.length > 0) {
+        while (allInstruction.length > 0) {
+          const i = allInstruction.shift();
+          if (allInstruction.length === 1) {
+            i.replaceWith(mainComment);
+          } else {
+            i.remove();
           }
         }
-        arrayBefore = [];
-        return;
       }
+      arrayBefore = [];
+      return;
+    }
 
-      const pars = value.map((...args: any) => callback?.apply(this, args));
-      const arr = DifferentItems(arrayBefore, pars);
+    const pars = value.map((...args: any) => callback?.apply(this, args));
+    const arr = DifferentItems(arrayBefore, pars);
 
-      if (arr.length > 0) {
-        arr.forEach((item: any) => {
-          if (item.type === DiffType.New) {
-            const block = pars[item.index];
-            const mounted = mounterInsance(parserInstance(block) as any);
+    if (arr.length > 0) {
+      arr.forEach((item: any) => {
+        if (item.type === DiffType.New) {
+          const block = pars[item.index];
+          const mounted = mounterInsance(parserInstance(block) as any);
 
-            if (item.index !== 0) {
-              allInstruction[item.index - 1].after(mounted.node);
-            }
-
-            if (allInstruction.length === 0) {
-              mainComment.replaceWith(mounted.node);
-            }
-            allInstruction.push(mounted.node);
+          if (item.index !== 0) {
+            allInstruction[item.index - 1].after(mounted.node);
           }
-          if (item.type === DiffType.Modify) {
-            const block = pars[item.index];
-            const mounted = mounterInsance(parserInstance(block) as any);
-            allInstruction[item.index].replaceWith(mounted.node);
-            allInstruction[item.index] = mounted.node;
-          }
-          if (item.type === DiffType.Delete) {
-            if (
-              allInstruction.filter((item: any) => item !== null).length === 1
-            ) {
-              allInstruction[item.index].replaceWith(mainComment);
-              allInstruction[item.index] = null;
-            } else {
-              allInstruction[item.index].remove();
-              allInstruction[item.index] = null;
-            }
-          }
-        });
-      }
 
-      arrayBefore = pars;
-      allInstruction = allInstruction.filter((item: any) => item !== null);
-    },
+          if (allInstruction.length === 0) {
+            mainComment.replaceWith(mounted.node);
+          }
+          allInstruction.push(mounted.node);
+        }
+        if (item.type === DiffType.Modify) {
+          const block = pars[item.index];
+          const mounted = mounterInsance(parserInstance(block) as any);
+          allInstruction[item.index].replaceWith(mounted.node);
+          allInstruction[item.index] = mounted.node;
+        }
+        if (item.type === DiffType.Delete) {
+          if (
+            allInstruction.filter((item: any) => item !== null).length === 1
+          ) {
+            allInstruction[item.index].replaceWith(mainComment);
+            allInstruction[item.index] = null;
+          } else {
+            allInstruction[item.index].remove();
+            allInstruction[item.index] = null;
+          }
+        }
+      });
+    }
+
+    arrayBefore = pars;
+    allInstruction = allInstruction.filter((item: any) => item !== null);
   });
 }
 

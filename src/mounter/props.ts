@@ -62,20 +62,15 @@ function propsWorker(root: HTMLElement, item: Props) {
     }
 
     if (obj.type === TypeProps.Event) {
-      fromEvent(root, key).subscribe(obj.value);
+      root.addEventListener(key, obj.value);
     }
 
     if (obj.type === TypeProps.EventReactive) {
-      let event = fromEvent(root, key).subscribe(obj.value.value);
+      root.addEventListener(key, obj.value.value);
 
-      obj.value.$sub
-        .pipe(pairwise())
-        .subscribe(([before, after]: [() => any, () => any]) => {
-          if (String(before || "") !== String(after || "")) {
-            event.unsubscribe();
-            event = fromEvent(root, key).subscribe(after);
-          }
-        });
+      obj.value.$sub.subscribe((val: any) => {
+        root.addEventListener(key, val);
+      });
     }
     if (obj.type === TypeProps.EventReactiveF) {
       const item = obj.value;

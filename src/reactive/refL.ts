@@ -1,4 +1,4 @@
-import { BehaviorSubject, share } from "rxjs";
+import { Line } from "../utils/line";
 
 export interface refL {
   value: any;
@@ -10,11 +10,11 @@ export interface refL {
  * @returns реактивную переменную
  */
 function refL() {
-  const subject: BehaviorSubject<any> = new BehaviorSubject(undefined);
+  const subject = new Line();
 
   const obj = {
     value: undefined,
-    $sub: subject.pipe(share()),
+    $sub: subject,
   };
 
   const proxy = new Proxy(obj, {

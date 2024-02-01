@@ -1,4 +1,4 @@
-import { Subject } from "rxjs";
+import { Line } from "../utils/line";
 import { FRAGMENT } from "../keys";
 import { NodeOP } from "../parser/parser";
 import { NodeHtml, NodeChild } from "../parser/type";
@@ -100,7 +100,7 @@ function singleMounterChildren(root: Element | null, parent?: childrenParent) {
   };
 }
 
-type childrenParent = { type: TypeNode; $sub: Subject<any> | null | undefined };
+type childrenParent = { type: TypeNode; $sub: Line | null | undefined };
 
 /**
  * Монтирование node

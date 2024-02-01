@@ -1,4 +1,4 @@
-import { Subject } from "rxjs";
+import { Line } from "../utils/line";
 import { ref } from "../index";
 import { ReactiveType } from "./type";
 import { buffer, updateBuffer } from "../utils/buffer";
@@ -7,7 +7,7 @@ import { isEqual } from "../utils/isEqual";
 
 type Computed<T> = {
   type: ReactiveType;
-  $sub: Subject<T>;
+  $sub: Line;
   value: T;
   _value?: unknown;
 };
@@ -63,7 +63,7 @@ function effect<T>(func: () => T) {
       (Array.isArray(listFollow) && listFollow.length > 0)
     ) {
       listFollow.forEach((e: any) => {
-        e.complete();
+        e();
       });
     }
 
@@ -73,23 +73,16 @@ function effect<T>(func: () => T) {
         // if (dep.type === ReactiveType.RefO) {
         //   lastValue = returnNewClone(dep.parent[dep.key]);
         // }
-        let f = true;
-        return dep.$sub.subscribe({
-          next() {
-            if (!f) {
-              recall();
-            } else {
-              f = false;
-            }
-            // if (dep.type === ReactiveType.RefO) {
-            //   if (!isEqual(dep.parent[dep.key], lastValue)) {
-            //     recall();
-            //     lastValue = returnNewClone(dep.parent[dep.key]);
-            //   }
-            // } else {
-            //   recall();
-            // }
-          },
+        return dep.$sub.subscribe(() => {
+          recall();
+          // if (dep.type === ReactiveType.RefO) {
+          //   if (!isEqual(dep.parent[dep.key], lastValue)) {
+          //     recall();
+          //     lastValue = returnNewClone(dep.parent[dep.key]);
+          //   }
+          // } else {
+          //   recall();
+          // }
         });
       });
     }
