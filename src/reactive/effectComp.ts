@@ -12,7 +12,7 @@ type Computed<T> = {
   _value?: unknown;
 };
 
-function effect<T>(func: () => T) {
+function computedEffect<T>(func: () => T) {
   const deps: any = [];
   updateBuffer(deps);
   let acc = func();
@@ -80,4 +80,4 @@ function effect<T>(func: () => T) {
   return obj;
 }
 
-export { effect };
+export { computedEffect };

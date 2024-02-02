@@ -53,9 +53,8 @@ export function refArrayBuilder(arr: any[], obj: any) {
     set(t: any[], p: string, v: any) {
       const s = Reflect.set(t, p, v);
       const num = parseInt(p, 10);
-
       if (!Number.isNaN(num)) {
-        t[parseInt(p, 10)] = v;
+        t[num] = v;
         obj.$sub.next(t);
       }
 

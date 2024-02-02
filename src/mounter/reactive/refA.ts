@@ -62,12 +62,8 @@ function RefArray(
   }
 
   // игнорирую первый next
-  let f = true;
   item.$sub.subscribe((_value: any) => {
-    if (f) {
-      f = false;
-      return;
-    }
+    console.log(_value);
     let value = _value;
     if (item.type === ReactiveType.RefO) {
       const i = item as any;
@@ -100,7 +96,6 @@ function RefArray(
 
     const pars = value.map((...args: any) => callback?.apply(this, args));
     const arr = DifferentItems(arrayBefore, pars);
-
     if (arr.length > 0) {
       arr.forEach((item: any) => {
         if (item.type === DiffType.New) {
