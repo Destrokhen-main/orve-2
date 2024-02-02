@@ -61,9 +61,7 @@ function RefArray(
     root?.appendChild(mainComment);
   }
 
-  // игнорирую первый next
   item.$sub.subscribe((_value: any) => {
-    console.log(_value);
     let value = _value;
     if (item.type === ReactiveType.RefO) {
       const i = item as any;
