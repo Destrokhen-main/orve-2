@@ -1,6 +1,6 @@
 import { TypeNode } from "../../parser/type";
 import { ReactiveType } from "../../reactive/type";
-import { updateBuffer } from "../../utils/buffer";
+import { getDeps } from "../../utils/getDepsOfFunction";
 import { isEqual } from "../../utils/isEqual";
 import { returnNewClone } from "../../utils/returnClone";
 import { singleMounterChildren } from "../children";
@@ -24,10 +24,7 @@ function OifWorker(
 
   let currentRules;
   if (item.deps === undefined || item.deps.length === 0) {
-    deps = [];
-    updateBuffer(deps);
-    currentRules = item.rule();
-    updateBuffer(null);
+    [deps, currentRules] = getDeps(item.rule);
   } else {
     currentRules = item.rule();
   }

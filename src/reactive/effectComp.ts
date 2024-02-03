@@ -1,9 +1,10 @@
 import { Line } from "../utils/line";
 import { ref } from "../index";
 import { ReactiveType } from "./type";
-import { buffer, updateBuffer } from "../utils/buffer";
+import { buffer } from "../utils/buffer";
 import { returnNewClone } from "../utils/returnClone";
 import { isEqual } from "../utils/isEqual";
+import { getDeps } from "../utils/getDepsOfFunction";
 
 type Computed<T> = {
   type: ReactiveType;
@@ -13,10 +14,8 @@ type Computed<T> = {
 };
 
 function computedEffect<T>(func: () => T) {
-  const deps: any = [];
-  updateBuffer(deps);
-  let acc = func();
-  updateBuffer(null);
+  const [deps, _acc] = getDeps(func);
+  let acc = _acc;
 
   const pack = ref(acc);
 
@@ -45,10 +44,7 @@ function computedEffect<T>(func: () => T) {
   });
 
   const recall = () => {
-    const deps: any = [];
-    updateBuffer(deps);
-    const call = func();
-    updateBuffer(null);
+    const [deps, call] = getDeps(func);
     if (!isEqual(acc, call)) {
       reConnectDeps(deps);
       acc = call;
