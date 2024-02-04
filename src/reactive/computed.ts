@@ -58,6 +58,8 @@ import { ReactiveType } from "./type";
 import { logger } from "../utils/logger";
 import { isEqual } from "../utils/isEqual";
 import { returnNewClone } from "../utils/returnClone";
+import { uniquae } from "../utils/line/uniquaTransform";
+import { buffer } from "../utils/buffer";
 
 type Computed<T> = {
   type: ReactiveType;
@@ -67,7 +69,7 @@ type Computed<T> = {
 };
 
 function computed<T>(func: () => T, deps: any[]) {
-  let acc = func();
+  const acc = func();
   const pack = ref(acc);
 
   const startObj: Computed<T> = {
@@ -88,29 +90,27 @@ function computed<T>(func: () => T, deps: any[]) {
   });
 
   const recall = () => {
-    const call = func();
-    if (!isEqual(acc, call)) {
-      acc = call;
-      obj._value = call;
-    }
+    obj._value = func();
   };
 
   if (deps.length > 0) {
     deps.forEach((dep) => {
-      let lastValue: any;
-      if (dep.type === ReactiveType.RefO) {
-        lastValue = returnNewClone(dep.parent[dep.key]);
-      }
-      dep.$sub.subscribe(() => {
-        if (dep.type === ReactiveType.RefO) {
-          if (!isEqual(dep.parent[dep.key], lastValue)) {
-            recall();
-            lastValue = returnNewClone(dep.parent[dep.key]);
-          }
-        } else {
+      // let lastValue: any;
+      // if (dep.type === ReactiveType.RefO) {
+      //   lastValue = returnNewClone(dep.parent[dep.key]);
+      // }
+      dep.$sub.subscribe(
+        uniquae(() => {
+          // if (dep.type === ReactiveType.RefO) {
+          //   if (!isEqual(dep.parent[dep.key], lastValue)) {
+          //     recall();
+          //     lastValue = returnNewClone(dep.parent[dep.key]);
+          //   }
+          // } else {
           recall();
-        }
-      });
+          // }
+        }, acc),
+      );
     });
   }
 
@@ -124,6 +124,13 @@ function computed<T>(func: () => T, deps: any[]) {
 
       logger("warn", "%c[computed]%c Нельзя перезаписывать значение computed");
       return false;
+    },
+    get(t, p) {
+      if (p === "value" && buffer !== null) {
+        buffer.push(t);
+      }
+
+      return Reflect.get(t, p);
     },
   });
 }

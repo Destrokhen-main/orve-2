@@ -23,12 +23,7 @@ function validationPropsParent(
     );
   }
 
-  if (props["dep"] === undefined) {
-    logger(
-      "warn",
-      '%c[o-if]%c: "dep" - Чтобы реактивно следить за изменения в функции. Необходимо передать dep',
-    );
-  } else {
+  if (props["dep"] !== undefined) {
     const check = (req: any) => {
       if (req.$sub !== undefined) return true;
     };

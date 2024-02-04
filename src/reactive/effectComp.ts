@@ -5,6 +5,7 @@ import { buffer } from "../utils/buffer";
 import { returnNewClone } from "../utils/returnClone";
 import { isEqual } from "../utils/isEqual";
 import { getDeps } from "../utils/getDepsOfFunction";
+import { uniquae } from "../utils/line/uniquaTransform";
 
 type Computed<T> = {
   type: ReactiveType;
@@ -15,7 +16,7 @@ type Computed<T> = {
 
 function computedEffect<T>(func: () => T) {
   const [deps, _acc] = getDeps(func);
-  let acc = _acc;
+  const acc = _acc;
 
   const pack = ref(acc);
 
@@ -45,11 +46,8 @@ function computedEffect<T>(func: () => T) {
 
   const recall = () => {
     const [deps, call] = getDeps(func);
-    if (!isEqual(acc, call)) {
-      reConnectDeps(deps);
-      acc = call;
-      obj._value = call;
-    }
+    reConnectDeps(deps);
+    obj._value = call;
   };
 
   let listFollow: any = null;
@@ -65,9 +63,11 @@ function computedEffect<T>(func: () => T) {
 
     if (deps.length > 0) {
       listFollow = deps.map((dep: any) => {
-        return dep.$sub.subscribe(() => {
-          recall();
-        });
+        return dep.$sub.subscribe(
+          uniquae(() => {
+            recall();
+          }, acc),
+        );
       });
     }
   }

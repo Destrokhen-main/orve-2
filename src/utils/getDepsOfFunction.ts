@@ -6,7 +6,6 @@ function getDeps(func: () => any): [any[], any] {
   updateBuffer(deps);
   const res = func();
   updateBuffer(null);
-
   return [deps, res];
 }
 
