@@ -1,4 +1,4 @@
-import { isEqual } from "../isEqual";
+import { isEqual } from "lodash-es";
 import { Call } from "./type";
 
 export class ULine {

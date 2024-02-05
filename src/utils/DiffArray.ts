@@ -1,4 +1,4 @@
-import { isEqual } from "./isEqual";
+import { isEqual } from "lodash-es";
 
 export enum DiffType {
   Modify = "Modify",

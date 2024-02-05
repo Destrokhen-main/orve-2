@@ -1,7 +1,7 @@
 import { TypeNode } from "../../parser/type";
 import { ReactiveType } from "../../reactive/type";
 import { getDeps } from "../../utils/getDepsOfFunction";
-import { isEqual } from "../../utils/isEqual";
+import { isEqual } from "lodash-es";
 import { returnNewClone } from "../../utils/returnClone";
 import { singleMounterChildren } from "../children";
 import { RefCComponentWorker } from "./refC";

@@ -1,7 +1,7 @@
 import { Line } from "../utils/line";
 import { ReactiveType } from "./type";
 import { returnNewClone } from "../utils/returnClone";
-import { isEqual } from "../utils/isEqual";
+import { isEqual } from "lodash-es";
 
 interface Dep {
   [T: string]: any;

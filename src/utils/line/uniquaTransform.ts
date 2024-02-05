@@ -1,4 +1,4 @@
-import { isEqual } from "../isEqual";
+import { isEqual } from "lodash-es";
 
 function unique(func: (v: any) => any, startValue: any) {
   let _startValue = startValue;

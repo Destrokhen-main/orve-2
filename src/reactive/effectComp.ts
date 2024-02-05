@@ -3,7 +3,7 @@ import { ref } from "../index";
 import { ReactiveType } from "./type";
 import { buffer } from "../utils/buffer";
 import { returnNewClone } from "../utils/returnClone";
-import { isEqual } from "../utils/isEqual";
+import { isEqual } from "lodash-es";
 import { getDeps } from "../utils/getDepsOfFunction";
 import { unique } from "../utils/line/uniquaTransform";
 
