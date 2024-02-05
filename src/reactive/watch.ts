@@ -2,6 +2,8 @@ import { Line } from "../utils/line";
 import { ReactiveType } from "./type";
 import { returnNewClone } from "../utils/returnClone";
 import { isEqual } from "lodash-es";
+import { uniqueWithPast, unique } from "../utils/line/uniquaTransform";
+import { getDeps } from "../utils/getDepsOfFunction";
 
 interface Dep {
   [T: string]: any;
@@ -14,66 +16,39 @@ interface Dep {
  * @param dep - реактивные переменные, для которых будет применять функция watch
  * @returns  либо одно или массив функций, для отключения watch
  */
-function watch(func: (n: any, o: any) => void, dep: Dep | Dep[]) {
+function watch(func: (n?: any, o?: any) => void, dep: Dep) {
   if (typeof dep !== "object" || dep === null) {
     console.warn("[watch] - Dep is bad");
     return false;
   }
 
-  if (Array.isArray(dep) && dep.length > 0) {
-    const depArrayDisconnect = [];
+  const d = dep as Dep;
 
-    let showD = false;
-
-    for (let i = 0; i !== dep.length; i++) {
-      if (dep[i].$sub !== undefined) {
-        let lastValue: any = null;
-        const cur: any = dep[i].$sub.subscribe((_value: any) => {
-          let value = _value;
-          if (dep[i].type === ReactiveType.RefO) {
-            const ti = dep[i] as any;
-            value = ti.parent[ti.key];
-          }
-          if (lastValue === null) {
-            lastValue = returnNewClone(value);
-          } else if (!isEqual(value, lastValue)) {
-            func(value, lastValue);
-            lastValue = returnNewClone(value);
-          }
-        });
-        depArrayDisconnect.push(() => cur.complete());
-      } else {
-        showD = true;
-      }
-    }
-
-    if (showD) {
-      console.warn("[watch] - One or any dep is not subscribe");
-    }
-
-    return depArrayDisconnect;
-  } else {
-    const d = dep as Dep;
-
-    if (d.$sub === undefined) {
-      return false;
-    }
-    let lastValue: any = null;
-    const cur: any = d.$sub.subscribe((_value: any) => {
-      let value = _value;
-      if (d.type === ReactiveType.RefO) {
-        const i = d as any;
-        value = i.parent[i.key];
-      }
-      if (lastValue === null) {
-        lastValue = returnNewClone(value);
-      } else if (!isEqual(value, lastValue)) {
-        func(value, lastValue);
-        lastValue = returnNewClone(value);
-      }
-    });
-    return () => cur.complete();
+  if (d.$sub === undefined) {
+    return false;
   }
+  const cur: any = d.$sub.subscribe(uniqueWithPast((newV: any, oldV: any) => {
+    func(newV, oldV);
+  }, d.value ?? null));
+  return () => cur();
 }
 
-export { watch };
+function watchEffect(func: () => void) {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [deps, _] = getDeps(func);
+
+  const completeAll: any = [];
+
+  deps.forEach((dep) => {
+    const cur: any = dep.$sub.subscribe(unique(() => {
+      func();
+    }, dep.value ?? null));
+    completeAll.push(cur);
+  });
+
+  return () => {
+    completeAll.forEach((e: any) => e());
+  };
+}
+
+export { watch, watchEffect };

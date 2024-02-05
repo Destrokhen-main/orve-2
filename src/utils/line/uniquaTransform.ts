@@ -1,14 +1,27 @@
 import { isEqual } from "lodash-es";
+import { returnNewClone } from "../returnClone";
+
 
 function unique(func: (v: any) => any, startValue: any) {
-  let _startValue = startValue;
+  let _startValue = returnNewClone(startValue);
 
   return (value: any) => {
     if (!isEqual(_startValue, value)) {
-      _startValue = value;
+      _startValue = returnNewClone(value);
       func(value);
     }
   };
 }
 
-export { unique };
+function uniqueWithPast(func: (n: any, o: any) => any, startValue: any) {
+  let _startValue = returnNewClone(startValue);
+
+  return (value: any) => {
+    if (!isEqual(_startValue, value)) {
+      func(value, _startValue);
+      _startValue = returnNewClone(value);
+    }
+  };
+}
+
+export { unique, uniqueWithPast };
