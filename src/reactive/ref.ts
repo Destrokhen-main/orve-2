@@ -3,8 +3,6 @@ import { ReactiveType } from "./type";
 import { refArrayBuilder } from "./refHelper";
 import { buffer } from "../utils/buffer";
 
-let buf: any = null;
-
 function createReactiveObject(obj: any, reactive: any) {
   const keys = Object.keys(obj);
 
