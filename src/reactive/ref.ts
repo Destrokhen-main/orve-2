@@ -3,22 +3,32 @@ import { ReactiveType } from "./type";
 import { refArrayBuilder } from "./refHelper";
 import { buffer } from "../utils/buffer";
 
+let buf: any = null;
+
 function createReactiveObject(obj: any, reactive: any) {
+  const keys = Object.keys(obj);
+
+  keys.forEach((key: string) => {
+    const type = returnType(obj[key]);
+
+    if (type === "object" && obj[key].type === undefined) {
+      obj[key] = createReactiveObject(obj[key], reactive);
+    } else if (type === "array") {
+      obj[key] = refArrayBuilder(obj[key], reactive, true);
+    }
+  });
+
   return new Proxy(obj, {
-    set(t, p, v, r) {
+    set(t, p, v) {
       const res = Reflect.set(t, p, v);
-      console.log(r, reactive);
-
-      // if (typeof v === "object" && v.type === ReactiveType.Ref) {
-      //   v.$sub.subscribe(() => {
-      //     reactive.$sub.next(t);
-      //   });
-      //   return true;
-      // }
-
-      reactive.$sub.next(t);
+      reactive.$sub.next(reactive.value);
       return res;
     },
+    get(t, p) {
+      const type = returnType(t[p]);
+
+      return Reflect.get(t, p);
+    }
   });
 }
 
@@ -96,29 +106,15 @@ function ref<T>(value: T) {
       }
       if (type === "object") {
         if (Object.keys(reactive).includes(p)) return Reflect.get(t, p);
-        // const vl = t.value[p];
-        // if (vl && typeof vl === "object" && vl.type === ReactiveType.Ref) {
-        //   if (typeof vl.value === "object" && !Array.isArray(vl.value)) {
-        //     return vl;
-        //   } else {
-        //     vl.$sub.subscribe(() => {
-        //       t.$sub.next(t);
-        //     });
 
-        //     return {
-        //       type: ReactiveType.RefO,
-        //       key: p,
-        //       $sub: t.$sub,
-        //       parent: t.value,
-        //     };
-        //   }
-        // }
-        return {
+        const returnObj = {
           type: ReactiveType.RefO,
           key: p,
           $sub: t.$sub,
           parent: t.value,
         };
+
+        return returnObj;
       }
       return Reflect.get(t, p);
     },

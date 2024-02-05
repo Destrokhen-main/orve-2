@@ -95,6 +95,7 @@ function RefChildCreator(
   // TODO при первом вызове обновления не приходит next
   sub.subscribe(
     unique((_after: string | number) => {
+      console.log(_after, item);
       // TODO посылает запрос если 2 и больше реактивных переменных
       // будет слать столько сколько переменных
       // так не должно быть.

@@ -4,7 +4,7 @@
  * @param obj - реактивная переменная массива
  * @returns Реактивную переменную массива
  */
-export function refArrayBuilder(arr: any[], obj: any) {
+export function refArrayBuilder(arr: any[], obj: any, isObj: boolean = false) {
   return new Proxy(arr, {
     get(t: any[], p: any) {
       const val = t[p];
@@ -13,14 +13,14 @@ export function refArrayBuilder(arr: any[], obj: any) {
           if (p === "push") {
             return function (...args: any[]) {
               const result = Array.prototype[p].apply(t, args);
-              obj.$sub.next(t);
+              obj.$sub.next(isObj ? obj.value : t);
               return result;
             };
           } else {
             // unshift
             return function (...args: any[]) {
               const result = Array.prototype[p].apply(t, args);
-              obj.$sub.next(t);
+              obj.$sub.next(isObj ? obj.value : t);
               return result;
             };
           }
@@ -28,21 +28,21 @@ export function refArrayBuilder(arr: any[], obj: any) {
         if (["shift"].includes(p)) {
           return function () {
             const result = Array.prototype[p].apply(t);
-            obj.$sub.next(t);
+            obj.$sub.next(isObj ? obj.value : t);
             return result;
           };
         }
         if (["pop"].includes(p)) {
           return function () {
             const result = Array.prototype[p].apply(t);
-            obj.$sub.next(t);
+            obj.$sub.next(isObj ? obj.value : t);
             return result;
           };
         }
         if (["splice"].includes(p)) {
           return function (A: string, B: string, ...args: any[]) {
             const result = Array.prototype[p].apply(t, [A, B, ...args]);
-            obj.$sub.next(t);
+            obj.$sub.next(isObj ? obj.value : t);
             return result;
           };
         }
@@ -55,7 +55,7 @@ export function refArrayBuilder(arr: any[], obj: any) {
       const num = parseInt(p, 10);
       if (!Number.isNaN(num)) {
         t[num] = v;
-        obj.$sub.next(t);
+        obj.$sub.next(isObj ? obj.value : t);
       }
 
       return s;
