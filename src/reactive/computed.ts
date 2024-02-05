@@ -56,8 +56,6 @@ import { Line } from "../utils/line";
 import { ref } from "./ref";
 import { ReactiveType } from "./type";
 import { logger } from "../utils/logger";
-import { isEqual } from "lodash-es";
-import { returnNewClone } from "../utils/returnClone";
 import { unique } from "../utils/line/uniquaTransform";
 import { buffer } from "../utils/buffer";
 

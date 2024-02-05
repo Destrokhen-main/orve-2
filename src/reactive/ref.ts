@@ -27,11 +27,11 @@ function returnType(v: unknown): string {
     ? Array.isArray(v)
       ? "array"
       : v === null
-      ? "null"
-      : "object"
+        ? "null"
+        : "object"
     : v === undefined
-    ? "undefined"
-    : "primitive";
+      ? "undefined"
+      : "primitive";
 }
 
 type Ref<T> = {
@@ -59,8 +59,8 @@ function ref<T>(value: T) {
   reactive.value = Array.isArray(value)
     ? refArrayBuilder(value, reactive)
     : value && typeof value === "object"
-    ? createReactiveObject(value, reactive)
-    : value;
+      ? createReactiveObject(value, reactive)
+      : value;
 
   let type = returnType(value);
   const reactiveObject = new Proxy(reactive, {
@@ -96,7 +96,7 @@ function ref<T>(value: T) {
       }
       if (type === "object") {
         if (Object.keys(reactive).includes(p)) return Reflect.get(t, p);
-        const vl = t.value[p];
+        // const vl = t.value[p];
         // if (vl && typeof vl === "object" && vl.type === ReactiveType.Ref) {
         //   if (typeof vl.value === "object" && !Array.isArray(vl.value)) {
         //     return vl;
