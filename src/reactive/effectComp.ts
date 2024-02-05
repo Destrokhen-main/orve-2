@@ -5,7 +5,7 @@ import { buffer } from "../utils/buffer";
 import { returnNewClone } from "../utils/returnClone";
 import { isEqual } from "../utils/isEqual";
 import { getDeps } from "../utils/getDepsOfFunction";
-import { uniquae } from "../utils/line/uniquaTransform";
+import { unique } from "../utils/line/uniquaTransform";
 
 type Computed<T> = {
   type: ReactiveType;
@@ -64,9 +64,7 @@ function computedEffect<T>(func: () => T) {
     if (deps.length > 0) {
       listFollow = deps.map((dep: any) => {
         return dep.$sub.subscribe(
-          uniquae(() => {
-            recall();
-          }, acc),
+          unique(recall, dep.value ?? null),
         );
       });
     }

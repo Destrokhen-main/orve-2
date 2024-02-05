@@ -3,8 +3,7 @@ import { Ref } from "../reactive/ref";
 import { EtypeComment } from "./helperType";
 import { isHtmlNode } from "../parser/childrenHelper";
 import { ReactiveType } from "../reactive/type";
-import { isEqual } from "../utils/isEqual";
-import { uniquae } from "../utils/line/uniquaTransform";
+import { unique } from "../utils/line/uniquaTransform";
 
 function textNodeCreator(item: NodeChild) {
   const textNode = document.createTextNode(String(item.value));
@@ -95,7 +94,7 @@ function RefChildCreator(
 
   // TODO при первом вызове обновления не приходит next
   sub.subscribe(
-    uniquae((_after: string | number) => {
+    unique((_after: string | number) => {
       // TODO посылает запрос если 2 и больше реактивных переменных
       // будет слать столько сколько переменных
       // так не должно быть.

@@ -58,7 +58,7 @@ import { ReactiveType } from "./type";
 import { logger } from "../utils/logger";
 import { isEqual } from "../utils/isEqual";
 import { returnNewClone } from "../utils/returnClone";
-import { uniquae } from "../utils/line/uniquaTransform";
+import { unique } from "../utils/line/uniquaTransform";
 import { buffer } from "../utils/buffer";
 
 type Computed<T> = {
@@ -100,16 +100,7 @@ function computed<T>(func: () => T, deps: any[]) {
       //   lastValue = returnNewClone(dep.parent[dep.key]);
       // }
       dep.$sub.subscribe(
-        uniquae(() => {
-          // if (dep.type === ReactiveType.RefO) {
-          //   if (!isEqual(dep.parent[dep.key], lastValue)) {
-          //     recall();
-          //     lastValue = returnNewClone(dep.parent[dep.key]);
-          //   }
-          // } else {
-          recall();
-          // }
-        }, acc),
+        unique(recall, dep.value ?? null),
       );
     });
   }

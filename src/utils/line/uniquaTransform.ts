@@ -1,6 +1,6 @@
 import { isEqual } from "../isEqual";
 
-function uniquae(func: (v: any) => any, startValue: any) {
+function unique(func: (v: any) => any, startValue: any) {
   let _startValue = startValue;
 
   return (value: any) => {
@@ -11,4 +11,4 @@ function uniquae(func: (v: any) => any, startValue: any) {
   };
 }
 
-export { uniquae };
+export { unique };
