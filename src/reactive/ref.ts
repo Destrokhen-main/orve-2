@@ -2,6 +2,7 @@ import { Line } from "../utils/line";
 import { ReactiveType } from "./type";
 import { refArrayBuilder } from "./refHelper";
 import { buffer } from "../utils/buffer";
+import { unique } from "../utils/line/uniquaTransform";
 
 function createReactiveObject(obj: any, reactive: any) {
   const keys = Object.keys(obj);
@@ -9,9 +10,7 @@ function createReactiveObject(obj: any, reactive: any) {
   keys.forEach((key: string) => {
     const type = returnType(obj[key]);
 
-    if (type === "object" && obj[key].type === undefined) {
-      obj[key] = createReactiveObject(obj[key], reactive);
-    } else if (type === "array") {
+    if (type === "array") {
       obj[key] = refArrayBuilder(obj[key], reactive, true);
     }
   });
@@ -23,10 +22,8 @@ function createReactiveObject(obj: any, reactive: any) {
       return res;
     },
     get(t, p) {
-      const type = returnType(t[p]);
-
       return Reflect.get(t, p);
-    }
+    },
   });
 }
 
@@ -35,11 +32,11 @@ function returnType(v: unknown): string {
     ? Array.isArray(v)
       ? "array"
       : v === null
-        ? "null"
-        : "object"
+      ? "null"
+      : "object"
     : v === undefined
-      ? "undefined"
-      : "primitive";
+    ? "undefined"
+    : "primitive";
 }
 
 type Ref<T> = {
@@ -67,8 +64,8 @@ function ref<T>(value: T) {
   reactive.value = Array.isArray(value)
     ? refArrayBuilder(value, reactive)
     : value && typeof value === "object"
-      ? createReactiveObject(value, reactive)
-      : value;
+    ? createReactiveObject(value, reactive)
+    : value;
 
   let type = returnType(value);
   const reactiveObject = new Proxy(reactive, {
@@ -87,6 +84,8 @@ function ref<T>(value: T) {
         } else {
           if (Array.isArray(value)) {
             t.value = refArrayBuilder(value, reactive) as any;
+          } else if (value && typeof value === "object") {
+            t.value = createReactiveObject(value, reactive);
           } else {
             t.value = value;
           }
@@ -104,6 +103,16 @@ function ref<T>(value: T) {
       }
       if (type === "object") {
         if (Object.keys(reactive).includes(p)) return Reflect.get(t, p);
+        const value = t.value[p];
+        if (returnType(value) === "object" && value.type === ReactiveType.Ref) {
+          value.$sub.subscribe(
+            unique(() => {
+              const item = t.value[p];
+              t.value[p] = item;
+            }, t.value[p].value),
+          );
+          return value;
+        }
 
         const returnObj = {
           type: ReactiveType.RefO,
