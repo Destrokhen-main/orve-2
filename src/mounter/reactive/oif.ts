@@ -282,7 +282,12 @@ function OifWorker(
           const answerNow = rule();
           if (answerNow !== currentAnswer) {
             currentAnswer = answerNow;
-            nodes = componentBuilder(nodes, answer, answerNow);
+            nodes = componentBuilder.call(
+              item.context,
+              nodes,
+              answer,
+              answerNow,
+            );
           }
         }, dep.value),
       );
