@@ -273,7 +273,6 @@ function OifWorker(
   } else {
     [deps, currentAnswer] = getDeps(rule);
   }
-  console.log(item);
   nodes = componentBuilder.call(item.context, nodes, answer, currentAnswer);
 
   if (deps.length > 0) {
