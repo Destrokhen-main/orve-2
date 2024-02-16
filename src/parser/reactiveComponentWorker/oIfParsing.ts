@@ -1,6 +1,7 @@
 import { FRAGMENT } from "../../keys";
 import { ReactiveType } from "../../reactive/type";
 import { logger } from "../../utils/logger";
+import { returnNewClone } from "../../utils/returnClone";
 import { parseSingleChildren } from "../children";
 import { NodeOP } from "../parser";
 import { TypeNode } from "../type";
@@ -147,18 +148,27 @@ function oifParsing(component: NodeOP) {
   }
   if (newProps === null) return null;
 
+  let answerSettings: Record<any, any> = {};
   if (component.children !== undefined) {
-    newChildren = validationChildren(component.children!);
-  }
-  if (newChildren === null) return null;
-  const answerSettings: Record<any, any> = {};
-  newChildren.forEach((e) => {
-    if (e.ans !== undefined) {
-      answerSettings[e.ans] = e.component;
-    } else if (e.else !== undefined) {
-      answerSettings.else = e.component;
+    if (
+      component.children.length === 1 &&
+      component.children[0].tag === undefined
+    ) {
+      answerSettings = component.children[0];
+    } else {
+      newChildren = validationChildren(component.children!);
+
+      if (newChildren === null) return null;
+
+      newChildren.forEach((e) => {
+        if (e.ans !== undefined) {
+          answerSettings[e.ans] = e.component;
+        } else if (e.else !== undefined) {
+          answerSettings.else = e.component;
+        }
+      });
     }
-  });
+  }
 
   return {
     type: TypeNode.Reactive,
@@ -166,6 +176,7 @@ function oifParsing(component: NodeOP) {
       type: ReactiveType.Oif,
       answer: answerSettings,
       ...newProps,
+      context: returnNewClone(this),
     },
   };
 }

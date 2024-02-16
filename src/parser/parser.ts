@@ -56,7 +56,6 @@ export function prepareComponent(
   if (propsW.$slot === undefined) {
     propsW.$slot = {};
   }
-
   try {
     if ((func as Record<string, any>).props !== undefined) {
       component = checkPropsBeforeCall(func, propsW);
@@ -198,7 +197,7 @@ function parserNodeF(
   }
 
   if (REACTIVE_COMPONENT.includes(String(componentO.tag))) {
-    return reactiveWorkComponent(componentO) as any;
+    return reactiveWorkComponent.call(this, componentO) as any;
   }
 
   //NOTE beforeCreate
@@ -278,7 +277,7 @@ function parserNodeO(node: NodeO, parent: NodeOP | null = null): NodeOP | null {
   }
 
   if (REACTIVE_COMPONENT.includes(String(componentO.tag))) {
-    return reactiveWorkComponent(componentO) as any;
+    return reactiveWorkComponent.call(this, componentO) as any;
   }
 
   if (componentO.hooks && !InvokeHook(componentO, "beforeCreate")) {

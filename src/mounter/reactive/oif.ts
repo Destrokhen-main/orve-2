@@ -6,6 +6,8 @@ import { returnNewClone } from "../../utils/returnClone";
 import { singleMounterChildren } from "../children";
 import { RefCComponentWorker } from "./refC";
 import { unique } from "../../utils/line/uniquaTransform";
+import { parseSingleChildren } from "../../parser/children";
+import { parserNodeF } from "../../parser/parser";
 
 // ПЕРЕПИСЫВАЕМ, НЕ РАБОТАЕТ КАК ХОЧУУУ
 
@@ -226,16 +228,24 @@ function insertNodes(nodes: any[] | any, replacer: any) {
     return nodes.node;
   }
 }
-
+// TODO теряю контекст, а не должен
 function componentBuilder(existNodes: any, answer: any, rule: any) {
   const replaceNode = removeAllNodes(existNodes);
   const mounterInstance = singleMounterChildren(null);
-
   if (answer[rule] !== undefined) {
-    const wNodes = mounterInstance(answer[rule]);
+    let ans = answer[rule];
+    if (typeof ans === "function") {
+      ans = parserNodeF.call(this, answer[rule]);
+    }
+
+    const wNodes = mounterInstance(ans);
     return insertNodes(wNodes, replaceNode);
   } else if (answer.else !== undefined) {
-    const wNodes = mounterInstance(answer.else);
+    let ans = answer.else;
+    if (typeof ans === "function") {
+      ans = parserNodeF.call(this, answer.else);
+    }
+    const wNodes = mounterInstance(ans);
     return insertNodes(wNodes, replaceNode);
   } else {
     replaceNode.replaceWith(COMMENT);
@@ -254,7 +264,6 @@ function OifWorker(
   root?.appendChild(COMMENT);
   let nodes: any = COMMENT;
   let currentAnswer: any = null;
-
   const { answer, rule } = item;
 
   let deps = [];
@@ -264,8 +273,8 @@ function OifWorker(
   } else {
     [deps, currentAnswer] = getDeps(rule);
   }
-
-  nodes = componentBuilder(nodes, answer, currentAnswer);
+  console.log(item);
+  nodes = componentBuilder.call(item.context, nodes, answer, currentAnswer);
 
   if (deps.length > 0) {
     deps.forEach((dep: any) => {
