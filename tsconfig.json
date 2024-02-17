@@ -11,9 +11,11 @@
     "newLine": "LF",
     "removeComments": false,
     "resolveJsonModule": true,
-    "noImplicitThis": false
+    "noImplicitThis": false,
   },
-  "include": ["./src/**/*"],
+  "include": [
+    "./src/**/*"
+  ],
   "exclude": [
     "node_modules"
   ]

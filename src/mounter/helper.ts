@@ -1,7 +1,9 @@
 import { NodeChild, NodeHtml, TypeNode } from "../parser/type";
-import { Ref, RefFormater } from "../reactive/ref";
-import { distinct, startWith } from "rxjs";
+import { Ref } from "../reactive/ref";
 import { EtypeComment } from "./helperType";
+import { isHtmlNode } from "../parser/childrenHelper";
+import { ReactiveType } from "../reactive/type";
+import { unique } from "../utils/line/uniquaTransform";
 
 function textNodeCreator(item: NodeChild) {
   const textNode = document.createTextNode(String(item.value));
@@ -18,49 +20,94 @@ function htmlNodeCreate(item: NodeHtml) {
   return item;
 }
 
+function removeAllSub(obj: Record<string, any>) {
+  if (Array.isArray(obj) || typeof obj !== "object") return obj;
+
+  let newObj: Record<string, any> = {};
+
+  if (obj.$sub !== undefined) {
+    newObj = removeAllSub(obj.value);
+  } else {
+    const keys = Object.keys(obj);
+    keys.forEach((key: string) => {
+      newObj[key] = removeAllSub(obj[key]);
+    });
+  }
+
+  return newObj;
+}
+
+export function toString(value: unknown): string {
+  if (typeof value === "object" && value !== undefined && value !== null) {
+    return JSON.stringify(removeAllSub(value));
+  }
+  if (value === undefined) return "";
+  return String(value);
+}
+
+function worker(_after: any, item: any, isHTML: any, textNode: any) {
+  let after = _after;
+  if (item.type === ReactiveType.RefO) {
+    const i = item as any;
+    after = i.parent[i.key];
+  }
+
+  if (typeof after === "string" && isHtmlNode(after)) {
+    isHTML = true;
+    const node = htmlNodeCreate({
+      type: TypeNode.HTML,
+      value: after,
+      node: null,
+    });
+    if (node.node !== null) {
+      textNode.replaceWith(node.node);
+      textNode = node.node as any;
+    } else {
+      console.warn("[ ref ] - HTML code can't be parsed");
+    }
+  } else if (
+    (isHTML && typeof after === "string" && !isHtmlNode(after)) ||
+    (isHTML && typeof after !== "string")
+  ) {
+    const n = document.createTextNode(toString(after));
+    textNode.replaceWith(n);
+    textNode = n;
+    isHTML = false;
+  } else {
+    textNode.textContent = toString(after);
+  }
+
+  return [isHTML, textNode];
+}
+
 function RefChildCreator(
   root: Element | null,
-  item: Ref,
+  item: Ref<any>,
   replaceItem?: Element | Comment,
   parent?: any,
 ) {
-  const textNode = document.createTextNode(String(item.value));
-
+  let textNode = document.createTextNode("");
   const sub = item.$sub;
+  let isHTML = false;
+
+  [isHTML, textNode] = worker(item.value, item, isHTML, textNode);
+
   // TODO при первом вызове обновления не приходит next
-  sub.subscribe({
-    next(after: string | number) {
-      if (parent) {
-        parent.$sub.next("beforeUpdate");
-      }
-      textNode.textContent = String(after);
-      if (parent) {
-        parent.$sub.next("updated");
-      }
-    },
-  } as any);
+  sub.subscribe(
+    unique((_after: string | number) => {
+      // TODO посылает запрос если 2 и больше реактивных переменных
+      // будет слать столько сколько переменных
+      // так не должно быть.
+      parent.$sub.next("beforeUpdate");
+      [isHTML, textNode] = worker(_after, item, isHTML, textNode);
+      parent.$sub.next("updated");
+    }, item.value),
+  );
 
   if (replaceItem !== undefined) {
     replaceItem.replaceWith(textNode);
     return textNode;
   } else if (root !== null) {
-    root.appendChild(textNode);
-  }
-}
-
-function RefFormateChildCreator(root: Element | null, item: RefFormater) {
-  const formItem = item.value(item.parent.value);
-
-  const textNode = document.createTextNode(String(formItem));
-
-  item.parent.$sub.subscribe({
-    next(after: string | number) {
-      const formatedItem = item.value(after);
-      textNode.textContent = String(formatedItem);
-    },
-  });
-
-  if (root !== null) {
     root.appendChild(textNode);
   }
 }
@@ -105,9 +152,4 @@ export * from "./reactive/oif";
 export * from "./reactive/refO";
 export * from "./reactive/refA";
 
-export {
-  textNodeCreator,
-  htmlNodeCreate,
-  RefChildCreator,
-  RefFormateChildCreator,
-};
+export { textNodeCreator, htmlNodeCreate, RefChildCreator };

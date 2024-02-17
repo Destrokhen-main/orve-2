@@ -6,6 +6,7 @@ import { isComponent, isHtmlNode, isReactiveObject } from "./childrenHelper";
 import { genUID } from "../helper/generation";
 import { ReactiveType } from "../reactive/type";
 import { snakeToCamel } from "../utils/transformFunctions";
+import { returnNewClone } from "../utils/returnClone";
 
 /**
  * Надстройка для статики.
@@ -15,7 +16,7 @@ import { snakeToCamel } from "../utils/transformFunctions";
 function compareStatic(item: string | number | boolean): NodeChild {
   return {
     type: TypeNode.Static,
-    value: item,
+    value: typeof item === "object" ? JSON.stringify(item) : item,
     node: null,
   };
 }
@@ -55,7 +56,7 @@ function hasUnreformateArray(nodes: unknown[]): boolean {
  * @param parse
  * @returns
  */
-function setupRefCAsComponent(parse: NodeO) {
+function setupRefCAsComponent(parse: NodeO, parent: any) {
   const ObjectForWork: IRefCSetup = {
     type: ReactiveType.RefCComponent,
     proxy: parse.tag,
@@ -73,6 +74,8 @@ function setupRefCAsComponent(parse: NodeO) {
     type: TypeNode.Reactive,
     keyNode: genUID(8),
     value: ObjectForWork,
+    parent,
+    context: returnNewClone(this),
   };
 }
 
@@ -87,10 +90,10 @@ const parseSingleChildren = function (parent: NodeOP | null) {
       return {
         type: TypeNode.Reactive,
         keyNode: genUID(8),
+        context: { ...this },
         value: item,
       };
     }
-
     if (
       typeof item === "object" &&
       item !== null &&
@@ -128,18 +131,26 @@ const parseSingleChildren = function (parent: NodeOP | null) {
         (component.tag as Record<string, any>).type !== undefined &&
         (component.tag as Record<string, any>).type === ReactiveType.RefC
       ) {
-        return setupRefCAsComponent(component);
+        return setupRefCAsComponent.call(this, component, parent);
       }
       const parse = parserNodeO.call(context, component, parent);
 
       return parse !== null ? parse : null;
     }
 
+    if (typeof item === "object" && !isComponent(item as any)) {
+      return compareStatic(item as any);
+    }
+
     if (typeof item === "string" && isHtmlNode(item)) {
       return compareHTML(item);
     }
 
-    if (typeof item === "string" || typeof item === "number" || typeof item === 'boolean') {
+    if (
+      typeof item === "string" ||
+      typeof item === "number" ||
+      typeof item === "boolean"
+    ) {
       return compareStatic(item);
     }
 

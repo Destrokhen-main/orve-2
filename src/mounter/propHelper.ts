@@ -1,3 +1,5 @@
+import { toString } from "../mounter/helper";
+
 /**
  * Функция помогает правильно менять атрибуты у HTMLElement
  * @param root - HTMLElement
@@ -6,9 +8,11 @@
  */
 const changerAttributes = (root: HTMLElement, key: string, value: any) => {
   if (key === "value") {
-    (root as HTMLInputElement).value = String(value);
+    (root as HTMLInputElement).value = toString(value);
   } else {
-    root.setAttribute(key, String(value));
+    if (value !== undefined) {
+      root.setAttribute(key, String(value));
+    }
   }
 };
 

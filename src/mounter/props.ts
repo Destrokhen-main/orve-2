@@ -1,8 +1,8 @@
-import { distinctUntilChanged, fromEvent, pairwise } from "rxjs";
 import { Props } from "../jsx-type";
 import { PropsItem, SPECIFIC_KEYS, objectToCss } from "../parser/props";
 import { TypeProps } from "../parser/type";
 import { changerAttributes } from "./propHelper";
+import { ReactiveType } from "../reactive/type";
 
 /**
  * Функция для работы с реактивными props
@@ -47,42 +47,44 @@ function propsWorker(root: HTMLElement, item: Props) {
     const obj: PropsItem = item[key] as any;
 
     if (obj.type === TypeProps.Static) {
-      changerAttributes(root, key, obj.value);
+      const value = obj.value;
+      // COMPUTED
+      if (typeof value === "object" && value.type === ReactiveType.Ref) {
+        changerAttributes(root, key, value.value);
+
+        value.$sub.subscribe((next: any) => {
+          changerAttributes(root, key, next);
+        });
+      } else {
+        changerAttributes(root, key, value);
+      }
     }
 
     if (obj.type === TypeProps.Event) {
-      fromEvent(root, key).subscribe(obj.value);
+      root.addEventListener(key, obj.value);
     }
 
     if (obj.type === TypeProps.EventReactive) {
-      let event = fromEvent(root, key).subscribe(obj.value.value);
+      root.addEventListener(key, obj.value.value);
 
-      obj.value.$sub
-        .pipe(pairwise())
-        .subscribe(([before, after]: [() => any, () => any]) => {
-          if (String(before || "") !== String(after || "")) {
-            event.unsubscribe();
-            event = fromEvent(root, key).subscribe(after);
-          }
-        });
+      obj.value.$sub.subscribe((val: any) => {
+        root.addEventListener(key, val);
+      });
     }
     if (obj.type === TypeProps.EventReactiveF) {
       const item = obj.value;
       const value = prepaireStaticRectF(item, key);
 
       if (value !== null && typeof value === "function") {
-        let event = fromEvent(root, key).subscribe(value);
+        document.addEventListener(key, value);
 
-        item.parent.$sub
-          .pipe(pairwise())
-          .subscribe(([before, after]: [any, any]) => {
-            const newKey = prepaireStaticRectF(item, key, after);
+        item.parent.$sub.subscribe((value: any) => {
+          const newKey = prepaireStaticRectF(item, key, value);
 
-            if (newKey !== null && before !== newKey) {
-              event.unsubscribe();
-              event = fromEvent(root, key).subscribe(newKey);
-            }
-          });
+          if (newKey !== null) {
+            document.addEventListener(key, newKey);
+          }
+        });
       } else {
         if (typeof value !== "function") {
           console.error("value return not a function");
@@ -91,58 +93,34 @@ function propsWorker(root: HTMLElement, item: Props) {
     }
 
     if (obj.type === TypeProps.StaticReactive) {
-      changerAttributes(root, key, obj.value.value);
+      const reactiveItem = obj.value;
 
-      obj.value.$sub
-        .pipe(pairwise())
-        .subscribe(([before, after]: [string | number, string | number]) => {
-          if (before !== after) {
-            changerAttributes(root, key, after);
-          }
-        });
-    }
-
-    if (obj.type === TypeProps.StaticReactiveF) {
-      const item = obj.value;
-      const value = prepaireStaticRectF(item, key);
-
-      if (value !== null && value !== "") {
-        const insertValue = value;
-
-        if (SPECIFIC_KEYS.includes(key)) {
-          if (key === "style") {
-            let insertV: string = String(insertValue);
-            if (typeof insertValue === "object") {
-              insertV = objectToCss(insertValue);
-            }
-
-            root.setAttribute(key, insertV);
-
-            item.parent.$sub
-              .pipe(pairwise())
-              .subscribe(([before, after]: [any, any]) => {
-                const newKey = prepaireStaticRectF(item, key, after);
-                const st = prepaireClass(newKey);
-
-                if (st !== null && before !== st) {
-                  root.setAttribute(key, st);
-                }
-              });
-          }
-        } else {
-          root.setAttribute(key, insertValue);
-
-          item.parent.$sub
-            .pipe(pairwise())
-            .subscribe(([before, after]: [any, any]) => {
-              const newKey = prepaireStaticRectF(item, key, after);
-
-              if (newKey !== null && before !== newKey) {
-                root.setAttribute(key, String(newKey));
-              }
-            });
-        }
+      let value = reactiveItem.value;
+      if (reactiveItem.type === ReactiveType.RefO) {
+        const i = reactiveItem as any;
+        value = i.parent[i.key];
       }
+      if (typeof value === "object" && key === "style") {
+        const cssInline = objectToCss(value);
+        changerAttributes(root, key, cssInline);
+      } else {
+        changerAttributes(root, key, value);
+      }
+
+      obj.value.$sub.subscribe((_after: any) => {
+        let after = _after;
+        if (reactiveItem.type === ReactiveType.RefO) {
+          const i = reactiveItem as any;
+          after = i.parent[i.key];
+        }
+
+        if (typeof after === "object" && key === "style") {
+          const cssInline = objectToCss(after);
+          changerAttributes(root, key, cssInline);
+        } else {
+          changerAttributes(root, key, after);
+        }
+      });
     }
 
     // TODO сейчас только для статики работает, нужно логику и для style и для остального
@@ -151,11 +129,7 @@ function propsWorker(root: HTMLElement, item: Props) {
       if (item.value !== null && item.value !== "") {
         root.setAttribute(key, item.value);
 
-        item.$sub.pipe(
-          distinctUntilChanged((prevHigh: any, temp: any) => {
-            return temp === prevHigh;
-          }),
-        ).subscribe(() => {
+        item.$sub.subscribe(() => {
           root.setAttribute(key, item.value);
         });
       }

@@ -1,4 +1,4 @@
-import { Subject } from "rxjs";
+import { Line } from "../utils/line";
 import { FRAGMENT } from "../keys";
 import { NodeOP } from "../parser/parser";
 import { NodeHtml, NodeChild } from "../parser/type";
@@ -9,11 +9,8 @@ import {
   textNodeCreator,
   htmlNodeCreate,
   RefChildCreator,
-  RefFormateChildCreator,
   RefArray,
-  RefOWorker,
   OifWorker,
-  RefCWorker,
   RefCComponentWorker,
 } from "./helper";
 
@@ -33,10 +30,7 @@ function singleMounterChildren(root: Element | null, parent?: childrenParent) {
       return null;
     }
 
-    if (
-      item.type === TypeNode.Component ||
-      item.type === TypeNode.RebuildComponent
-    ) {
+    if (item.type === TypeNode.Component) {
       const knowItem = item as NodeOP;
 
       if (knowItem.tag !== FRAGMENT) {
@@ -68,26 +62,18 @@ function singleMounterChildren(root: Element | null, parent?: childrenParent) {
     }
 
     if (item.type === TypeNode.Reactive) {
-      const reactiveObject: Ref = (item as any).value;
-      if (reactiveObject.type === ReactiveType.Ref) {
+      const reactiveObject: Ref<any> = (item as any).value;
+      if (
+        reactiveObject.type === ReactiveType.Ref ||
+        reactiveObject.type === ReactiveType.RefO
+      ) {
         RefChildCreator(root, reactiveObject, undefined, parent);
         return item;
       }
 
-      if (reactiveObject.type === ReactiveType.RefFormater) {
-        RefFormateChildCreator(root, reactiveObject as any);
-        return item;
-      }
-
-      if (reactiveObject.type === ReactiveType.RefA) {
-        console.warn(
-          'Пожалуйста, используйте "for" для отображения массива правильно',
-        );
-        return item;
-      }
-
       if (reactiveObject.type === ReactiveType.RefArrFor) {
-        RefArray(
+        RefArray.call(
+          (item as any).context,
           root,
           (reactiveObject as any).parent,
           item,
@@ -96,18 +82,8 @@ function singleMounterChildren(root: Element | null, parent?: childrenParent) {
         return item;
       }
 
-      if (reactiveObject.type === ReactiveType.RefO) {
-        RefOWorker(root, item as any);
-        return item;
-      }
-
       if (reactiveObject.type === ReactiveType.Oif) {
         OifWorker(root, reactiveObject);
-        return item;
-      }
-
-      if (reactiveObject.type === ReactiveType.RefC) {
-        RefCWorker(root, reactiveObject);
         return item;
       }
 
@@ -124,7 +100,7 @@ function singleMounterChildren(root: Element | null, parent?: childrenParent) {
   };
 }
 
-type childrenParent = { type: TypeNode; $sub: Subject<any> | null | undefined };
+type childrenParent = { type: TypeNode; $sub: Line | null | undefined };
 
 /**
  * Монтирование node

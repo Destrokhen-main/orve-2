@@ -5,7 +5,6 @@ export enum TypeNode {
   Static = "Static",
   HTML = "HTML",
   Component = "Component",
-  RebuildComponent = "RebuildComponent",
   Reactive = "Reactive",
 }
 
@@ -15,7 +14,6 @@ export enum TypeProps {
   EventReactive = "EventReactive",
   EventReactiveF = "EventReactiveF",
   StaticReactive = "StaticReactive",
-  StaticReactiveF = "StaticReactiveF",
   ReactiveComputed = "ReactiveComputed",
 }
 
@@ -34,7 +32,7 @@ export interface NodeHtml {
 
 export interface ReactiveNode {
   type: TypeNode;
-  value: Ref;
+  value: Ref<any>;
   node: HTMLElement | null;
 }
 
