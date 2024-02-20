@@ -17,7 +17,7 @@ import { ReactiveType } from "./reactive/type";
 function Node(
   tag: Tag,
   props: Props | null = null,
-  ...children: Children
+  ...children: Children[]
 ): NodeB {
   if (
     (typeof tag === "function" && tag.name === FRAGMENT) ||
@@ -43,10 +43,7 @@ function Node(
       if (KEY_NEED_REWRITE.includes(key)) {
         SetProps[`o${key}`] = props[key];
       } else if (DIRECTIVES_ORVE.includes(key)) {
-        const insertedKey = key
-          .replace("o-", "")
-          .toLocaleLowerCase()
-          .trim() as any;
+        const insertedKey = key.replace("o-", "").toLocaleLowerCase().trim();
 
         if (insertedKey === "key") {
           Node.keyNode = String(props[key]);
