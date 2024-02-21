@@ -232,7 +232,7 @@ function componentBuilder(existNodes: any, answer: any, rule: any) {
   if (answer[rule] !== undefined) {
     let ans = answer[rule];
     if (typeof ans === "function") {
-      ans = parserNodeF.call(this, answer[rule]);
+      ans = parserNodeF.call(this.context, answer[rule]);
     }
 
     const wNodes = mounterInstance(ans);
@@ -240,14 +240,13 @@ function componentBuilder(existNodes: any, answer: any, rule: any) {
   } else if (answer.else !== undefined) {
     let ans = answer.else;
     if (typeof ans === "function") {
-      ans = parserNodeF.call(this, answer.else);
+      ans = parserNodeF.call(this.context, answer.else);
     }
     const wNodes = mounterInstance(ans);
     return insertNodes(wNodes, replaceNode);
   } else {
-    const COMMENT = document.createComment(" o-if ");
-    replaceNode.replaceWith(COMMENT);
-    return COMMENT;
+    replaceNode.replaceWith(this.COMMENT);
+    return this.COMMENT;
   }
 }
 
@@ -273,7 +272,12 @@ function OifWorker(
   } else {
     [deps, currentAnswer] = getDeps(rule);
   }
-  nodes = componentBuilder.call(item.context, nodes, answer, currentAnswer);
+  nodes = componentBuilder.call(
+    { context: item.context, COMMENT },
+    nodes,
+    answer,
+    currentAnswer,
+  );
 
   if (deps.length > 0) {
     deps.forEach((dep: any) => {
