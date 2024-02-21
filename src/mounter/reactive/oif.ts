@@ -196,9 +196,6 @@ import { parserNodeF } from "../../parser/parser";
 //     return workedNode;
 //   }
 // }
-
-const COMMENT = document.createComment(" o-if ");
-
 function removeAllNodes(nodes: any[] | any) {
   if (Array.isArray(nodes)) {
     const first = nodes[0];
@@ -248,6 +245,7 @@ function componentBuilder(existNodes: any, answer: any, rule: any) {
     const wNodes = mounterInstance(ans);
     return insertNodes(wNodes, replaceNode);
   } else {
+    const COMMENT = document.createComment(" o-if ");
     replaceNode.replaceWith(COMMENT);
     return COMMENT;
   }
@@ -256,11 +254,13 @@ function componentBuilder(existNodes: any, answer: any, rule: any) {
 // [x] - o-fragment attribute
 // [ ] - o-if in o-if
 // [ ] - Написать тесты для refO и o-if.
+// [ ] - c комента на блок, выходит плохо
 function OifWorker(
   root: Element | null,
   item: Record<string, any>,
   needReturnRoot: boolean = false,
 ) {
+  const COMMENT = document.createComment(" o-if ");
   root?.appendChild(COMMENT);
   let nodes: any = COMMENT;
   let currentAnswer: any = null;
