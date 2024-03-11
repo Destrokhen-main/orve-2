@@ -1,6 +1,5 @@
-### TODO
 ```javascript
-import { ref } from "orve-rxjs"
+import { ref, computedEffect } from "orve-rxjs"
 
 function CreateToDoComponent({ createCallBack }) {
   const inp1 = ref("a");
@@ -56,10 +55,13 @@ function ListToDo({ list, del }) {
 
 
 export default function App() {
-  const listToDo = ref([]);
+  this.id = '1'
+
+  const listToDo = ref([{ title: "a", desc: "a" }]);
 
   const message = ref("");
   const ErrorMessage = (mess) => {
+    console.log('asd', mess);
     message.value = mess;
 
     setTimeout(() => {
@@ -79,12 +81,21 @@ export default function App() {
   const deleteTask = (id) => {
     listToDo.value.splice(id, 1)
   }
+
+  const items = computedEffect(() => listToDo.value.filter((e) => e.desc === 'a'))
   return (
     <>
+      <div>
+        <o-for items={items}>
+          {(item, index) => {
+            return <div>{index} {item.desc}</div>
+          }}
+        </o-for>
+      </div>
       <o-if rule={() => message.value.length > 0}>
-        <div o-if={true}>
+        <span o-if={true}>
           {message}
-        </div>
+        </span>
       </o-if>
       <CreateToDoComponent createCallBack={createTodo} />
       <hr />
