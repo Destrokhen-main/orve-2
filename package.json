@@ -1,7 +1,7 @@
 {
-  "name": "orve-rxjs",
+  "name": "orve",
   "version": "0.0.0",
-  "description": "orve with rxjs",
+  "description": "orve - spa libary",
   "main": "./built/cjs/index.js",
   "module": "./built/esm/index.js",
   "scripts": {
