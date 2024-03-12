@@ -3863,9 +3863,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"orve-rxjs@workspace:.":
+"orve@workspace:.":
   version: 0.0.0-use.local
-  resolution: "orve-rxjs@workspace:."
+  resolution: "orve@workspace:."
   dependencies:
     "@types/jest": ^29.5.3
     "@types/lodash-es": ^4.17.12

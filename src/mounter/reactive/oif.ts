@@ -232,7 +232,7 @@ function componentBuilder(existNodes: any, answer: any, rule: any) {
   if (answer[rule] !== undefined) {
     let ans = answer[rule];
     if (typeof ans === "function") {
-      ans = parserNodeF.call(this.context, answer[rule]);
+      ans = parserNodeF.call(this.context ?? {}, answer[rule]);
     }
 
     const wNodes = mounterInstance(ans);
@@ -240,7 +240,7 @@ function componentBuilder(existNodes: any, answer: any, rule: any) {
   } else if (answer.else !== undefined) {
     let ans = answer.else;
     if (typeof ans === "function") {
-      ans = parserNodeF.call(this.context, answer.else);
+      ans = parserNodeF.call(this.context ?? {}, answer.else);
     }
     const wNodes = mounterInstance(ans);
     return insertNodes(wNodes, replaceNode);
@@ -287,7 +287,7 @@ function OifWorker(
           if (answerNow !== currentAnswer) {
             currentAnswer = answerNow;
             nodes = componentBuilder.call(
-              item.context,
+              { context: item.context, COMMENT },
               nodes,
               answer,
               answerNow,

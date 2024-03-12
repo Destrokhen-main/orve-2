@@ -123,6 +123,8 @@ function specificProps(obj: Props, key: string): boolean {
   return false;
 }
 
+const dopCheck = ["checked", "disabled"];
+
 /**
  * Работа с props которые не являютя event. Необходимо чтобы правильно работать с реактивными переменными и так далее.
  * @param obj
@@ -150,6 +152,16 @@ function workWithStaticProps(obj: ParsedProps, key: string): boolean {
     typeof value === "number" ||
     typeof value === "boolean"
   ) {
+    if (dopCheck.includes(key)) {
+      if (obj[key]) {
+        obj[key] = {
+          type: TypeProps.Static,
+          value: obj[key],
+        };
+      }
+      return true;
+    }
+
     obj[key] = {
       type: TypeProps.Static,
       value: obj[key],
