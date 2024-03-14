@@ -44,7 +44,6 @@ describe("props", () => {
           type: "Ref",
           value: 1,
           $sub: {},
-          formate: {},
         },
       },
     });

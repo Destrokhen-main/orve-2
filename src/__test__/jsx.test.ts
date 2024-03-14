@@ -21,9 +21,9 @@ describe("jsx", () => {
   });
 
   test("unknow tag", () => {
-    const unkhowTag = Node("asd", null, "test");
+    const unknowTag = Node("asd", null, "test");
 
-    expect(unkhowTag).toStrictEqual({
+    expect(unknowTag).toStrictEqual({
       tag: "asd",
       children: ["test"],
     });

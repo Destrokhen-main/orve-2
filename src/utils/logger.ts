@@ -1,14 +1,14 @@
-type TypeLogger = 'log' | 'warn' | 'error';
+type TypeLogger = "log" | "warn" | "error";
 
-export function logger(type: TypeLogger, text: string) {
+export function logger(type: TypeLogger, ...text: any[]) {
   let needFormat = false;
 
-  if (/%c/gm.test(text)) {
+  if (text.some((x) => /%c/gm.test(x))) {
     needFormat = true;
   }
 
   if (needFormat) {
-    console[type](text, `font-weight: bold`, `font-weight: normal`,);
+    console[type](text, `font-weight: bold`, `font-weight: normal`);
   } else {
     console[type](text);
   }

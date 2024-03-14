@@ -37,12 +37,12 @@ describe("парсинг children", () => {
       {
         tag: "div",
         children: [{ type: "Static", value: "HELLO WORLD", node: null }],
-        props: {},
+        props: undefined,
         node: null,
         parent: null,
         $sub: null,
         type: "Component",
-        nameC: undefined,
+        nameC: "Unknow component",
       },
     ]);
   });
@@ -64,7 +64,7 @@ describe("парсинг children", () => {
       {
         tag: "div",
         children: [{ type: "Static", value: "HELLO WORLD", node: null }],
-        props: {},
+        props: undefined,
         node: null,
         $sub: null,
         parent: null,

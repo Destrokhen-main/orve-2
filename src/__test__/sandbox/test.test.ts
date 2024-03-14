@@ -22,18 +22,18 @@ describe("Тестирование", () => {
     const a2 = [1];
     const b2 = [2, 1, 3];
     expect(DifferentItems(a, b)).toStrictEqual([
-      { type: "modify", index: 2 },
-      { type: "modify", index: 3 },
+      { type: "Modify", index: 2 },
+      { type: "Modify", index: 3 },
     ]);
     expect(DifferentItems(a1, b1)).toStrictEqual([
-      { type: "new", index: 0 },
-      { type: "new", index: 1 },
-      { type: "new", index: 2 },
+      { type: "New", index: 0 },
+      { type: "New", index: 1 },
+      { type: "New", index: 2 },
     ]);
     expect(DifferentItems(a2, b2)).toStrictEqual([
-      { type: "modify", index: 0 },
-      { type: "new", index: 1 },
-      { type: "new", index: 2 },
+      { type: "Modify", index: 0 },
+      { type: "New", index: 1 },
+      { type: "New", index: 2 },
     ]);
   });
 });

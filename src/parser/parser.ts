@@ -8,9 +8,10 @@ import {
   REACTIVE_COMPONENT,
   reactiveWorkComponent,
 } from "./reactiveComponentWorker";
-import { definedProps } from "../utils";
+import { definedProps, getName } from "../utils";
 import { snakeToCamel } from "../utils/transformFunctions";
 import { Line } from "../utils/line";
+import { logger } from "../utils/logger";
 
 export interface NodeO extends NodeB {
   tag: string | ((props?: Record<string, any>) => unknown);
@@ -26,7 +27,7 @@ export interface NodeOP extends NodeO {
   $sub?: Line | null;
 }
 
-function checkPropsBeforeCall(func: () => unknown, propsW: Props) {
+function initPropsGuard(func: () => unknown, propsW: Props) {
   const propFunction = (func as Record<string, any>).props;
   delete (func as Record<string, any>).props;
   let prepFunc = null;
@@ -51,26 +52,30 @@ export function prepareComponent(
   props: Props | null = null,
 ): NodeO | null {
   let component: unknown | null = null;
-
+  const funcAsObject = func as Record<string, any>;
   const propsW = props !== null ? props : {};
+
   if (propsW.$slot === undefined) {
     propsW.$slot = {};
   }
-  try {
-    if ((func as Record<string, any>).props !== undefined) {
-      component = checkPropsBeforeCall(func, propsW);
-    } else {
-      component = func.call(this, propsW);
-    }
-  } catch (error) {
-    console.error(`[${func.name ?? "-"}()] - [Parser error]:`, error);
-  }
-  if (component && validationNode(component, func.name) === true) {
-    if ((func as Record<string, any>).hooks !== undefined) {
-      (component as any).hooks = (func as Record<string, any>).hooks;
-    }
 
-    return component as NodeO;
+  try {
+    component =
+      funcAsObject.props !== undefined
+        ? initPropsGuard.call(this, func, propsW)
+        : func.call(this, propsW);
+  } catch (error) {
+    logger("error", `[${getName(func)}()] - [Parser error]:`, error);
+  }
+
+  if (component && validationNode(component, func.name)) {
+    const comp = component as NodeO;
+    const funcAsObject = func as Record<string, any>;
+
+    if (funcAsObject.hooks !== undefined) {
+      comp.hooks = funcAsObject.hooks;
+    }
+    return comp;
   }
 
   return null;
@@ -106,7 +111,7 @@ export function recursiveNode(node: NodeO): NodeO | null {
       let component: unknown | null = null;
       try {
         if ((node.tag as Record<string, any>).props !== undefined) {
-          component = checkPropsBeforeCall(node.tag, object);
+          component = initPropsGuard(node.tag, object);
         } else {
           component = node.tag.call(this, object);
         }
@@ -130,10 +135,6 @@ export function recursiveNode(node: NodeO): NodeO | null {
   return returnedNode;
 }
 
-/* TODO
-[ ] - Есть чувство, что parseNodeF и parseNodeO - имеют очень много общего и их можно объединить 
-*/
-
 /**
  * Функция помогающая обработать компонент.
  * @param app Функция компонента
@@ -141,28 +142,27 @@ export function recursiveNode(node: NodeO): NodeO | null {
  * @returns Или объект или null
  */
 function parserNodeF(
-  app: () => unknown,
+  app: (() => unknown) | NodeO,
   props: Props | null = null,
   parent: NodeOP | null = null,
 ): NodeOP | null {
-  let component = prepareComponent.call(this, app, props);
+  let component;
 
-  if (component === null) {
-    console.warn("Component don't be build");
-    return null;
-  }
+  if (typeof app === "function") {
+    component = prepareComponent.call(this, app, props);
 
-  component.nameC = app.name;
+    if (component === null) {
+      console.warn("Component don't be build");
+      return null;
+    }
 
-  if (typeof component.tag === "function") {
-    component = recursiveNode.call(this, component);
-  }
-
-  if (component === null) {
-    return null;
+    component.nameC = app.name;
+  } else {
+    component = app;
   }
 
   if (
+    this &&
     this.globalComponents !== undefined &&
     typeof component.tag === "string"
   ) {
@@ -183,6 +183,19 @@ function parserNodeF(
     return null;
   }
 
+  let nameC;
+  if (typeof component.tag === "function") {
+    if (typeof app === "object") {
+      nameC = component.tag.name;
+    }
+
+    component = recursiveNode.call(this, component);
+  }
+
+  if (component === null) {
+    return null;
+  }
+
   const componentO = {
     type: TypeNode.Component,
     $sub: !this.__SUB__ ? new Line() : null,
@@ -191,6 +204,9 @@ function parserNodeF(
     node: null,
     parent: !this.__CTX_PARENT__ ? parent : null,
   };
+  if (typeof app === "object") {
+    componentO.nameC = nameC ?? parent?.nameC ?? "Unknow component";
+  }
 
   if (component.keyNode === undefined) {
     // componentO.keyNode = !this["__CTX_ID__"] ? genUID(8) : "1";
@@ -227,83 +243,4 @@ function parserNodeF(
   return componentO;
 }
 
-/**
- * Функция для обработки объекта Компонента
- * @param node - объект с настройками компонента
- * @returns Или объект или null
- */
-function parserNodeO(node: NodeO, parent: NodeOP | null = null): NodeOP | null {
-  let workNode: NodeO | null = node;
-
-  // TODO Не уверен в этом коде
-  if (this.globalComponents !== undefined && typeof workNode.tag === "string") {
-    const nameTag = /([-_][a-z])/g.test(workNode.tag)
-      ? snakeToCamel(workNode.tag)
-      : workNode.tag;
-
-    if (this.globalComponents[nameTag] !== undefined) {
-      workNode = prepareComponent.call(
-        this,
-        this.globalComponents[nameTag],
-        workNode.props ?? null,
-      );
-    }
-  }
-  if (workNode === null) {
-    return null;
-  }
-  let nameC = undefined;
-  if (typeof workNode.tag === "function") {
-    nameC = workNode.tag.name;
-    workNode = recursiveNode.call(this, workNode);
-  }
-
-  if (workNode === null) {
-    return null;
-  }
-
-  const componentO: NodeOP = {
-    type: TypeNode.Component,
-    $sub: !this.__SUB__ ? new Line() : null,
-    ...workNode,
-    props: (workNode.props as any) ?? null,
-    node: null,
-    parent: !this.__CTX_PARENT__ ? parent : null,
-  };
-  componentO.nameC = nameC ?? parent?.nameC;
-
-  if (workNode.keyNode === undefined) {
-    // componentO.keyNode = !this.__CTX_ID__ ? genUID(8) : "1";
-  }
-
-  if (REACTIVE_COMPONENT.includes(String(componentO.tag))) {
-    return reactiveWorkComponent.call(this, componentO) as any;
-  }
-
-  if (componentO.hooks && !InvokeHook(componentO, "beforeCreate")) {
-    console.warn(
-      `[${componentO.nameC ?? "-"}()] hooks: "beforeCreate" - Error in hook`,
-    );
-  }
-
-  if (componentO.props !== undefined) {
-    componentO.props = propsWorker.call(this, componentO.props);
-  }
-
-  if (componentO.children !== undefined) {
-    componentO.children = parseChildren.call(
-      this,
-      componentO.children,
-      componentO,
-    );
-  }
-
-  if (componentO.hooks && !InvokeHook(componentO, "created")) {
-    console.warn(
-      `[${componentO.nameC ?? "-"}()] hooks: "created" - Error in hook`,
-    );
-  }
-  return componentO;
-}
-
-export { parserNodeF, parserNodeO };
+export { parserNodeF };

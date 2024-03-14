@@ -1,6 +1,5 @@
 import { validationNode } from "./helper";
 import { NodeO, NodeOP, parserNodeF } from "./parser";
-import { parserNodeO } from "./parser";
 import { TypeNode, NodeChild, NodeHtml, IRefCSetup } from "./type";
 import { isComponent, isHtmlNode, isReactiveObject } from "./childrenHelper";
 import { genUID } from "../helper/generation";
@@ -133,7 +132,7 @@ const parseSingleChildren = function (parent: NodeOP | null) {
       ) {
         return setupRefCAsComponent.call(this, component, parent);
       }
-      const parse = parserNodeO.call(context, component, parent);
+      const parse = parserNodeF.call(context, component, null, parent);
 
       return parse !== null ? parse : null;
     }

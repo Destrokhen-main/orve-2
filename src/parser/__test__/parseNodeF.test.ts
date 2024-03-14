@@ -1,4 +1,4 @@
-import { parserNodeF, parserNodeO } from "../parser";
+import { parserNodeF } from "../parser";
 import { Node } from "../../jsx";
 import { FRAGMENT } from "../../keys";
 import { OrveContext } from "../../instance";
@@ -44,7 +44,7 @@ describe("parseNodeF children", () => {
         {
           tag: "div",
           children: [{ type: "Static", value: "HELLO WORLD", node: null }],
-          props: {},
+          props: undefined,
           node: null,
           $sub: null,
           parent: null,
@@ -80,7 +80,7 @@ describe("parseNodeF children", () => {
         {
           tag: "Fragment",
           children: [{ type: "Static", value: "HELLO WORLD", node: null }],
-          props: {},
+          props: undefined,
           node: null,
           parent: null,
           type: "Component",
@@ -118,7 +118,7 @@ describe("parseNodeF children", () => {
         {
           tag: "div",
           children: [{ type: "Static", value: "HELLO WORLD", node: null }],
-          props: {},
+          props: undefined,
           node: null,
           parent: null,
           type: "Component",
@@ -167,13 +167,13 @@ describe("parseNodeF children", () => {
               nameC: "component2",
               node: null,
               parent: null,
-              props: {},
+              props: undefined,
               tag: "div",
               $sub: null,
               type: "Component",
             },
           ],
-          props: {},
+          props: undefined,
           node: null,
           parent: null,
           type: "Component",
@@ -445,10 +445,9 @@ describe("parseNodeO", () => {
       children: ["HELLO"],
     };
 
-    const res = parserNodeO.call(
+    const res = parserNodeF.call(
       { __CTX_ID__: true, __SUB__: true } as OrveContext,
       componentA,
-      null,
     );
     expect(res).toStrictEqual({
       tag: "div",
@@ -464,7 +463,7 @@ describe("parseNodeO", () => {
       $sub: null,
       parent: null,
       type: "Component",
-      nameC: undefined,
+      nameC: "Unknow component",
     });
   });
 
@@ -495,7 +494,7 @@ describe("parseNodeO", () => {
         },
       ],
     };
-    const res = parserNodeO.call(
+    const res = parserNodeF.call(
       { __CTX_ID__: true, __CTX_PARENT__: true, __SUB__: true } as OrveContext,
       component1,
       null,
@@ -525,8 +524,8 @@ describe("parseNodeO", () => {
       node: null,
       parent: null,
       type: "Component",
-      nameC: undefined,
-      props: {},
+      nameC: "Unknow component",
+      props: undefined,
     });
   });
 });
