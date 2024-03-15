@@ -1,12 +1,12 @@
-import { TypeNode } from "../../parser/type";
-import { ReactiveType } from "../../reactive/type";
+// import { TypeNode } from "../../parser/type";
+// import { ReactiveType } from "../../reactive/type";
 import { getDeps } from "../../utils/getDepsOfFunction";
-import { isEqual } from "lodash-es";
-import { returnNewClone } from "../../utils/returnClone";
+// import { isEqual } from "lodash-es";
+// import { returnNewClone } from "../../utils/returnClone";
 import { singleMounterChildren } from "../children";
-import { RefCComponentWorker } from "./refC";
+// import { RefCComponentWorker } from "./refC";
 import { unique } from "../../utils/line/uniquaTransform";
-import { parseSingleChildren } from "../../parser/children";
+// import { parseSingleChildren } from "../../parser/children";
 import { parserNodeF } from "../../parser/parser";
 
 // ПЕРЕПИСЫВАЕМ, НЕ РАБОТАЕТ КАК ХОЧУУУ
@@ -257,6 +257,7 @@ function componentBuilder(existNodes: any, answer: any, rule: any) {
 function OifWorker(
   root: Element | null,
   item: Record<string, any>,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   needReturnRoot: boolean = false,
 ) {
   const COMMENT = document.createComment(" o-if ");

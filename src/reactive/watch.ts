@@ -1,7 +1,7 @@
 import { Line } from "../utils/line";
-import { ReactiveType } from "./type";
-import { returnNewClone } from "../utils/returnClone";
-import { isEqual } from "lodash-es";
+// import { ReactiveType } from "./type";
+// import { returnNewClone } from "../utils/returnClone";
+// import { isEqual } from "lodash-es";
 import { uniqueWithPast, unique } from "../utils/line/uniquaTransform";
 import { getDeps } from "../utils/getDepsOfFunction";
 

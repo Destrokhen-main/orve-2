@@ -1,5 +1,5 @@
 import { Props } from "../jsx-type";
-import { PropsItem, SPECIFIC_KEYS, objectToCss } from "../parser/props";
+import { PropsItem, objectToCss } from "../parser/props";
 import { TypeProps } from "../parser/type";
 import { changerAttributes } from "./propHelper";
 import { ReactiveType } from "../reactive/type";
@@ -137,4 +137,4 @@ function propsWorker(root: HTMLElement, item: Props) {
   });
 }
 
-export { propsWorker };
+export { propsWorker, prepaireClass };
