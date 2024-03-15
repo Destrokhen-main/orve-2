@@ -1,3 +1,4 @@
+import { logger } from "../utils/logger";
 import { OptionsRef, createReactiveObject, returnType } from "./ref";
 
 function modifyAr<T>(arr: T[], obj: any, options: OptionsRef = {}) {
@@ -88,10 +89,20 @@ export function refArrayBuilder<T>(
         return true;
       }
 
-      const s = Reflect.set(t, p, v);
       const num = parseInt(p, 10);
+
+      if (!Number.isNaN(num) && num > t.length) {
+        logger(
+          "warn",
+          "%c[ref]%c - index больше длины массива, лучше использовать push или unshift",
+        );
+        return true;
+      }
+
+      const s = Reflect.set(t, p, v);
       if (!Number.isNaN(num)) {
-        t[num] = v;
+        const m = modifyAr([v], obj, options);
+        t[num] = m[0];
         obj.$sub.next(isObj ? obj.value : t);
       }
 
