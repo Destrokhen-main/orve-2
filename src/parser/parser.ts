@@ -205,11 +205,7 @@ function parserNodeF(
     parent: !this.__CTX_PARENT__ ? parent : null,
   };
   if (typeof app === "object") {
-    componentO.nameC = nameC ?? parent?.nameC ?? "Unknow component";
-  }
-
-  if (component.keyNode === undefined) {
-    // componentO.keyNode = !this["__CTX_ID__"] ? genUID(8) : "1";
+    componentO.nameC = nameC ?? parent?.nameC ?? "Unknown component";
   }
 
   if (REACTIVE_COMPONENT.includes(String(componentO.tag))) {

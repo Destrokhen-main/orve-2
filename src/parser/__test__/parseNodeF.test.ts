@@ -383,7 +383,7 @@ describe("parseNodeF props", () => {
   });
 
   test("Two Component with props event", () => {
-    const func = () => {};
+    const func = () => { };
 
     function Component2(props: any) {
       return Node("div", props, "HELLO");
@@ -431,7 +431,7 @@ describe("parseNodeF props", () => {
 
 describe("parseNodeO", () => {
   test("Default component", () => {
-    const fn = () => {};
+    const fn = () => { };
 
     const componentA = {
       tag: "div",
@@ -463,12 +463,12 @@ describe("parseNodeO", () => {
       $sub: null,
       parent: null,
       type: "Component",
-      nameC: "Unknow component",
+      nameC: "Unknown component",
     });
   });
 
   test("Component in component", () => {
-    const fn = () => {};
+    const fn = () => { };
 
     const component2 = ({ children, ...props }: { children: any }) => {
       return {
@@ -524,7 +524,7 @@ describe("parseNodeO", () => {
       node: null,
       parent: null,
       type: "Component",
-      nameC: "Unknow component",
+      nameC: "Unknown component",
       props: undefined,
     });
   });

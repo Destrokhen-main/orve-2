@@ -1,82 +1,9 @@
 import { isValidNode } from "./helper";
 import { NodeO, NodeOP, parserNodeF } from "./parser";
-import { TypeNode, NodeChild, NodeHtml, IRefCSetup } from "./type";
-import { isComponent, isHtmlNode, isReactiveObject } from "./childrenHelper";
-import { genUID } from "../helper/generation";
+import { TypeNode } from "./type";
+import { compareHTML, compareStatic, hasUnreformedArray, isComponent, isHtmlNode, isReactiveObject, setupRefCAsComponent } from "./childrenHelper";
 import { ReactiveType } from "../reactive/type";
 import { snakeToCamel } from "../utils/transformFunctions";
-import { returnNewClone } from "../utils/returnClone";
-
-/**
- * Надстройка для статики.
- * @param item
- * @returns
- */
-function compareStatic(item: string | number | boolean): NodeChild {
-  return {
-    type: TypeNode.Static,
-    value: typeof item === "object" ? JSON.stringify(item) : item,
-    node: null,
-  };
-}
-
-/**
- * Надстройка для html кода внутри children
- * @param item
- * @returns
- */
-function compareHTML(item: string): NodeHtml {
-  return {
-    type: TypeNode.HTML,
-    value: item,
-    node: null,
-  };
-}
-
-/**
- * Если в children есть массив
- * @param nodes - массив node
- * @returns boolean true - если массив есть
- */
-function hasUnreformateArray(nodes: unknown[]): boolean {
-  if (Array.isArray(nodes)) {
-    for (let i = 0; i !== nodes.length; i++) {
-      if (Array.isArray(nodes[i])) {
-        return true;
-      }
-    }
-  }
-
-  return false;
-}
-
-/**
- * Преднастройка для <refC />
- * @param parse
- * @returns
- */
-function setupRefCAsComponent(parse: NodeO, parent: any) {
-  const ObjectForWork: IRefCSetup = {
-    type: ReactiveType.RefCComponent,
-    proxy: parse.tag,
-    props: {},
-  };
-  if (parse.props !== undefined) {
-    ObjectForWork.props = { ...parse.props };
-  }
-
-  if (parse.children !== undefined && ObjectForWork.props) {
-    ObjectForWork.props.children = parse.children;
-  }
-
-  return {
-    type: TypeNode.Reactive,
-    keyNode: genUID(8),
-    value: ObjectForWork,
-    parent,
-    context: returnNewClone(this),
-  };
-}
 
 /**
  * if you wanna use this function u need do .call(context);
@@ -88,7 +15,6 @@ const parseSingleChildren = function (parent: NodeOP | null) {
     if (typeof item === "object" && item !== null && isReactiveObject(item)) {
       return {
         type: TypeNode.Reactive,
-        keyNode: genUID(8),
         context: { ...this },
         value: item,
       };
@@ -169,7 +95,7 @@ function parseChildren(arrayNode: unknown[], parent: NodeOP | null): any {
   // TODO
   // [ ] - Необходимо убедиться, что тут после flat всё ещё валидный массив
   let workNodes = arrayNode;
-  if (hasUnreformateArray(arrayNode)) {
+  if (hasUnreformedArray(arrayNode)) {
     workNodes = (arrayNode as any).flat(1);
   }
   return workNodes.map(singleChildParser);

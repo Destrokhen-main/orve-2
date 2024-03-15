@@ -42,7 +42,7 @@ describe("парсинг children", () => {
         parent: null,
         $sub: null,
         type: "Component",
-        nameC: "Unknow component",
+        nameC: "Unknown component",
       },
     ]);
   });

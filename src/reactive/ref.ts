@@ -4,7 +4,7 @@ import { refArrayBuilder } from "./refHelper";
 import { buffer } from "../utils/buffer";
 import { unique } from "../utils/line/uniquaTransform";
 
-function createReactiveObject(obj: any, reactive: any) {
+export function createReactiveObject(obj: any, reactive: any) {
   const keys = Object.keys(obj);
 
   keys.forEach((key: string) => {
@@ -27,16 +27,16 @@ function createReactiveObject(obj: any, reactive: any) {
   });
 }
 
-function returnType(v: unknown): string {
+export function returnType(v: unknown): string {
   return typeof v === "object"
     ? Array.isArray(v)
       ? "array"
       : v === null
-      ? "null"
-      : "object"
+        ? "null"
+        : "object"
     : v === undefined
-    ? "undefined"
-    : "primitive";
+      ? "undefined"
+      : "primitive";
 }
 
 type Ref<T> = {
@@ -55,6 +55,8 @@ function ref<T>(value: T) {
 
   const subject = new Line();
 
+
+
   const reactive: Ref<T> = {
     type: ReactiveType.Ref,
     value,
@@ -64,8 +66,8 @@ function ref<T>(value: T) {
   reactive.value = Array.isArray(value)
     ? refArrayBuilder(value, reactive)
     : value && typeof value === "object"
-    ? createReactiveObject(value, reactive)
-    : value;
+      ? createReactiveObject(value, reactive)
+      : value;
 
   let type = returnType(value);
   const reactiveObject = new Proxy(reactive, {

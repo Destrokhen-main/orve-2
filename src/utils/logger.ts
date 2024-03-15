@@ -8,8 +8,8 @@ export function logger(type: TypeLogger, ...text: any[]) {
   }
 
   if (needFormat) {
-    console[type](text, `font-weight: bold`, `font-weight: normal`);
+    console[type](...text, `font-weight: bold`, `font-weight: normal`);
   } else {
-    console[type](text);
+    console[type](...text);
   }
 }
