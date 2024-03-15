@@ -4,7 +4,11 @@ import { refArrayBuilder } from "./refHelper";
 import { buffer } from "../utils/buffer";
 import { unique } from "../utils/line/uniquaTransform";
 
-export function createReactiveObject(obj: any, reactive: any, options: OptionsRef) {
+export function createReactiveObject(
+  obj: any,
+  reactive: any,
+  options: OptionsRef,
+) {
   const keys = Object.keys(obj);
 
   keys.forEach((key: string) => {
@@ -32,11 +36,11 @@ export function returnType(v: unknown): string {
     ? Array.isArray(v)
       ? "array"
       : v === null
-        ? "null"
-        : "object"
+      ? "null"
+      : "object"
     : v === undefined
-      ? "undefined"
-      : "primitive";
+    ? "undefined"
+    : "primitive";
 }
 
 type Ref<T> = {
@@ -47,16 +51,18 @@ type Ref<T> = {
 
 export type OptionsRef = {
   // Если необходимо в массивах следить только на изменением index то можно это поставить на false
-  deep?: boolean
-}
+  deep?: boolean;
+};
 
 /**
  * Реактивная переменная
  * @param value - начальные данные
  * @returns ref переменную.
  */
-function ref<T>(value: T, options: OptionsRef) {
+function ref<T>(value: T, options?: OptionsRef) {
   const context = this ?? {};
+
+  const opt = options || {};
 
   const subject = new Line();
 
@@ -67,10 +73,10 @@ function ref<T>(value: T, options: OptionsRef) {
   };
 
   reactive.value = Array.isArray(value)
-    ? refArrayBuilder(value, reactive, false, options)
+    ? refArrayBuilder(value, reactive, false, opt)
     : value && typeof value === "object"
-      ? createReactiveObject(value, reactive, options)
-      : value;
+    ? createReactiveObject(value, reactive, opt)
+    : value;
 
   let type = returnType(value);
   const reactiveObject = new Proxy(reactive, {
@@ -82,7 +88,7 @@ function ref<T>(value: T, options: OptionsRef) {
           if (newType === "array" || Array.isArray(value)) {
             t.value = refArrayBuilder(value, reactive, false, options) as any;
           } else if (value && typeof value === "object") {
-            t.value = createReactiveObject(value, reactive, options);
+            t.value = createReactiveObject(value, reactive, opt);
           } else {
             t.value = value;
           }
@@ -90,7 +96,7 @@ function ref<T>(value: T, options: OptionsRef) {
           if (Array.isArray(value)) {
             t.value = refArrayBuilder(value, reactive, false, options) as any;
           } else if (value && typeof value === "object") {
-            t.value = createReactiveObject(value, reactive, options);
+            t.value = createReactiveObject(value, reactive, opt);
           } else {
             t.value = value;
           }

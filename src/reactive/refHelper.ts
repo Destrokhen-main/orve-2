@@ -1,25 +1,34 @@
 import { OptionsRef, createReactiveObject, returnType } from "./ref";
 
+function modifyAr<T>(arr: T[], obj: any, options: OptionsRef = {}) {
+  return arr.map((item) => {
+    if (returnType(item) === "object") {
+      return createReactiveObject(item, obj, options);
+    }
+    if (returnType(item) === "array") {
+      return refArrayBuilder(item as T[], obj, true, options); // TODO хз тотально
+    }
+    return item;
+  });
+}
+
 /**
  * Функция помогающая правильно отрисовывать реактивные массивы
  * @param arr - массив
  * @param obj - реактивная переменная массива
  * @returns Реактивную переменную массива
  */
-export function refArrayBuilder<T>(arr: T[], obj: any, isObj: boolean = false, options: OptionsRef = {}): T[] {
+export function refArrayBuilder<T>(
+  arr: T[],
+  obj: any,
+  isObj: boolean = false,
+  options: OptionsRef = {},
+): T[] {
   // TODO экспериментальный код
   let mutableArray;
 
   if (options.deep !== false) {
-    mutableArray = arr.map((item) => {
-      if (returnType(item) === "object") {
-        return createReactiveObject(item, obj, options);
-      }
-      if (returnType(item) === "array") {
-        return refArrayBuilder(item as T[], obj, true, options); // TODO хз тотально
-      }
-      return item;
-    });
+    mutableArray = modifyAr(arr, obj, options);
   } else {
     mutableArray = arr;
   }
@@ -31,14 +40,18 @@ export function refArrayBuilder<T>(arr: T[], obj: any, isObj: boolean = false, o
         if (["push", "unshift"].includes(p)) {
           if (p === "push") {
             return function (...args: any[]) {
-              const result = Array.prototype[p].apply(t, args);
+              const ar = modifyAr(args, obj, options);
+              const result = Array.prototype[p].apply(t, ar);
+
               obj.$sub.next(isObj ? obj.value : t);
               return result;
             };
           } else {
             // unshift
             return function (...args: any[]) {
-              const result = Array.prototype[p].apply(t, args);
+              const ar = modifyAr(args, obj, options);
+
+              const result = Array.prototype[p].apply(t, ar);
               obj.$sub.next(isObj ? obj.value : t);
               return result;
             };
