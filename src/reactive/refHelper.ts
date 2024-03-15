@@ -1,4 +1,4 @@
-import { createReactiveObject, returnType } from "./ref";
+import { OptionsRef, createReactiveObject, returnType } from "./ref";
 
 /**
  * Функция помогающая правильно отрисовывать реактивные массивы
@@ -6,17 +6,23 @@ import { createReactiveObject, returnType } from "./ref";
  * @param obj - реактивная переменная массива
  * @returns Реактивную переменную массива
  */
-export function refArrayBuilder<T>(arr: T[], obj: any, isObj: boolean = false): T[] {
+export function refArrayBuilder<T>(arr: T[], obj: any, isObj: boolean = false, options: OptionsRef = {}): T[] {
   // TODO экспериментальный код
-  const mutableArray = arr.map((item) => {
-    if (returnType(item) === "object") {
-      return createReactiveObject(item, obj);
-    }
-    if (returnType(item) === "array") {
-      return refArrayBuilder(item as T[], obj, true); // TODO хз тотально
-    }
-    return item;
-  });
+  let mutableArray;
+
+  if (options.deep !== false) {
+    mutableArray = arr.map((item) => {
+      if (returnType(item) === "object") {
+        return createReactiveObject(item, obj, options);
+      }
+      if (returnType(item) === "array") {
+        return refArrayBuilder(item as T[], obj, true, options); // TODO хз тотально
+      }
+      return item;
+    });
+  } else {
+    mutableArray = arr;
+  }
 
   const pr = new Proxy(mutableArray, {
     get(t: any[], p: any) {

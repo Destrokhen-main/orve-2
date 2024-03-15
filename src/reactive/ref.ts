@@ -4,14 +4,14 @@ import { refArrayBuilder } from "./refHelper";
 import { buffer } from "../utils/buffer";
 import { unique } from "../utils/line/uniquaTransform";
 
-export function createReactiveObject(obj: any, reactive: any) {
+export function createReactiveObject(obj: any, reactive: any, options: OptionsRef) {
   const keys = Object.keys(obj);
 
   keys.forEach((key: string) => {
     const type = returnType(obj[key]);
 
     if (type === "array") {
-      obj[key] = refArrayBuilder(obj[key], reactive, true);
+      obj[key] = refArrayBuilder(obj[key], reactive, true, options);
     }
   });
 
@@ -45,17 +45,20 @@ type Ref<T> = {
   $sub: Line | Record<string, any>;
 };
 
+export type OptionsRef = {
+  // Если необходимо в массивах следить только на изменением index то можно это поставить на false
+  deep?: boolean
+}
+
 /**
  * Реактивная переменная
  * @param value - начальные данные
  * @returns ref переменную.
  */
-function ref<T>(value: T) {
+function ref<T>(value: T, options: OptionsRef) {
   const context = this ?? {};
 
   const subject = new Line();
-
-
 
   const reactive: Ref<T> = {
     type: ReactiveType.Ref,
@@ -64,9 +67,9 @@ function ref<T>(value: T) {
   };
 
   reactive.value = Array.isArray(value)
-    ? refArrayBuilder(value, reactive)
+    ? refArrayBuilder(value, reactive, false, options)
     : value && typeof value === "object"
-      ? createReactiveObject(value, reactive)
+      ? createReactiveObject(value, reactive, options)
       : value;
 
   let type = returnType(value);
@@ -77,17 +80,17 @@ function ref<T>(value: T) {
         if (newType !== type) {
           type = newType;
           if (newType === "array" || Array.isArray(value)) {
-            t.value = refArrayBuilder(value, reactive) as any;
+            t.value = refArrayBuilder(value, reactive, false, options) as any;
           } else if (value && typeof value === "object") {
-            t.value = createReactiveObject(value, reactive);
+            t.value = createReactiveObject(value, reactive, options);
           } else {
             t.value = value;
           }
         } else {
           if (Array.isArray(value)) {
-            t.value = refArrayBuilder(value, reactive) as any;
+            t.value = refArrayBuilder(value, reactive, false, options) as any;
           } else if (value && typeof value === "object") {
-            t.value = createReactiveObject(value, reactive);
+            t.value = createReactiveObject(value, reactive, options);
           } else {
             t.value = value;
           }
