@@ -6,7 +6,7 @@ import { HOOKS_STRING_NAME, ACCESS_KEY } from "../jsx-type";
  * @param node - Компонент
  * @returns true если всё хорошо
  */
-function validationNode(node: unknown, nameComponent = "-"): boolean {
+function isValidNode(node: unknown, nameComponent = "-"): boolean {
   if (typeof node !== "object") {
     return false;
   }
@@ -49,4 +49,4 @@ function validationNode(node: unknown, nameComponent = "-"): boolean {
   return true;
 }
 
-export { validationNode };
+export { isValidNode };

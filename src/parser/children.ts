@@ -1,4 +1,4 @@
-import { validationNode } from "./helper";
+import { isValidNode } from "./helper";
 import { NodeO, NodeOP, parserNodeF } from "./parser";
 import { TypeNode, NodeChild, NodeHtml, IRefCSetup } from "./type";
 import { isComponent, isHtmlNode, isReactiveObject } from "./childrenHelper";
@@ -97,7 +97,7 @@ const parseSingleChildren = function (parent: NodeOP | null) {
       typeof item === "object" &&
       item !== null &&
       isComponent(item) &&
-      validationNode(item)
+      isValidNode(item)
     ) {
       const component = item as NodeO;
       const context = this ?? {};

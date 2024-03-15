@@ -1,5 +1,5 @@
 import { Props, Children, NodeB } from "../jsx-type";
-import { validationNode } from "./helper";
+import { isValidNode } from "./helper";
 import { parseChildren } from "./children";
 import { propsWorker } from "./props";
 import { TypeNode } from "./type";
@@ -68,7 +68,7 @@ export function prepareComponent(
     logger("error", `[${getName(func)}()] - [Parser error]:`, error);
   }
 
-  if (component && validationNode(component, func.name)) {
+  if (component && isValidNode(component, func.name)) {
     const comp = component as NodeO;
     const funcAsObject = func as Record<string, any>;
 
@@ -119,7 +119,7 @@ export function recursiveNode(node: NodeO): NodeO | null {
         console.warn(`[${node.tag.name ?? "-"}()] Recursive `, error);
       }
 
-      if (component && validationNode(component, node.tag.name) === true) {
+      if (component && isValidNode(component, node.tag.name) === true) {
         if ((node.tag as Record<string, any>).hooks !== undefined) {
           (component as any).hooks = (node.tag as Record<string, any>).hooks;
         }
