@@ -40,4 +40,5 @@ export interface IRefCSetup {
   type: ReactiveType;
   proxy: any;
   props?: Record<string, any>;
+  context: Record<string, any>;
 }

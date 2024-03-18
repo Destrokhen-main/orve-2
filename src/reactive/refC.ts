@@ -1,9 +1,11 @@
+import { buffer } from "../utils/buffer";
 import { Line } from "../utils/line";
 import { Reactive, ReactiveType } from "./type";
 
 interface IRefC extends Reactive {
   $sub: any;
   value: any;
+  update: () => void;
 }
 
 /**
@@ -17,6 +19,9 @@ function refC(startComponent: any) {
     type: ReactiveType.RefC,
     $sub: subject,
     value: startComponent,
+    update: function () {
+      this.$sub.next("update");
+    },
   };
 
   return new Proxy(component, {
@@ -26,6 +31,12 @@ function refC(startComponent: any) {
         t.$sub.next(v);
       }
       return s;
+    },
+    get(t: IRefC, p) {
+      if (p === "value" && buffer !== null) {
+        buffer.push(t);
+      }
+      return Reflect.get(t, p);
     },
   });
 }

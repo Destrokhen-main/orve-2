@@ -88,7 +88,7 @@ function singleMounterChildren(root: Element | null, parent?: childrenParent) {
       }
 
       if (reactiveObject.type === ReactiveType.RefCComponent) {
-        RefCComponentWorker(root, reactiveObject);
+        RefCComponentWorker.call(this, root, reactiveObject);
         return item;
       }
 

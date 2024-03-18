@@ -56,7 +56,6 @@ function isReactiveObject(item: unknown): boolean {
   return false;
 }
 
-
 /**
  * Надстройка для статики.
  * @param item
@@ -110,6 +109,7 @@ function setupRefCAsComponent(parse: NodeO, parent: any) {
     type: ReactiveType.RefCComponent,
     proxy: parse.tag,
     props: {},
+    context: this,
   };
   if (parse.props !== undefined) {
     ObjectForWork.props = { ...parse.props };
@@ -127,4 +127,12 @@ function setupRefCAsComponent(parse: NodeO, parent: any) {
   };
 }
 
-export { isComponent, isHtmlNode, isReactiveObject, setupRefCAsComponent, hasUnreformedArray, compareHTML, compareStatic };
+export {
+  isComponent,
+  isHtmlNode,
+  isReactiveObject,
+  setupRefCAsComponent,
+  hasUnreformedArray,
+  compareHTML,
+  compareStatic,
+};
