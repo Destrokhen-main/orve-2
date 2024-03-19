@@ -1,4 +1,4 @@
-import { isEqual } from "lodash-es";
+import { isEqual, isEqualWith, omit, functions } from "lodash-es";
 
 export enum DiffType {
   Modify = "Modify",
@@ -6,12 +6,23 @@ export enum DiffType {
   New = "New",
 }
 
+// isEqual(_.omit(o1, _.functions(o1)), _.omit(o2, _.functions(o2)))
+
 export function DifferentItems(a: any[], b: any[]): number[] {
   const items: any[] = [];
 
   a.forEach((item, index) => {
     if (b[index] !== undefined) {
-      if (!isEqual(item, b[index])) {
+      // TODO фиг знает норм или нет
+      if (
+        !isEqualWith(item, b[index], (n, o) => {
+          if (typeof n === 'function' && typeof o === 'function') {
+            return isEqual(functions(n), functions(o));
+          }
+
+          return undefined;
+        })
+      ) {
         items.push({
           type: DiffType.Modify,
           index,

@@ -94,6 +94,7 @@ function RefArray(
 
     const pars = value.map((...args: any) => callback?.apply(this, args));
     const arr = DifferentItems(arrayBefore, pars);
+    console.log(arr);
     if (arr.length > 0) {
       arr.forEach((item: any) => {
         if (item.type === DiffType.New) {
