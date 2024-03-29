@@ -27,21 +27,6 @@ function workWithEvent(obj: Props, key: string): Props {
   const pKey = key.replace("on", "").toLowerCase().trim();
 
   delete obj[key];
-  if (
-    typeof func === "object" &&
-    func.type !== undefined &&
-    (func.type === TypeProps.EventReactiveF ||
-      func.type === TypeProps.EventReactive)
-  ) {
-    obj[pKey] = {
-      type:
-        func.type === ReactiveType.RefFormater
-          ? TypeProps.EventReactiveF
-          : TypeProps.EventReactive,
-      value: func,
-    };
-    return obj;
-  }
 
   obj[pKey] = {
     type: TypeProps.Event,

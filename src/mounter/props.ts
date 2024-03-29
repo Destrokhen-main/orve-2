@@ -3,25 +3,7 @@ import { PropsItem, objectToCss } from "../parser/props";
 import { TypeProps } from "../parser/type";
 import { changerAttributes } from "./propHelper";
 import { ReactiveType } from "../reactive/type";
-
-/**
- * Функция для работы с реактивными props
- * @param item - ref object
- * @param key - аттрибут
- * @param val - значение которое необходимо прокинуть в реактивный обхект
- * @returns Реззультат выполнения
- */
-function prepaireStaticRectF(item: any, key: string, val: any = null) {
-  let value = null;
-
-  try {
-    value = item.value(val === null ? item.parent.value : val);
-  } catch (err) {
-    console.error(` "${key}" - ${err}`);
-  }
-
-  return value;
-}
+import { unique } from "../utils/line/uniquaTransform";
 
 /**
  * Функция для работы со стрилямо
@@ -53,7 +35,6 @@ const classWorker = (key: string, value: unknown) => {
 function propsWorker(root: HTMLElement, item: Props) {
   Object.keys(item).forEach((key: string) => {
     const obj: PropsItem = item[key] as any;
-    console.log(obj.type, key);
 
     if (obj.type === TypeProps.Static) {
       const value = obj.value;
@@ -62,43 +43,35 @@ function propsWorker(root: HTMLElement, item: Props) {
       if (typeof value === "object" && value.type === ReactiveType.Ref) {
         changerAttributes(root, key, classWorker(key, value.value));
 
-        value.$sub.subscribe((next: any) => {
-          changerAttributes(root, key, classWorker(key, next));
-        });
+        value.$sub.subscribe(
+          unique((next: any) => {
+            changerAttributes(root, key, classWorker(key, next));
+          }, value.value),
+        );
       } else {
         changerAttributes(root, key, classWorker(key, value));
       }
     }
 
     if (obj.type === TypeProps.Event) {
-      root.addEventListener(key, obj.value);
-    }
+      const val = obj.value;
 
-    if (obj.type === TypeProps.EventReactive) {
-      root.addEventListener(key, obj.value.value);
+      if (typeof val === "object" && val.type === ReactiveType.Ref) {
+        const _v = val.value;
 
-      obj.value.$sub.subscribe((val: any) => {
-        root.addEventListener(key, val);
-      });
-    }
-    if (obj.type === TypeProps.EventReactiveF) {
-      const item = obj.value;
-      const value = prepaireStaticRectF(item, key);
+        root.addEventListener(key, _v);
 
-      if (value !== null && typeof value === "function") {
-        document.addEventListener(key, value);
+        let pref = _v;
 
-        item.parent.$sub.subscribe((value: any) => {
-          const newKey = prepaireStaticRectF(item, key, value);
-
-          if (newKey !== null) {
-            document.addEventListener(key, newKey);
-          }
-        });
+        val.$sub.subscribe(
+          unique((next: any) => {
+            root.removeEventListener(key, pref);
+            root.addEventListener(key, next);
+            pref = next;
+          }, _v),
+        );
       } else {
-        if (typeof value !== "function") {
-          console.error("value return not a function");
-        }
+        root.addEventListener(key, obj.value);
       }
     }
 
@@ -141,9 +114,11 @@ function propsWorker(root: HTMLElement, item: Props) {
       if (item.value !== null && item.value !== "") {
         root.setAttribute(key, item.value);
 
-        item.$sub.subscribe(() => {
-          root.setAttribute(key, item.value);
-        });
+        item.$sub.subscribe(
+          unique(() => {
+            root.setAttribute(key, item.value);
+          }, item.value),
+        );
       }
     }
   });
