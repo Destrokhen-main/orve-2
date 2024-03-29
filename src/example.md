@@ -1,106 +1,174 @@
 ```javascript
-import { ref, computedEffect } from "orve-rxjs"
+import { computedEffect, ref } from 'orve'
 
-function CreateToDoComponent({ createCallBack }) {
-  const inp1 = ref("a");
-  const inp2 = ref("a");
-
-  const click = () => {
-    createCallBack(inp1.value, inp2.value)
+function ModalCreateTodo({ createTodo, item, index }) {
+  const title = ref(item?.title ?? '')
+  const descriptions = ref(item?.descriptions ?? '')
+  const createTodoFunc = () => {
+    createTodo(title.value, descriptions.value, index ?? null)
+    title.value = ""
+    descriptions.value = ""
   }
-
+  
   return (
     <div>
       <div>
-        <label for="inp-1">Имя задачи</label><br />
-        <input id="inp-1" value={inp1} onInput={(e) => inp1.value = e.target.value}/>
+        <label>
+          <p>Название задачи</p>
+          <input value={title} onInput={(e) => { title.value = e.target.value }}/>
+        </label>
       </div>
       <div>
-        <label for="inp-2">Описание</label><br />
-        <textarea id="inp-2" value={inp2} onInput={(e) => inp2.value = e.target.value}></textarea>
+        <label>
+          <p>Описание задачи</p>
+          <textarea value={descriptions} onInput={(e) => { descriptions.value = e.target.value }}></textarea>
+        </label>
       </div>
       <div>
-        <button onClick={click}>Создать</button>
+        <button onClick={createTodoFunc}>{
+          index === null ? 'Создать' : 'Редактировать'
+        }</button>
       </div>
     </div>
   )
 }
 
-function ListToDo({ list, del }) {
+function Todo({ title, descriptions, id, index, done, doneTodo, deleteTodo, edit }) {
   return (
-    <>
-      <o-if rule={() => list.value.length > 0}>
-        {{
-          true: () => (
-            <div>
-              <o-for items={list}>
-                {(item, index) => {
-                  return (
-                    <div>
-                      <h4>[ {index + 1} ] - { item.title }</h4>
-                      <p>{ item.desc }</p>
-                      <button onClick={() => del(index)}>Delete</button>
-                    </div>
-                  )
-                }}
-              </o-for>
-            </div>
-          ),
-          else: () => <div>Список Пуст</div>
-        }}
-      </o-if>
-    </>
+    <div class={style.todo} >
+      <div>
+        <h3><input type="checkbox" checked={done} onInput={() => doneTodo(id)} /> [{index}] { title }</h3>
+        <p>{ descriptions }</p>
+      </div>
+      <div>
+        <div>
+          <button class={style['action-btn']} onClick={() => deleteTodo(id)}>Удалить</button>
+        </div>
+        <div>
+          <button class={style['action-btn']} onClick={() => edit(id)}>Редактировать</button>
+        </div>
+      </div>
+    </div>
   )
 }
 
-
 export default function App() {
-  this.id = '1'
+  const showModal = ref(false)
+  const todos = ref([ { id: 1, title: "Задача", descriptions: "Описание", done: false }, { id: 2, title: "Задача-1", descriptions: "Описание", done: false }, { id: 3, title: "Задача-2", descriptions: "Описание", done: false } ]);
+  const selectedIndex = ref(null);
 
-  const listToDo = ref([{ title: "a", desc: "a" }]);
-
-  const message = ref("");
-  const ErrorMessage = (mess) => {
-    console.log('asd', mess);
-    message.value = mess;
-
-    setTimeout(() => {
-      message.value = "";
-    }, 2000)
-  }
-
-  const createTodo = (title, desc) => {
-    const existItem = listToDo.value.find((e) => e.title === title)
-    if (existItem === undefined) {
-      listToDo.value.push({ title, desc })
-    } else {
-      ErrorMessage("Уже такой есть")
-    }
+  const doneTodo = (id) => {
+    const item = todos.value.find((e) => e.id === id);
+    item.done = !item.done;
   } 
 
-  const deleteTask = (id) => {
-    listToDo.value.splice(id, 1)
+  const deleteTodo = (index) => {
+    const findIndex = todos.value.findIndex((e) => e.id === index)
+    todos.value.splice(findIndex, 1)
   }
 
-  const items = computedEffect(() => listToDo.value.filter((e) => e.desc === 'a'))
+  const createTodo = (title, descriptions, index = null) => {
+    if (index === null) {
+      todos.value.push({
+        title,
+        descriptions,
+        done: false
+      })
+    } else {
+      const item = todos.value.find((e) => e.id === index);
+      item.title = title;
+      item.descriptions = descriptions;
+      selectedIndex.value = null;
+    }
+    showModal.value = false
+  }
+
+  const editFunc = (index) => {
+    selectedIndex.value = index
+    showModal.value = true;
+  }
+
+  const readyTodo = computedEffect(() => {
+    return todos.value.filter((i) => i.done)
+  })
+
+  const notreadeTodo = computedEffect(() => {
+    return todos.value.filter((i) => !i.done)
+  })
+
   return (
-    <>
-      <div>
-        <o-for items={items}>
-          {(item, index) => {
-            return <div>{index} {item.desc}</div>
-          }}
-        </o-for>
+    <div class={style.window}>
+      <div class={style['d-flex-a-c-j-sb']}>
+        <h3>TODO</h3>
+        <button onClick={() => {
+          if (!showModal.value && selectedIndex.value !== null) {
+            selectedIndex.value = null;
+          }
+
+          showModal.value = !showModal.value
+        }}>
+          <o-if rule={() => !showModal.value}>
+            {{
+              true: () => <>+</>,
+              false: () => <>-</>
+            }}
+          </o-if>
+        </button>
       </div>
-      <o-if rule={() => message.value.length > 0}>
-        <span o-if={true}>
-          {message}
-        </span>
+      <o-if rule={() => showModal.value}>
+        {{
+          true: () => <ModalCreateTodo createTodo={createTodo} item={todos.value.find((e) => e.id === selectedIndex.value)} index={selectedIndex.value} o-if={true} />
+        }}
       </o-if>
-      <CreateToDoComponent createCallBack={createTodo} />
-      <hr />
-      <ListToDo list={listToDo} del={deleteTask} />
-    </>
+      <o-for items={notreadeTodo}>
+        {
+          (item, index) => <Todo 
+            index={index + 1}
+            id={item.id}
+            title={item.title}
+            doneTodo={doneTodo}
+            deleteTodo={deleteTodo}
+            done={item.done}
+            descriptions={item.descriptions}
+            edit={editFunc}
+            />
+        }
+      </o-for>
+
+      <o-if rule={() => readyTodo.value.length > 0}>
+        <div o-if={true}>
+          <o-if rule={() => notreadeTodo.value.length !== 0}>
+            <hr o-if={true} />
+          </o-if>
+          <h3>Готовые задачи</h3>
+          <div>
+            <button type="checkbox" onClick={() => {
+              todos.value.forEach((todo) => {
+                if (todo.done) {
+                  todo.done = false;
+                }
+              })
+            }}>
+              Все не готово
+            </button>
+          </div>
+          <o-for items={readyTodo}>
+            {
+              (item, index) => <Todo 
+              index={index + 1}
+              id={item.id}
+              title={item.title}
+              doneTodo={doneTodo}
+              deleteTodo={deleteTodo}
+              done={item.done}
+              descriptions={item.descriptions}
+              edit={editFunc}
+              />
+            }
+          </o-for>
+        </div>
+      </o-if>
+    </div>
   )
 }
 ```
