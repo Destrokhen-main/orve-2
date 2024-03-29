@@ -37,6 +37,14 @@ function prepaireClass(insertValue: any) {
   return insertV;
 }
 
+const classWorker = (key: string, value: unknown) => {
+  if (["class"].includes(key)) {
+    return Array.isArray(value) ? value.join(" ") : value;
+  } else {
+    return value;
+  }
+};
+
 /**
  * Функция, которая устанавливает атрибуты внутрь HTMLElement
  * @param root - HTMLElement в который будет указаны атрибуты
@@ -45,18 +53,20 @@ function prepaireClass(insertValue: any) {
 function propsWorker(root: HTMLElement, item: Props) {
   Object.keys(item).forEach((key: string) => {
     const obj: PropsItem = item[key] as any;
+    console.log(obj.type, key);
 
     if (obj.type === TypeProps.Static) {
       const value = obj.value;
+
       // COMPUTED
       if (typeof value === "object" && value.type === ReactiveType.Ref) {
-        changerAttributes(root, key, value.value);
+        changerAttributes(root, key, classWorker(key, value.value));
 
         value.$sub.subscribe((next: any) => {
-          changerAttributes(root, key, next);
+          changerAttributes(root, key, classWorker(key, next));
         });
       } else {
-        changerAttributes(root, key, value);
+        changerAttributes(root, key, classWorker(key, value));
       }
     }
 
@@ -104,7 +114,8 @@ function propsWorker(root: HTMLElement, item: Props) {
         const cssInline = objectToCss(value);
         changerAttributes(root, key, cssInline);
       } else {
-        changerAttributes(root, key, value);
+        const _v = Array.isArray(value) ? value.join(" ") : value;
+        changerAttributes(root, key, _v);
       }
 
       obj.value.$sub.subscribe((_after: any) => {
@@ -118,7 +129,8 @@ function propsWorker(root: HTMLElement, item: Props) {
           const cssInline = objectToCss(after);
           changerAttributes(root, key, cssInline);
         } else {
-          changerAttributes(root, key, after);
+          const _v = Array.isArray(after) ? after.join(" ") : after;
+          changerAttributes(root, key, _v);
         }
       });
     }
