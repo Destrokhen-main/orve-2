@@ -175,7 +175,7 @@ function oifParsing(component: NodeOP) {
       type: ReactiveType.Oif,
       answer: answerSettings,
       ...newProps,
-      context: returnNewClone(this),
+      context: this,
     },
   };
 }

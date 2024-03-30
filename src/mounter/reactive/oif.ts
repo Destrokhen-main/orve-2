@@ -225,13 +225,30 @@ function insertNodes(nodes: any[] | any, replacer: any) {
     return nodes.node;
   }
 }
+
+function isNotBuildComponent(comp: unknown): boolean {
+  if (typeof comp !== "object" || !comp) {
+    return false;
+  }
+  const w = comp as Record<string, unknown>;
+  if (w.node !== undefined) {
+    return false;
+  }
+
+  if (w.tag === undefined) {
+    return false;
+  }
+
+  return true;
+}
+
 // TODO теряю контекст, а не должен
 function componentBuilder(existNodes: any, answer: any, rule: any) {
   const replaceNode = removeAllNodes(existNodes);
   const mounterInstance = singleMounterChildren(null);
   if (answer[rule] !== undefined) {
     let ans = answer[rule];
-    if (typeof ans === "function") {
+    if (typeof ans === "function" || isNotBuildComponent(ans)) {
       ans = parserNodeF.call(this.context ?? {}, answer[rule]);
     }
 
@@ -239,7 +256,7 @@ function componentBuilder(existNodes: any, answer: any, rule: any) {
     return insertNodes(wNodes, replaceNode);
   } else if (answer.else !== undefined) {
     let ans = answer.else;
-    if (typeof ans === "function") {
+    if (typeof ans === "function" || isNotBuildComponent(ans)) {
       ans = parserNodeF.call(this.context ?? {}, answer.else);
     }
     const wNodes = mounterInstance(ans);
@@ -254,6 +271,8 @@ function componentBuilder(existNodes: any, answer: any, rule: any) {
 // [ ] - o-if in o-if
 // [ ] - Написать тесты для refO и o-if.
 // [ ] - c комента на блок, выходит плохо
+// [x] - почему не могу вставить просто компонент вместо функции в {}
+// [ ] - правильное общение o-if с o-for и другими структурами, попробовать обойтись без род ноды
 function OifWorker(
   root: Element | null,
   item: Record<string, any>,

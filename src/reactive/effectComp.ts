@@ -12,6 +12,9 @@ type Computed<T> = {
   _value?: unknown;
 };
 
+/*
+[ ] - может вернуть jsx Node надо бы обрабатывать
+*/
 function computedEffect<T>(func: () => T) {
   const [deps, _acc] = getDeps(func);
   const acc = _acc;
@@ -61,9 +64,7 @@ function computedEffect<T>(func: () => T) {
 
     if (deps.length > 0) {
       listFollow = deps.map((dep: any) => {
-        return dep.$sub.subscribe(
-          unique(recall, dep.value ?? null),
-        );
+        return dep.$sub.subscribe(unique(recall, dep.value ?? null));
       });
     }
   }
