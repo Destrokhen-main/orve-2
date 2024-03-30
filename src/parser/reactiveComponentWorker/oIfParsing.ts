@@ -68,7 +68,7 @@ interface IChildrenOif {
  * @returns массив обработанных children
  */
 function validationChildren(children: Array<any>) {
-  const parserInstance = parseSingleChildren.call(null, null);
+  const parserInstance = parseSingleChildren.call(this, null);
 
   if (children.length === 0) return null;
 
@@ -156,7 +156,7 @@ function oifParsing(component: NodeOP) {
     ) {
       answerSettings = component.children[0];
     } else {
-      newChildren = validationChildren(component.children!);
+      newChildren = validationChildren.call(this, component.children!);
 
       if (newChildren === null) return null;
 
@@ -169,7 +169,6 @@ function oifParsing(component: NodeOP) {
       });
     }
   }
-
   return {
     type: TypeNode.Reactive,
     value: {
