@@ -60,7 +60,6 @@ function RefArray(
     object = value;
     value = Object.keys(value);
   }
-
   // first render
   if (Array.isArray(value) && value.length > 0) {
     const parsedStartArray = callerWorker(value, callback, object);
@@ -85,88 +84,90 @@ function RefArray(
     root?.appendChild(mainComment);
   }
 
-  item.$sub.subscribe((_value: any) => {
-    let value = _value;
-    if (item.type === ReactiveType.RefO) {
-      const i = item as any;
-      const val = i.parent[i.key];
-      if (
-        typeof val === "object" &&
-        !Array.isArray(val) &&
-        val.type === ReactiveType.Ref
-      ) {
-        value = val.value;
-      } else {
-        value = val;
-      }
-    }
-
-    if (typeof value === "number" && value > 0) {
-      value = new Array(value).fill(0).map((_, i) => i + 1);
-    }
-
-    let object = null;
-    if (returnType(value) === "object") {
-      object = value;
-      value = Object.keys(value);
-    }
-
-    if (!Array.isArray(value)) {
-      if (allInstruction.length > 0) {
-        while (allInstruction.length > 0) {
-          const i = allInstruction.shift();
-          if (allInstruction.length === 1 || allInstruction.length === 0) {
-            i.replaceWith(mainComment);
-          } else {
-            i.remove();
-          }
+  if (item.$sub !== undefined) {
+    item.$sub.subscribe((_value: any) => {
+      let value = _value;
+      if (item.type === ReactiveType.RefO) {
+        const i = item as any;
+        const val = i.parent[i.key];
+        if (
+          typeof val === "object" &&
+          !Array.isArray(val) &&
+          val.type === ReactiveType.Ref
+        ) {
+          value = val.value;
+        } else {
+          value = val;
         }
       }
-      arrayBefore = [];
-      return;
-    }
 
-    const pars = callerWorker(value, callback, object);
+      if (typeof value === "number" && value > 0) {
+        value = new Array(value).fill(0).map((_, i) => i + 1);
+      }
 
-    const arr = DifferentItems(arrayBefore, pars);
-    if (arr.length > 0) {
-      arr.forEach((item: any) => {
-        if (item.type === DiffType.New) {
-          const block = pars[item.index];
-          const mounted = mounterInsance(parserInstance(block) as any);
+      let object = null;
+      if (returnType(value) === "object") {
+        object = value;
+        value = Object.keys(value);
+      }
 
-          if (item.index !== 0) {
-            allInstruction[item.index - 1].after(mounted.node);
-          }
-
-          if (allInstruction.length === 0) {
-            mainComment.replaceWith(mounted.node);
-          }
-          allInstruction.push(mounted.node);
-        }
-        if (item.type === DiffType.Modify) {
-          const block = pars[item.index];
-          const mounted = mounterInsance(parserInstance(block) as any);
-          allInstruction[item.index].replaceWith(mounted.node);
-          allInstruction[item.index] = mounted.node;
-        }
-        if (item.type === DiffType.Delete) {
-          if (
-            allInstruction.filter((item: any) => item !== null).length === 1
-          ) {
-            allInstruction[item.index].replaceWith(mainComment);
-            allInstruction[item.index] = null;
-          } else {
-            allInstruction[item.index].remove();
-            allInstruction[item.index] = null;
+      if (!Array.isArray(value)) {
+        if (allInstruction.length > 0) {
+          while (allInstruction.length > 0) {
+            const i = allInstruction.shift();
+            if (allInstruction.length === 1 || allInstruction.length === 0) {
+              i.replaceWith(mainComment);
+            } else {
+              i.remove();
+            }
           }
         }
-      });
-    }
+        arrayBefore = [];
+        return;
+      }
 
-    arrayBefore = pars;
-    allInstruction = allInstruction.filter((item: any) => item !== null);
-  });
+      const pars = callerWorker(value, callback, object);
+
+      const arr = DifferentItems(arrayBefore, pars);
+      if (arr.length > 0) {
+        arr.forEach((item: any) => {
+          if (item.type === DiffType.New) {
+            const block = pars[item.index];
+            const mounted = mounterInsance(parserInstance(block) as any);
+
+            if (item.index !== 0) {
+              allInstruction[item.index - 1].after(mounted.node);
+            }
+
+            if (allInstruction.length === 0) {
+              mainComment.replaceWith(mounted.node);
+            }
+            allInstruction.push(mounted.node);
+          }
+          if (item.type === DiffType.Modify) {
+            const block = pars[item.index];
+            const mounted = mounterInsance(parserInstance(block) as any);
+            allInstruction[item.index].replaceWith(mounted.node);
+            allInstruction[item.index] = mounted.node;
+          }
+          if (item.type === DiffType.Delete) {
+            if (
+              allInstruction.filter((item: any) => item !== null).length === 1
+            ) {
+              allInstruction[item.index].replaceWith(mainComment);
+              allInstruction[item.index] = null;
+            } else {
+              allInstruction[item.index].remove();
+              allInstruction[item.index] = null;
+            }
+          }
+        });
+      }
+
+      arrayBefore = pars;
+      allInstruction = allInstruction.filter((item: any) => item !== null);
+    });
+  }
 }
 
 export { RefArray };
