@@ -108,7 +108,7 @@ function specificProps(obj: Props, key: string): boolean {
   return false;
 }
 
-const dopCheck = ["checked", "disabled"];
+const dopCheck = ["checked", "disabled", "selected"];
 
 /**
  * Работа с props которые не являютя event. Необходимо чтобы правильно работать с реактивными переменными и так далее.

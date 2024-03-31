@@ -5,6 +5,10 @@ import { changerAttributes } from "./propHelper";
 import { ReactiveType } from "../reactive/type";
 import { unique } from "../utils/line/uniquaTransform";
 
+/*
+[ ] - value в select не выставляется, надо выставлять
+*/
+
 /**
  * Функция для работы со стрилямо
  * @param insertValue - значение
