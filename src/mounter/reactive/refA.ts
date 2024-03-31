@@ -1,7 +1,20 @@
 import { parseSingleChildren } from "../../parser/children";
+import { returnType } from "../../reactive/ref";
 import { ReactiveType } from "../../reactive/type";
 import { DiffType, DifferentItems } from "../../utils/DiffArray";
 import { singleMounterChildren } from "../children";
+
+function callerWorker(
+  value: any[],
+  callback: ((a: any, b: number) => any) | null,
+  object: any,
+) {
+  if (object !== null) {
+    return value.map((key: any) => callback?.apply(this, [object![key], key]));
+  } else {
+    return value.map((...args: any) => callback?.apply(this, args));
+  }
+}
 
 /* TODO 
 [] - fragment - там больно, надо доработать
@@ -37,11 +50,21 @@ function RefArray(
       value = val;
     }
   }
+
+  if (typeof value === "number" && value > 0) {
+    value = new Array(value).fill(0).map((_, i) => i + 1);
+  }
+
+  let object: Record<string, unknown> | null = null;
+  if (returnType(value) === "object") {
+    object = value;
+    value = Object.keys(value);
+  }
+
   // first render
   if (Array.isArray(value) && value.length > 0) {
-    const parsedStartArray = value.map((...args: any) =>
-      callback?.apply(this, args),
-    );
+    const parsedStartArray = callerWorker(value, callback, object);
+
     arrayBefore = parsedStartArray;
 
     allInstruction = parsedStartArray.map((item: any) => {
@@ -78,11 +101,21 @@ function RefArray(
       }
     }
 
+    if (typeof value === "number" && value > 0) {
+      value = new Array(value).fill(0).map((_, i) => i + 1);
+    }
+
+    let object = null;
+    if (returnType(value) === "object") {
+      object = value;
+      value = Object.keys(value);
+    }
+
     if (!Array.isArray(value)) {
       if (allInstruction.length > 0) {
         while (allInstruction.length > 0) {
           const i = allInstruction.shift();
-          if (allInstruction.length === 1) {
+          if (allInstruction.length === 1 || allInstruction.length === 0) {
             i.replaceWith(mainComment);
           } else {
             i.remove();
@@ -93,7 +126,8 @@ function RefArray(
       return;
     }
 
-    const pars = value.map((...args: any) => callback?.apply(this, args));
+    const pars = callerWorker(value, callback, object);
+
     const arr = DifferentItems(arrayBefore, pars);
     if (arr.length > 0) {
       arr.forEach((item: any) => {
