@@ -3,11 +3,13 @@ import { OptionsRef, createReactiveObject, returnType } from "./ref";
 
 function modifyAr<T>(arr: T[], obj: any, options: OptionsRef = {}) {
   return arr.map((item) => {
-    if (returnType(item) === "object") {
-      return createReactiveObject(item, obj, options);
-    }
-    if (returnType(item) === "array") {
-      return refArrayBuilder(item as T[], obj, true, options); // TODO хз тотально
+    if (!options.shallow) {
+      if (returnType(item) === "object") {
+        return createReactiveObject(item, obj, options);
+      }
+      if (returnType(item) === "array") {
+        return refArrayBuilder(item as T[], obj, true, options); // TODO хз тотально
+      }
     }
     return item;
   });
@@ -28,7 +30,7 @@ export function refArrayBuilder<T>(
   // TODO экспериментальный код
   let mutableArray;
 
-  if (options.deep !== false) {
+  if (!options.shallow) {
     mutableArray = modifyAr(arr, obj, options);
   } else {
     mutableArray = arr;
@@ -101,8 +103,12 @@ export function refArrayBuilder<T>(
 
       const s = Reflect.set(t, p, v);
       if (!Number.isNaN(num)) {
-        const m = modifyAr([v], obj, options);
-        t[num] = m[0];
+        if (!options.shallow) {
+          const m = modifyAr([v], obj, options);
+          t[num] = m[0];
+        } else {
+          t[num] = v;
+        }
         obj.$sub.next(isObj ? obj.value : t);
       }
 

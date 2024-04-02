@@ -36,11 +36,11 @@ export function returnType(v: unknown): string {
     ? Array.isArray(v)
       ? "array"
       : v === null
-        ? "null"
-        : "object"
+      ? "null"
+      : "object"
     : v === undefined
-      ? "undefined"
-      : "primitive";
+    ? "undefined"
+    : "primitive";
 }
 
 type Ref<T> = {
@@ -51,8 +51,12 @@ type Ref<T> = {
 
 export type OptionsRef = {
   // Если необходимо в массивах следить только на изменением index то можно это поставить на false
-  deep?: boolean;
+  shallow?: boolean;
 };
+
+/*
+[ ] - объекты всегда обладают погружением. А так не всегда надо
+*/
 
 /**
  * Реактивная переменная
@@ -75,8 +79,8 @@ function ref<T>(value: T, options?: OptionsRef) {
   reactive.value = Array.isArray(value)
     ? refArrayBuilder(value, reactive, false, opt)
     : value && typeof value === "object"
-      ? createReactiveObject(value, reactive, opt)
-      : value;
+    ? createReactiveObject(value, reactive, opt)
+    : value;
 
   let type = returnType(value);
   const reactiveObject: Ref<T> = new Proxy(reactive, {
@@ -109,6 +113,7 @@ function ref<T>(value: T, options?: OptionsRef) {
       return Reflect.set(t, p, value);
     },
     get(t: any, p: string) {
+      const res = Reflect.get(t, p);
       if (p === "value" && buffer !== null) {
         buffer.push(t);
       }
@@ -116,6 +121,7 @@ function ref<T>(value: T, options?: OptionsRef) {
         if (Object.keys(reactive).includes(p)) return Reflect.get(t, p);
         const value = t.value[p];
         if (returnType(value) === "object" && value.type === ReactiveType.Ref) {
+          // TODO мб тут надо проверку на много пересчётов
           value.$sub.subscribe(
             unique(() => {
               const item = t.value[p];
@@ -134,7 +140,7 @@ function ref<T>(value: T, options?: OptionsRef) {
 
         return returnObj;
       }
-      return Reflect.get(t, p);
+      return res;
     },
   });
 
