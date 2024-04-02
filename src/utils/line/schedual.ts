@@ -1,13 +1,13 @@
-export class Scheduled {
-  private _controller = false;
+export function scheduled() {
+  let _controller = false;
 
-  trigger(func: any, value: any) {
-    if (!this._controller) {
-      this._controller = true;
+  return (func: any, value: any) => {
+    if (!_controller) {
+      _controller = true;
       queueMicrotask(() => {
-        this._controller = false;
+        _controller = false;
         func(value);
       });
     }
-  }
+  };
 }

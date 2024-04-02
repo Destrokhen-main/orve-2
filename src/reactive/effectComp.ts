@@ -4,7 +4,7 @@ import { ReactiveType } from "./type";
 import { buffer } from "../utils/buffer";
 import { getDeps } from "../utils/getDepsOfFunction";
 import { unique } from "../utils/line/uniquaTransform";
-import { Scheduled } from "../utils/line/schedual";
+import { scheduled } from "../utils/line/schedual";
 
 type Computed<T> = {
   type: ReactiveType;
@@ -65,10 +65,10 @@ function computedEffect<T>(func: () => T) {
     }
 
     if (deps.length > 0) {
-      const sc = new Scheduled();
+      const sc = scheduled();
       listFollow = deps.map((dep: any) => {
         const func = unique(recall, dep.value ?? null);
-        return dep.$sub.subscribe((value: any) => sc.trigger(func, value));
+        return dep.$sub.subscribe((value: any) => sc(func, value));
       });
     }
   }
