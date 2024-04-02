@@ -63,13 +63,12 @@ import { scheduled } from "../utils/line/schedual";
 type Computed<T> = {
   type: ReactiveType;
   $sub: Line;
-  value: T;
+  value: T | null;
   _value?: unknown;
 };
 
 function computed<T>(func: () => T, deps: any[]) {
-  const acc = func();
-  const pack = ref(acc);
+  const pack = ref(null);
 
   const startObj: Computed<T> = {
     type: ReactiveType.Ref,
@@ -77,36 +76,28 @@ function computed<T>(func: () => T, deps: any[]) {
     value: pack.value,
   };
 
-  const obj: Computed<T> = new Proxy(startObj, {
-    set(t, p, v) {
-      if (p === "_value") {
-        t.value = v;
-        pack.value = v;
-        return true;
-      }
-      return false;
-    },
-  });
-
   const recall = () => {
     obj._value = func();
   };
 
-  if (deps.length > 0) {
-    const sc = scheduled();
-    deps.forEach((dep) => {
-      // let lastValue: any;
-      // if (dep.type === ReactiveType.RefO) {
-      //   lastValue = returnNewClone(dep.parent[dep.key]);
-      // }
-      const func = unique(recall, dep.value ?? null);
-      dep.$sub.subscribe(
-        (value: any) => sc(func, value)
-      );
-    });
-  }
+  const connectDeps = () => {
+    if (deps.length > 0) {
+      const sc = scheduled();
+      deps.forEach((dep) => {
+        // let lastValue: any;
+        // if (dep.type === ReactiveType.RefO) {
+        //   lastValue = returnNewClone(dep.parent[dep.key]);
+        // }
+        const func = unique(recall, dep.value ?? null);
+        dep.$sub.subscribe(
+          (value: any) => sc(func, value)
+        );
+      });
+    }
+  };
 
-  return new Proxy(obj, {
+  let firstCall = false;
+  const obj: Computed<T> = new Proxy(startObj, {
     set(t, p, v) {
       if (p === "_value") {
         t.value = v;
@@ -122,9 +113,18 @@ function computed<T>(func: () => T, deps: any[]) {
         buffer.push(t);
       }
 
+      if (p === 'value' && !firstCall) {
+        firstCall = true;
+        const acc = func();
+        connectDeps();
+        return acc;
+      }
+
       return Reflect.get(t, p);
     },
-  }) as Computed<T>;
+  });
+
+  return obj;
 }
 
 export { computed };

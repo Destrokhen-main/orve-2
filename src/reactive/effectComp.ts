@@ -9,7 +9,7 @@ import { scheduled } from "../utils/line/schedual";
 type Computed<T> = {
   type: ReactiveType;
   $sub: Line;
-  value: T;
+  value: T | null;
   _value?: unknown;
 };
 
@@ -18,10 +18,8 @@ type Computed<T> = {
 [ ] - если не используется, не пересчитываем
 */
 function computedEffect<T>(func: () => T) {
-  const [deps, _acc] = getDeps(func);
-  const acc = _acc;
-
-  const pack = ref(acc);
+  // const [deps, _acc] = getDeps(func);
+  const pack = ref(null);
 
   const startObj: Computed<T> = {
     type: ReactiveType.Ref,
@@ -29,10 +27,20 @@ function computedEffect<T>(func: () => T) {
     value: pack.value,
   };
 
+  let firstCall = false;
+
   const obj: Computed<T> = new Proxy(startObj, {
     get(t, p) {
       if (p === "value" && buffer !== null) {
         buffer.push(t);
+      }
+
+      if (p === 'value' && !firstCall) {
+        firstCall = true;
+        const [deps, _acc] = getDeps(func);
+
+        reConnectDeps(deps);
+        return _acc;
       }
 
       return Reflect.get(t, p);
@@ -73,7 +81,6 @@ function computedEffect<T>(func: () => T) {
     }
   }
 
-  reConnectDeps(deps);
   return obj as Computed<T>;
 }
 
