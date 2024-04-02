@@ -4,6 +4,7 @@ import { TypeProps } from "../parser/type";
 import { changerAttributes } from "./propHelper";
 import { ReactiveType } from "../reactive/type";
 import { unique } from "../utils/line/uniquaTransform";
+import { scheduled } from "../utils/line/schedual";
 
 /*
 [ ] - value в select не выставляется, надо выставлять
@@ -47,10 +48,14 @@ function propsWorker(root: HTMLElement, item: Props) {
       if (typeof value === "object" && value.type === ReactiveType.Ref) {
         changerAttributes(root, key, classWorker(key, value.value));
 
+        const sc = scheduled();
+
+        const func = unique((next: any) => {
+          changerAttributes(root, key, classWorker(key, next));
+        }, value.value);
+
         value.$sub.subscribe(
-          unique((next: any) => {
-            changerAttributes(root, key, classWorker(key, next));
-          }, value.value),
+          (val: any) => sc(func, val),
         );
       } else {
         changerAttributes(root, key, classWorker(key, value));
@@ -67,12 +72,17 @@ function propsWorker(root: HTMLElement, item: Props) {
 
         let pref = _v;
 
+        const sc = scheduled();
+
+        const func = unique((next: any) => {
+          root.removeEventListener(key, pref);
+          root.addEventListener(key, next);
+          pref = next;
+        }, _v);
+
+
         val.$sub.subscribe(
-          unique((next: any) => {
-            root.removeEventListener(key, pref);
-            root.addEventListener(key, next);
-            pref = next;
-          }, _v),
+          (val: any) => sc(func, val),
         );
       } else {
         root.addEventListener(key, obj.value);
@@ -95,7 +105,9 @@ function propsWorker(root: HTMLElement, item: Props) {
         changerAttributes(root, key, _v);
       }
 
-      obj.value.$sub.subscribe((_after: any) => {
+      const sc = scheduled();
+
+      const func = (_after: any) => {
         let after = _after;
         if (reactiveItem.type === ReactiveType.RefO) {
           const i = reactiveItem as any;
@@ -109,7 +121,9 @@ function propsWorker(root: HTMLElement, item: Props) {
           const _v = Array.isArray(after) ? after.join(" ") : after;
           changerAttributes(root, key, _v);
         }
-      });
+      };
+
+      obj.value.$sub.subscribe((val: any) => sc(func, val));
     }
 
     // TODO сейчас только для статики работает, нужно логику и для style и для остального
@@ -118,10 +132,14 @@ function propsWorker(root: HTMLElement, item: Props) {
       if (item.value !== null && item.value !== "") {
         root.setAttribute(key, item.value);
 
+        const sc = scheduled();
+
+        const func = unique(() => {
+          root.setAttribute(key, item.value);
+        }, item.value);
+
         item.$sub.subscribe(
-          unique(() => {
-            root.setAttribute(key, item.value);
-          }, item.value),
+          (val: any) => sc(func, val)
         );
       }
     }
