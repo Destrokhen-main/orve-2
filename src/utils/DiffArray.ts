@@ -1,4 +1,4 @@
-import { isEqual, isEqualWith, omit, functions } from "lodash-es";
+import { isEqual, isEqualWith, functions } from "lodash-es";
 
 export enum DiffType {
   Modify = "Modify",
@@ -16,7 +16,7 @@ export function DifferentItems(a: any[], b: any[]): number[] {
       // TODO фиг знает норм или нет
       if (
         !isEqualWith(item, b[index], (n, o) => {
-          if (typeof n === 'function' && typeof o === 'function') {
+          if (typeof n === "function" && typeof o === "function") {
             return isEqual(functions(n), functions(o));
           }
 
