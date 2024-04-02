@@ -442,6 +442,8 @@ function App() {
 	created(),
 	beforeMount(),
 	mounted(),
+	beforeUpdate(),	// пока делаю
+	updated(),  		// пока делаю
 	beforeUnmount(),
 	unmounted(),
 }

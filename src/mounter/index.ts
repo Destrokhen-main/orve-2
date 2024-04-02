@@ -1,6 +1,7 @@
 import { InvokeHook } from "../helper/hookHelper";
 import { FRAGMENT } from "../keys";
 import { NodeOP } from "../parser/parser";
+import { scheduled } from "../utils/line/schedual";
 import { mounterChildren } from "./children";
 import { propsWorker } from "./props";
 
@@ -38,8 +39,7 @@ function mounterNode(root: Element | null, tree: NodeOP) {
   // before mount
   if (tree.hooks && !InvokeHook(tree, "beforeMount")) {
     console.warn(
-      `[${
-        tree.nameC ?? "-"
+      `[${tree.nameC ?? "-"
       }()] - hooks: "beforeMount" - Before mount hook error`,
     );
   }
@@ -59,9 +59,17 @@ function mounterNode(root: Element | null, tree: NodeOP) {
 
   tree.node = elem;
 
+  const beforeUpdate = scheduled();
+  const updated = scheduled();
   tree.$sub?.subscribe((n: any) => {
-    // beforeUpdate updated
-    upperHooksWorker(tree, n);
+    switch (n) {
+      case 'beforeUpdate':
+        beforeUpdate(() => upperHooksWorker(tree, n), n);
+        break;
+      case 'updated':
+        updated(() => upperHooksWorker(tree, n), n);
+        break;
+    }
   });
 
   if (root !== null) {
