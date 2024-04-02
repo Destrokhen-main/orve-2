@@ -10,13 +10,25 @@ interface Dep {
   $sub: Line;
 }
 
+type Options = {
+  immediate?: boolean;
+  once?: boolean;
+};
+
+/*
+[ ] - callback на оключение орёт что переменная юзаеться до инициализации. плохо (
+*/
 /**
  * Смотритель для реактивной переменной
  * @param func - watcher - что будет вызываться при срабатывания watch
  * @param dep - реактивные переменные, для которых будет применять функция watch
  * @returns  либо одно или массив функций, для отключения watch
  */
-function watch(func: (n?: any, o?: any) => void, dep: Dep) {
+function watch(
+  func: (n?: any, o?: any) => void,
+  dep: Dep,
+  options: Options | null = null,
+) {
   if (typeof dep !== "object" || dep === null) {
     console.warn("[watch] - Dep is bad");
     return false;
@@ -27,9 +39,20 @@ function watch(func: (n?: any, o?: any) => void, dep: Dep) {
   if (d.$sub === undefined) {
     return false;
   }
-  const cur: any = d.$sub.subscribe(uniqueWithPast((newV: any, oldV: any) => {
-    func(newV, oldV);
-  }, d.value ?? null));
+  const cur: any = d.$sub.subscribe(
+    uniqueWithPast((newV: any, oldV: any) => {
+      func(newV, oldV);
+    }, d.value ?? null),
+  );
+
+  if (options && options.immediate) {
+    func(undefined, undefined);
+  }
+
+  if (options && options.once) {
+    cur();
+  }
+
   return () => cur();
 }
 
@@ -40,9 +63,11 @@ function watchEffect(func: () => void) {
   const completeAll: any = [];
 
   deps.forEach((dep) => {
-    const cur: any = dep.$sub.subscribe(unique(() => {
-      func();
-    }, dep.value ?? null));
+    const cur: any = dep.$sub.subscribe(
+      unique(() => {
+        func();
+      }, dep.value ?? null),
+    );
     completeAll.push(cur);
   });
 

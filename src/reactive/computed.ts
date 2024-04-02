@@ -89,9 +89,7 @@ function computed<T>(func: () => T, deps: any[]) {
         //   lastValue = returnNewClone(dep.parent[dep.key]);
         // }
         const func = unique(recall, dep.value ?? null);
-        dep.$sub.subscribe(
-          (value: any) => sc(func, value)
-        );
+        dep.$sub.subscribe((value: any) => sc(func, value));
       });
     }
   };
@@ -113,10 +111,11 @@ function computed<T>(func: () => T, deps: any[]) {
         buffer.push(t);
       }
 
-      if (p === 'value' && !firstCall) {
+      if (p === "value" && !firstCall) {
         firstCall = true;
         const acc = func();
         connectDeps();
+        t.value = acc;
         return acc;
       }
 

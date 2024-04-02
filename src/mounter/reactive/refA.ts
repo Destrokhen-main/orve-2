@@ -87,7 +87,6 @@ function RefArray(
 
   if (item.$sub !== undefined) {
     const func = (_value: any) => {
-      console.log('call');
       let value = _value;
       if (item.type === ReactiveType.RefO) {
         const i = item as any;

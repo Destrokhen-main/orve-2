@@ -28,18 +28,18 @@ function computedEffect<T>(func: () => T) {
   };
 
   let firstCall = false;
-
   const obj: Computed<T> = new Proxy(startObj, {
     get(t, p) {
       if (p === "value" && buffer !== null) {
         buffer.push(t);
       }
 
-      if (p === 'value' && !firstCall) {
+      if (p === "value" && !firstCall) {
         firstCall = true;
         const [deps, _acc] = getDeps(func);
 
         reConnectDeps(deps);
+        t.value = _acc;
         return _acc;
       }
 
