@@ -58,6 +58,7 @@ import { ReactiveType } from "./type";
 import { logger } from "../utils/logger";
 import { unique } from "../utils/line/uniquaTransform";
 import { buffer } from "../utils/buffer";
+import { Scheduled } from "../utils/line/schedual";
 
 type Computed<T> = {
   type: ReactiveType;
@@ -76,7 +77,7 @@ function computed<T>(func: () => T, deps: any[]) {
     value: pack.value,
   };
 
-  const obj = new Proxy(startObj, {
+  const obj: Computed<T> = new Proxy(startObj, {
     set(t, p, v) {
       if (p === "_value") {
         t.value = v;
@@ -92,13 +93,15 @@ function computed<T>(func: () => T, deps: any[]) {
   };
 
   if (deps.length > 0) {
+    const sc = new Scheduled();
     deps.forEach((dep) => {
       // let lastValue: any;
       // if (dep.type === ReactiveType.RefO) {
       //   lastValue = returnNewClone(dep.parent[dep.key]);
       // }
+      const func = unique(recall, dep.value ?? null)
       dep.$sub.subscribe(
-        unique(recall, dep.value ?? null),
+        (value: any) => sc.trigger(func, value)
       );
     });
   }
@@ -121,7 +124,7 @@ function computed<T>(func: () => T, deps: any[]) {
 
       return Reflect.get(t, p);
     },
-  });
+  }) as Computed<T>;
 }
 
 export { computed };

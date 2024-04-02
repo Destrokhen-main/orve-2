@@ -4,6 +4,7 @@ import { ReactiveType } from "./type";
 import { buffer } from "../utils/buffer";
 import { getDeps } from "../utils/getDepsOfFunction";
 import { unique } from "../utils/line/uniquaTransform";
+import { Scheduled } from "../utils/line/schedual";
 
 type Computed<T> = {
   type: ReactiveType;
@@ -14,6 +15,7 @@ type Computed<T> = {
 
 /*
 [ ] - может вернуть jsx Node надо бы обрабатывать
+[ ] - если не используется, не пересчитываем
 */
 function computedEffect<T>(func: () => T) {
   const [deps, _acc] = getDeps(func);
@@ -27,7 +29,7 @@ function computedEffect<T>(func: () => T) {
     value: pack.value,
   };
 
-  const obj = new Proxy(startObj, {
+  const obj: Computed<T> = new Proxy(startObj, {
     get(t, p) {
       if (p === "value" && buffer !== null) {
         buffer.push(t);
@@ -63,14 +65,16 @@ function computedEffect<T>(func: () => T) {
     }
 
     if (deps.length > 0) {
+      const sc = new Scheduled();
       listFollow = deps.map((dep: any) => {
-        return dep.$sub.subscribe(unique(recall, dep.value ?? null));
+        const func = unique(recall, dep.value ?? null);
+        return dep.$sub.subscribe((value: any) => sc.trigger(func, value));
       });
     }
   }
 
   reConnectDeps(deps);
-  return obj;
+  return obj as Computed<T>;
 }
 
 export { computedEffect };

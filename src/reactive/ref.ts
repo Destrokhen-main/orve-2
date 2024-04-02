@@ -36,11 +36,11 @@ export function returnType(v: unknown): string {
     ? Array.isArray(v)
       ? "array"
       : v === null
-      ? "null"
-      : "object"
+        ? "null"
+        : "object"
     : v === undefined
-    ? "undefined"
-    : "primitive";
+      ? "undefined"
+      : "primitive";
 }
 
 type Ref<T> = {
@@ -75,11 +75,11 @@ function ref<T>(value: T, options?: OptionsRef) {
   reactive.value = Array.isArray(value)
     ? refArrayBuilder(value, reactive, false, opt)
     : value && typeof value === "object"
-    ? createReactiveObject(value, reactive, opt)
-    : value;
+      ? createReactiveObject(value, reactive, opt)
+      : value;
 
   let type = returnType(value);
-  const reactiveObject = new Proxy(reactive, {
+  const reactiveObject: Ref<T> = new Proxy(reactive, {
     set(t: Ref<T>, p, value) {
       if (p === "value") {
         const newType = returnType(value);

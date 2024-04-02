@@ -13,9 +13,9 @@ export interface OrveInstance {
   component: (nameComponent: string, component: () => unknown) => void;
   createApp: (
     entry: unknown,
-    options: OptionsInstance | null,
+    options?: OptionsInstance | null,
   ) => boolean | null;
-  mount?: (
+  mount: (
     root: string | Element,
     render?: (el: Element, tree: NodeOP) => unknown,
   ) => void;
@@ -108,6 +108,7 @@ function orveCreate() {
     component,
     use: use,
     createApp,
+    mount: () => { console.warn("Приложение похоже не собралось"); }
   };
 
   return instance;
