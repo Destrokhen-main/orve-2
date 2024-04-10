@@ -8,6 +8,8 @@ import { singleMounterChildren } from "../children";
 import { unique } from "../../utils/line/uniquaTransform";
 // import { parseSingleChildren } from "../../parser/children";
 import { parserNodeF } from "../../parser/parser";
+import { TypeNode } from "../../parser/type";
+import { ReactiveType } from "../../reactive/type";
 
 // ПЕРЕПИСЫВАЕМ, НЕ РАБОТАЕТ КАК ХОЧУУУ
 
@@ -209,8 +211,24 @@ function removeAllNodes(nodes: any[] | any) {
   }
 }
 
+/*
+[ ] - Нужны проверки на то, если тут придёт массив или же ещё условие какое-то
+*/
 function insertNodes(nodes: any[] | any, replacer: any) {
   if (Array.isArray(nodes)) {
+    // Только первый уровень чекает
+    nodes = nodes.map((e) => {
+      if (e.node !== undefined) return e;
+
+      if (e.type === TypeNode.Reactive) {
+        const val = e.value;
+
+        if (val.type === ReactiveType.Oif) {
+          return { node: OifWorker(null, val) };
+        }
+      }
+    });
+
     const returnedNodes = [nodes[0].node];
     replacer.replaceWith(nodes[0].node);
     let l = nodes[0].node;
@@ -281,7 +299,8 @@ function OifWorker(
   needReturnRoot: boolean = false,
 ) {
   const COMMENT = document.createComment(" o-if ");
-  root?.appendChild(COMMENT);
+  if (root)
+    root.appendChild(COMMENT);
   let nodes: any = COMMENT;
   let currentAnswer: any = null;
   const { answer, rule } = item;
@@ -318,6 +337,8 @@ function OifWorker(
       );
     });
   }
+
+  if (!root) return nodes;
 }
 
 export { OifWorker };
