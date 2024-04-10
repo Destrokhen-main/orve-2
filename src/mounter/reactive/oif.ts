@@ -273,6 +273,7 @@ function componentBuilder(existNodes: any, answer: any, rule: any) {
 // [ ] - c комента на блок, выходит плохо
 // [x] - почему не могу вставить просто компонент вместо функции в {}
 // [ ] - правильное общение o-if с o-for и другими структурами, попробовать обойтись без род ноды
+// [ ] - при фрагменте надо придумать какой root отдавать
 function OifWorker(
   root: Element | null,
   item: Record<string, any>,
