@@ -15,6 +15,14 @@ function For(props: Props | null, children: Children[]) {
   };
 }
 
+function If(props: Props | null, children: Children[]) {
+  return {
+    tag: "o-if",
+    props,
+    children,
+  };
+}
+
 /**
  * Node creater
  * @param tag - String or Component
@@ -126,4 +134,4 @@ function Fragment(props: Props | null, ...children: any[]): NodeB {
   return a;
 }
 
-export { Node, Fragment, For };
+export { Node, Fragment, For, If };

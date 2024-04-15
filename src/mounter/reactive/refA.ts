@@ -51,7 +51,6 @@ function RefArray(
       value = val;
     }
   }
-
   if (typeof value === "number" && value > 0) {
     value = new Array(value).fill(0).map((_, i) => i + 1);
   }
@@ -62,6 +61,30 @@ function RefArray(
     value = Object.keys(value);
   }
   // first render
+  /*
+    array
+    object
+    number
+
+    Если нужно просто отрисовать что-то, и не париться с реактивностью
+  */
+  if (value === undefined) {
+    const type = returnType(item);
+
+    if (type === "object") {
+      object = item;
+      value = Object.keys(item);
+    }
+
+    if (type === "array") {
+      value = item;
+    }
+
+    if (typeof item === "number") {
+      value = new Array(item).fill(0).map((_, i) => i + 1);
+    }
+  }
+
   if (Array.isArray(value) && value.length > 0) {
     const parsedStartArray = callerWorker(value, callback, object);
 
