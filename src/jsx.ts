@@ -7,6 +7,14 @@ import { ReactiveType } from "./reactive/type";
 [ ] - Если пользовать использует RefC slot тоже должен работать
 */
 
+function For(props: Props | null, children: Children[]) {
+  return {
+    type: ReactiveType.RefArrFor,
+    value: children[0],
+    parent: props?.items,
+  };
+}
+
 /**
  * Node creater
  * @param tag - String or Component
@@ -27,11 +35,7 @@ function Node(
   }
 
   if (typeof tag === "string" && tag === "o-for") {
-    return {
-      type: ReactiveType.RefArrFor,
-      value: children[0],
-      parent: props?.items,
-    } as any;
+    return For(props, children) as any;
   }
 
   const Node: NodeB = { tag };
@@ -122,4 +126,4 @@ function Fragment(props: Props | null, ...children: any[]): NodeB {
   return a;
 }
 
-export { Node, Fragment };
+export { Node, Fragment, For };

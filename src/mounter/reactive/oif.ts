@@ -213,6 +213,7 @@ function removeAllNodes(nodes: any[] | any) {
 
 /*
 [ ] - Нужны проверки на то, если тут придёт массив или же ещё условие какое-то
+[ ] - если ничего не пришло, значит ничего и не вставляем, или вставляем комммент
 */
 function insertNodes(nodes: any[] | any, replacer: any) {
   if (Array.isArray(nodes)) {
@@ -299,8 +300,7 @@ function OifWorker(
   needReturnRoot: boolean = false,
 ) {
   const COMMENT = document.createComment(" o-if ");
-  if (root)
-    root.appendChild(COMMENT);
+  if (root) root.appendChild(COMMENT);
   let nodes: any = COMMENT;
   let currentAnswer: any = null;
   const { answer, rule } = item;

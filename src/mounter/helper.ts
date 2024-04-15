@@ -99,16 +99,14 @@ function RefChildCreator(
     // TODO посылает запрос если 2 и больше реактивных переменных
     // будет слать столько сколько переменных
     // так не должно быть.
-    parent.$sub.next("beforeUpdate");
+    parent && parent.$sub.next("beforeUpdate");
     [isHTML, textNode] = worker(_after, item, isHTML, textNode);
-    parent.$sub.next("updated");
+    parent && parent.$sub.next("updated");
   }, item.value);
 
-  sub.subscribe(
-    (val: string | number) => {
-      sc(func, val);
-    }
-  );
+  sub.subscribe((val: string | number) => {
+    sc(func, val);
+  });
 
   if (replaceItem !== undefined) {
     replaceItem.replaceWith(textNode);
