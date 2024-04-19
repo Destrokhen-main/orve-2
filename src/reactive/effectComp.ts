@@ -4,7 +4,7 @@ import { ReactiveType } from "./type";
 import { buffer } from "../utils/buffer";
 import { getDeps } from "../utils/getDepsOfFunction";
 import { unique } from "../utils/line/uniquaTransform";
-import { scheduled } from "../utils/line/schedual";
+import { scheduledWM } from "../utils/line/shedualWithOutMicrotask";
 
 type Computed<T> = {
   type: ReactiveType;
@@ -16,6 +16,7 @@ type Computed<T> = {
 /*
 [ ] - может вернуть jsx Node надо бы обрабатывать
 [ ] - если не используется, не пересчитываем
+[ ] - в линию проблемы получаются ( микротаска все портит
 */
 function computedEffect<T>(func: () => T) {
   // const [deps, _acc] = getDeps(func);
@@ -73,10 +74,12 @@ function computedEffect<T>(func: () => T) {
     }
 
     if (deps.length > 0) {
-      const sc = scheduled();
+      const sc = scheduledWM();
       listFollow = deps.map((dep: any) => {
         const func = unique(recall, dep.value ?? null);
-        return dep.$sub.subscribe((value: any) => sc(func, value));
+        return dep.$sub.subscribe((value: any) => {
+          sc(func, value);
+        });
       });
     }
   }

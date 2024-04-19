@@ -99,7 +99,7 @@ function Node(
     });
 
     if (Object.keys(slot).length > 0) {
-      if (Node.props !== undefined && Node.props !== null) {
+      if (Node.props) {
         Node.props.$slot = slot;
       } else {
         Node.props = { $slot: slot };

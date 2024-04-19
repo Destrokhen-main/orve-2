@@ -12,7 +12,8 @@
     "removeComments": false,
     "resolveJsonModule": true,
     "noImplicitThis": false,
-    "declaration": true
+    "declaration": true,
+    "jsx": "preserve"
   },
   "include": [
     "./src/**/*"
