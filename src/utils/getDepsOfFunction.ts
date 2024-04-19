@@ -12,7 +12,10 @@ function getDeps(func: () => any): [any[], any] {
   updateBuffer(deps);
   const res = func();
   updateBuffer(end);
-  return [deps, res];
+
+  const _deps = new Set(deps);
+
+  return [Array.from(_deps), res];
 }
 
 export { getDeps };

@@ -75,7 +75,7 @@ function computedEffect<T>(func: () => T) {
     }
 
     if (deps.length > 0) {
-      const sc = scheduled();
+      const sc = scheduledWM();
       listFollow = deps.map((dep: any) => {
         const func = unique(recall, dep.value ?? null);
         return dep.$sub.subscribe((value: any) => {
