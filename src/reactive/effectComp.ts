@@ -5,6 +5,7 @@ import { buffer } from "../utils/buffer";
 import { getDeps } from "../utils/getDepsOfFunction";
 import { unique } from "../utils/line/uniquaTransform";
 import { scheduledWM } from "../utils/line/shedualWithOutMicrotask";
+import { scheduled } from "../utils/line/schedual";
 
 type Computed<T> = {
   type: ReactiveType;
@@ -74,7 +75,7 @@ function computedEffect<T>(func: () => T) {
     }
 
     if (deps.length > 0) {
-      const sc = scheduledWM();
+      const sc = scheduled();
       listFollow = deps.map((dep: any) => {
         const func = unique(recall, dep.value ?? null);
         return dep.$sub.subscribe((value: any) => {
