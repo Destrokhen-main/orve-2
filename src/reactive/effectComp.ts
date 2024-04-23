@@ -64,6 +64,7 @@ function computedEffect<T>(func: () => T) {
   };
 
   let listFollow: any = null;
+  // [ ] - надо не всё вырубать, а просто проверить что там приехало
   function reConnectDeps(deps: any) {
     if (
       listFollow !== null ||
@@ -75,11 +76,11 @@ function computedEffect<T>(func: () => T) {
     }
 
     if (deps.length > 0) {
-      const sc = scheduled();
+      const sc = scheduledWM();
       listFollow = deps.map((dep: any) => {
         const func = unique(recall, dep.value ?? null);
         return dep.$sub.subscribe((value: any) => {
-          sc(func, value);
+          func(value);
         });
       });
     }

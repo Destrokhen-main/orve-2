@@ -89,7 +89,7 @@ function computed<T>(func: () => T, deps: any[]) {
         //   lastValue = returnNewClone(dep.parent[dep.key]);
         // }
         const func = unique(recall, dep.value ?? null);
-        dep.$sub.subscribe((value: any) => sc(func, value));
+        dep.$sub.subscribe((value: any) => func(value));
       });
     }
   };
