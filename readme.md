@@ -3,7 +3,7 @@
 Library for creating reactive SPA applications
 
 ```javascript
-import { ref, orveCreate, computed } from "orve";
+import { ref, orveCreate, computedEffect } from "orve";
 
 function Component() {
   const r = ref(0);
