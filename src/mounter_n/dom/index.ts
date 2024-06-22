@@ -3,6 +3,8 @@ import { patchClass } from "./patch/class";
 import { patchStyle } from "./patch/style";
 import { patchImage } from "./patch/image";
 
+type OrveElement = HTMLElement & { oNode: Record<string, any> };
+
 export function patchProps(
   el: any,
   key: string,
@@ -45,7 +47,7 @@ export function createElement(
   tag: string,
   namespace?: "svg" | "mathtml",
   isCustomizedBuiltInt?: string,
-) {
+): OrveElement {
   let el;
   if (namespace === "svg") {
     el = document.createElementNS("http://www.w3.org/2000/svg", tag);
@@ -67,7 +69,7 @@ export function createElement(
 
   // TODO miltiple для select, хз мб нужен будет
 
-  return el;
+  return el as OrveElement;
 }
 
 export function createText(text: string) {

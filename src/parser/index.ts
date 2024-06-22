@@ -1,7 +1,8 @@
 import { OrveInstance } from "../instance";
 import { Node, Fragment } from "../jsx";
 import { NodeOP, parserNodeF } from "./parser";
-import { mounterNode } from "../mounter";
+// import { mounterNode } from "../mounter";
+import { mounter } from "../mounter_n";
 import { InvokeAllNodeHook } from "../helper/hookHelper";
 
 export interface OptionsInstance {
@@ -50,19 +51,20 @@ function optionsInstance(options: OptionsInstance) {
  * @returns
  */
 function createApp(
+  this: OrveInstance,
   entry: unknown = null,
   options: OptionsInstance | null = null,
-): boolean | null {
+): OrveInstance {
   if (options !== null) {
     optionsInstance(options);
   }
 
   if (!isValidEntry(entry)) {
     console.warn("Entry not a function");
-    return null;
+    return this;
   }
 
-  const allContext: OrveInstance = this;
+  const allContext = this;
 
   const workFunction = entry as () => unknown;
   allContext.tree = parserNodeF.call(allContext.context, workFunction);
@@ -117,10 +119,10 @@ function createApp(
       allContext.tree =
         render !== undefined
           ? render(rootElement, allContext.tree)
-          : mounterNode(rootElement, allContext.tree);
+          : mounter(rootElement, allContext.tree);
     }
   };
-  return true;
+  return allContext;
 }
 
 export { createApp };
