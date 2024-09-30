@@ -4,7 +4,6 @@ import { EtypeComment } from "./helperType";
 import { isHtmlNode } from "../parser/childrenHelper";
 import { ReactiveType } from "../reactive/type";
 import { unique } from "../utils/line/uniquaTransform";
-import { scheduled } from "../utils/line/schedual";
 
 function textNodeCreator(item: NodeChild) {
   const textNode = document.createTextNode(String(item.value));
@@ -94,19 +93,16 @@ function RefChildCreator(
   [isHTML, textNode] = worker(item.value, item, isHTML, textNode);
 
   // TODO при первом вызове обновления не приходит next
-  const sc = scheduled();
   const func = unique((_after: string | number) => {
     // TODO посылает запрос если 2 и больше реактивных переменных
     // будет слать столько сколько переменных
     // так не должно быть.
-    parent && parent.$sub.next("beforeUpdate");
+    // parent && parent.$sub.next("beforeUpdate");
     [isHTML, textNode] = worker(_after, item, isHTML, textNode);
-    parent && parent.$sub.next("updated");
+    // parent && parent.$sub.next("updated");
   }, item.value);
 
-  sub.subscribe((val: string | number) => {
-    sc(func, val);
-  });
+  sub.subscribe(func);
 
   if (replaceItem !== undefined) {
     replaceItem.replaceWith(textNode);

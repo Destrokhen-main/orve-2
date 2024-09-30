@@ -82,8 +82,6 @@ function ref<T>(value: T, options?: OptionsRef) {
     ? createReactiveObject(value, reactive, opt)
     : value;
 
-  let buf: any = null;
-  let ac = false;
   let type = returnType(value);
   const reactiveObject: Ref<T> = new Proxy(reactive, {
     set(t: Ref<T>, p, value) {
@@ -108,14 +106,7 @@ function ref<T>(value: T, options?: OptionsRef) {
           }
         }
 
-        buf = value;
-        if (!ac) {
-          ac = true;
-          queueMicrotask(() => {
-            t.$sub.next(buf);
-            ac = false;
-          });
-        }
+        t.$sub.next(value);
 
         return true;
       }

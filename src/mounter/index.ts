@@ -1,7 +1,6 @@
 import { InvokeHook } from "../helper/hookHelper";
 import { FRAGMENT } from "../keys";
 import { NodeOP } from "../parser/parser";
-import { scheduled } from "../utils/line/schedual";
 import { LifeHook } from "../utils/typeLifehooks";
 import { mounterChildren } from "./children";
 import { propsWorker } from "./props";

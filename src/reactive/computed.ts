@@ -58,7 +58,6 @@ import { ReactiveType } from "./type";
 import { logger } from "../utils/logger";
 import { unique } from "../utils/line/uniquaTransform";
 import { buffer } from "../utils/buffer";
-import { scheduled } from "../utils/line/schedual";
 
 type Computed<T> = {
   type: ReactiveType;
@@ -86,7 +85,6 @@ function computed<T>(func: () => T, deps: any[]) {
 
   const connectDeps = () => {
     if (deps.length > 0) {
-      const sc = scheduled();
       deps.forEach((dep) => {
         // let lastValue: any;
         // if (dep.type === ReactiveType.RefO) {

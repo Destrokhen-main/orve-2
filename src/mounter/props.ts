@@ -4,7 +4,6 @@ import { TypeProps } from "../parser/type";
 import { changerAttributes } from "./propHelper";
 import { ReactiveType } from "../reactive/type";
 import { unique } from "../utils/line/uniquaTransform";
-import { scheduled } from "../utils/line/schedual";
 
 /*
 [ ] - value в select не выставляется, надо выставлять
@@ -48,15 +47,11 @@ function propsWorker(root: HTMLElement, item: Props) {
       if (typeof value === "object" && value.type === ReactiveType.Ref) {
         changerAttributes(root, key, classWorker(key, value.value));
 
-        const sc = scheduled();
-
         const func = unique((next: any) => {
           changerAttributes(root, key, classWorker(key, next));
         }, value.value);
 
-        value.$sub.subscribe(
-          (val: any) => sc(func, val),
-        );
+        value.$sub.subscribe(func);
       } else {
         changerAttributes(root, key, classWorker(key, value));
       }
@@ -72,18 +67,13 @@ function propsWorker(root: HTMLElement, item: Props) {
 
         let pref = _v;
 
-        const sc = scheduled();
-
         const func = unique((next: any) => {
           root.removeEventListener(key, pref);
           root.addEventListener(key, next);
           pref = next;
         }, _v);
 
-
-        val.$sub.subscribe(
-          (val: any) => sc(func, val),
-        );
+        val.$sub.subscribe(func);
       } else {
         root.addEventListener(key, obj.value);
       }
@@ -105,8 +95,6 @@ function propsWorker(root: HTMLElement, item: Props) {
         changerAttributes(root, key, _v);
       }
 
-      const sc = scheduled();
-
       const func = (_after: any) => {
         let after = _after;
         if (reactiveItem.type === ReactiveType.RefO) {
@@ -123,7 +111,7 @@ function propsWorker(root: HTMLElement, item: Props) {
         }
       };
 
-      obj.value.$sub.subscribe((val: any) => sc(func, val));
+      obj.value.$sub.subscribe(func);
     }
 
     // TODO сейчас только для статики работает, нужно логику и для style и для остального
@@ -132,15 +120,11 @@ function propsWorker(root: HTMLElement, item: Props) {
       if (item.value !== null && item.value !== "") {
         root.setAttribute(key, item.value);
 
-        const sc = scheduled();
-
         const func = unique(() => {
           root.setAttribute(key, item.value);
         }, item.value);
 
-        item.$sub.subscribe(
-          (val: any) => sc(func, val)
-        );
+        item.$sub.subscribe(func);
       }
     }
   });

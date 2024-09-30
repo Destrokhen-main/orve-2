@@ -2,7 +2,6 @@ import { parseSingleChildren } from "../../parser/children";
 import { returnType } from "../../reactive/ref";
 import { ReactiveType } from "../../reactive/type";
 import { DiffType, DifferentItems } from "../../utils/DiffArray";
-import { scheduled } from "../../utils/line/schedual";
 import { singleMounterChildren } from "../children";
 
 function callerWorker(
@@ -191,8 +190,7 @@ function RefArray(
       arrayBefore = pars;
       allInstruction = allInstruction.filter((item: any) => item !== null);
     };
-    const sc = scheduled();
-    item.$sub.subscribe((val: any) => sc(func, val));
+    item.$sub.subscribe(func);
   }
 }
 
