@@ -7,5 +7,5 @@ export function getName(
     return component.name ?? "Unknown Component";
   }
 
-  return (component.nameC as string) ?? "Unknown Component";
+  return (component.nameComponent as string) ?? "Unknown Component";
 }

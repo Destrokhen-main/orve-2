@@ -15,22 +15,28 @@ export function InvokeHook(
   obj: NodeOP,
   nameHook: string | keyof NodeHooks,
 ): boolean {
-  if (obj.hooks === undefined) {
-    return false;
+  if (obj.context && obj.context[nameHook]) {
+    obj.context[nameHook].forEach((f: () => void) => f());
   }
 
-  const h = obj.hooks;
-  if (Object.keys(h).includes(nameHook)) {
-    try {
-      h[nameHook as keyof NodeHooks]({});
-      return true;
-    } catch (er) {
-      console.error("[hooks] - catch error:", er);
-      return false;
-    }
-  } else {
-    return true;
-  }
+  return true;
+
+  // if (obj.hooks === undefined) {
+  //   return false;
+  // }
+
+  // const h = obj.hooks;
+  // if (Object.keys(h).includes(nameHook)) {
+  //   try {
+  //     h[nameHook as keyof NodeHooks]({});
+  //     return true;
+  //   } catch (er) {
+  //     console.error("[hooks] - catch error:", er);
+  //     return false;
+  //   }
+  // } else {
+  //   return true;
+  // }
 }
 
 /**

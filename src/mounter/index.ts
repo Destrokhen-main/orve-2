@@ -2,6 +2,7 @@ import { InvokeHook } from "../helper/hookHelper";
 import { FRAGMENT } from "../keys";
 import { NodeOP } from "../parser/parser";
 import { scheduled } from "../utils/line/schedual";
+import { LifeHook } from "../utils/typeLifehooks";
 import { mounterChildren } from "./children";
 import { propsWorker } from "./props";
 
@@ -39,7 +40,8 @@ function mounterNode(root: Element | null, tree: NodeOP) {
   // before mount
   if (tree.hooks && !InvokeHook(tree, "beforeMount")) {
     console.warn(
-      `[${tree.nameC ?? "-"
+      `[${
+        tree.nameComponent ?? "-"
       }()] - hooks: "beforeMount" - Before mount hook error`,
     );
   }
@@ -58,19 +60,20 @@ function mounterNode(root: Element | null, tree: NodeOP) {
   }
 
   tree.node = elem;
+  tree.context!.el = elem;
 
-  const beforeUpdate = scheduled();
-  const updated = scheduled();
-  tree.$sub?.subscribe((n: any) => {
-    switch (n) {
-      case 'beforeUpdate':
-        beforeUpdate(() => upperHooksWorker(tree, n), n);
-        break;
-      case 'updated':
-        updated(() => upperHooksWorker(tree, n), n);
-        break;
-    }
-  });
+  // const beforeUpdate = scheduled();
+  // const updated = scheduled();
+  // tree.$sub?.subscribe((n: any) => {
+  //   switch (n) {
+  //     case "beforeUpdate":
+  //       beforeUpdate(() => upperHooksWorker(tree, n), n);
+  //       break;
+  //     case "updated":
+  //       updated(() => upperHooksWorker(tree, n), n);
+  //       break;
+  //   }
+  // });
 
   if (root !== null) {
     root.appendChild(elem);
@@ -80,9 +83,11 @@ function mounterNode(root: Element | null, tree: NodeOP) {
     tree.ref.value = elem;
   }
 
-  if (tree.hooks && !InvokeHook(tree, "mounted")) {
+  if (!InvokeHook(tree, LifeHook.onMounted)) {
     console.warn(
-      `[${tree.nameC ?? "-"}()] hooks: "mounted" - Before mount hook error`,
+      `[${
+        tree.nameComponent ?? "-"
+      }()] hooks: "mounted" - Before mount hook error`,
     );
   }
 

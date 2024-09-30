@@ -84,10 +84,6 @@ export function setText(node: any, text: string) {
   node.nodeValue = text;
 }
 
-export function setElementText(element: any, text: string) {
-  element.textContent = text;
-}
-
 export function parentNode(node: any) {
   return node.parentNode;
 }

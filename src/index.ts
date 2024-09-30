@@ -7,3 +7,4 @@ export { randInt } from "./helper/random";
 export { mounterNode } from "./mounter/index";
 export * from "./types";
 export * from "./jsx";
+export * from "./utils/composables";

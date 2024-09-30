@@ -23,6 +23,10 @@ function If(props: Props | null, children: Children[]) {
   };
 }
 
+function notNullChildren(array: unknown[]) {
+  return array.filter((ch) => ch !== null && ch !== undefined);
+}
+
 /**
  * Node creater
  * @param tag - String or Component
@@ -37,83 +41,83 @@ function Node(
 ): NodeB {
   if (
     (typeof tag === "function" && tag.name === FRAGMENT) ||
-    (typeof tag === "string" && tag === FRAGMENT.toLowerCase())
+    (typeof tag === "string" && tag.toLowerCase() === FRAGMENT.toLowerCase())
   ) {
     return Fragment(props, ...children);
   }
 
-  if (typeof tag === "string" && tag === "o-for") {
-    return For(props, children) as any;
-  }
+  return {
+    tag: tag,
+    props: props ?? {},
+    children: notNullChildren(children),
+  };
 
-  const Node: NodeB = { tag };
-
-  if (props !== null) {
-    const SetProps: Record<string, any> = {};
-
-    Object.keys(props).forEach((key) => {
-      if (KEY_NEED_REWRITE.includes(key)) {
-        SetProps[`o${key}`] = props[key];
-      } else if (DIRECTIVES_ORVE.includes(key)) {
-        const insertedKey = key.replace("o-", "").toLocaleLowerCase().trim();
-
-        if (insertedKey === "key") {
-          Node.keyNode = String(props[key]);
-        } else {
-          Node[insertedKey as keyof NodeB] = props[key];
-        }
-      } else {
-        SetProps[key] = props[key];
-      }
-    });
-
-    Node.props = SetProps;
-  }
-
-  if (
-    children.length > 0 &&
-    (typeof tag === "function" ||
-      (typeof tag === "object" &&
-        (tag as Record<string, any>).type === ReactiveType.RefC))
-  ) {
-    // Проведём работы, чтобы избавиться от всех slot
-    const newChild: any[] = [];
-
-    const slot: Record<string, any> = {};
-
-    children.forEach((e: any) => {
-      if (typeof e !== "object") {
-        newChild.push(e);
-        return;
-      }
-
-      if (e.tag !== undefined && e.tag === FRAGMENT) {
-        if (e.props !== undefined && e.props.name !== undefined) {
-          slot[e.props.name] = e.children;
-        } else {
-          newChild.push(e);
-        }
-      } else {
-        newChild.push(e);
-      }
-    });
-
-    if (Object.keys(slot).length > 0) {
-      if (Node.props) {
-        Node.props.$slot = slot;
-      } else {
-        Node.props = { $slot: slot };
-      }
-    }
-
-    if (newChild.length > 0) {
-      Node.children = newChild;
-    }
-  } else if (children.length > 0) {
-    Node.children = children;
-  }
-
-  return Node;
+  // if (
+  //   (typeof tag === "function" && tag.name === FRAGMENT) ||
+  //   (typeof tag === "string" && tag === FRAGMENT.toLowerCase())
+  // ) {
+  //   return Fragment(props, ...children);
+  // }
+  // if (typeof tag === "string" && tag === "o-for") {
+  //   return For(props, children) as any;
+  // }
+  // const Node: NodeB = { tag };
+  // if (props !== null) {
+  //   const SetProps: Record<string, any> = {};
+  //   Object.keys(props).forEach((key) => {
+  //     if (KEY_NEED_REWRITE.includes(key)) {
+  //       SetProps[`o${key}`] = props[key];
+  //     } else if (DIRECTIVES_ORVE.includes(key)) {
+  //       const insertedKey = key.replace("o-", "").toLocaleLowerCase().trim();
+  //       if (insertedKey === "key") {
+  //         Node.keyNode = String(props[key]);
+  //       } else {
+  //         Node[insertedKey as keyof NodeB] = props[key];
+  //       }
+  //     } else {
+  //       SetProps[key] = props[key];
+  //     }
+  //   });
+  //   Node.props = SetProps;
+  // }
+  // if (
+  //   children.length > 0 &&
+  //   (typeof tag === "function" ||
+  //     (typeof tag === "object" &&
+  //       (tag as Record<string, any>).type === ReactiveType.RefC))
+  // ) {
+  //   // Проведём работы, чтобы избавиться от всех slot
+  //   const newChild: any[] = [];
+  //   const slot: Record<string, any> = {};
+  //   children.forEach((e: any) => {
+  //     if (typeof e !== "object") {
+  //       newChild.push(e);
+  //       return;
+  //     }
+  //     if (e.tag !== undefined && e.tag === FRAGMENT) {
+  //       if (e.props !== undefined && e.props.name !== undefined) {
+  //         slot[e.props.name] = e.children;
+  //       } else {
+  //         newChild.push(e);
+  //       }
+  //     } else {
+  //       newChild.push(e);
+  //     }
+  //   });
+  //   if (Object.keys(slot).length > 0) {
+  //     if (Node.props) {
+  //       Node.props.$slot = slot;
+  //     } else {
+  //       Node.props = { $slot: slot };
+  //     }
+  //   }
+  //   if (newChild.length > 0) {
+  //     Node.children = newChild;
+  //   }
+  // } else if (children.length > 0) {
+  //   Node.children = children;
+  // }
+  // return Node;
 }
 
 /**

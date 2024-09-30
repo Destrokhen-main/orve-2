@@ -12,6 +12,9 @@ import { definedProps, getName } from "../utils";
 import { snakeToCamel } from "../utils/transformFunctions";
 import { Line } from "../utils/line";
 import { logger } from "../utils/logger";
+import { generateInstace } from "../utils/instance";
+import { LifeHook } from "../utils/typeLifehooks";
+import { isStepCreateApp, setIsStepCreateApp } from "../instance";
 
 export interface NodeO extends NodeB {
   tag: string | ((props?: Record<string, any>) => unknown);
@@ -23,22 +26,23 @@ export interface NodeOP extends NodeO {
   keyNode?: string | number;
   node: Element | null;
   parent: NodeOP | null;
+  context?: Record<string, any>;
   type: TypeNode;
   $sub?: Line | null;
 }
 
-function initPropsGuard(func: () => unknown, propsW: Props) {
-  const propFunction = (func as Record<string, any>).props;
-  delete (func as Record<string, any>).props;
-  let prepFunc = null;
-  try {
-    prepFunc = definedProps(func, propFunction);
-  } catch (error) {
-    console.warn(`[${func.name ?? "-"}()] defineProps `, error);
-  }
+// function initPropsGuard(func: () => unknown, propsW: Props) {
+//   const propFunction = (func as Record<string, any>).props;
+//   delete (func as Record<string, any>).props;
+//   let prepFunc = null;
+//   try {
+//     prepFunc = definedProps(func, propFunction);
+//   } catch (error) {
+//     console.warn(`[${func.name ?? "-"}()] defineProps `, error);
+//   }
 
-  return prepFunc !== null ? prepFunc.call(this, propsW) : null;
-}
+//   return prepFunc !== null ? prepFunc.call(this, propsW) : null;
+// }
 
 /**
  * Так как мы не знаем, что мы получим после вызова функции,
@@ -52,29 +56,34 @@ export function prepareComponent(
   props: Props | null = null,
 ): NodeO | null {
   let component: unknown | null = null;
-  const funcAsObject = func as Record<string, any>;
   const propsW = props !== null ? props : {};
 
-  if (propsW.$slot === undefined) {
-    propsW.$slot = {};
-  }
+  // if (propsW.$slot === undefined) {
+  //   propsW.$slot = {};
+  // }
 
   try {
-    component =
-      funcAsObject.props !== undefined
-        ? initPropsGuard.call(this, func, propsW)
-        : func.call(this, propsW);
+    component = func(propsW);
   } catch (error) {
     logger("error", `[${getName(func)}()] - [Parser error]:`, error);
   }
 
+  // try {
+  //   component =
+  //     funcAsObject.props !== undefined
+  //       ? initPropsGuard.call(this, func, propsW)
+  //       : func.call(this, propsW);
+  // } catch (error) {
+  //
+  // }
+
   if (component && isValidNode(component, func.name)) {
     const comp = component as NodeO;
-    const funcAsObject = func as Record<string, any>;
+    // const funcAsObject = func as Record<string, any>;
 
-    if (funcAsObject.hooks !== undefined) {
-      comp.hooks = funcAsObject.hooks;
-    }
+    // if (funcAsObject.hooks !== undefined) {
+    //   comp.hooks = funcAsObject.hooks;
+    // }
     return comp;
   }
 
@@ -104,25 +113,26 @@ export function recursiveNode(node: NodeO): NodeO | null {
         object["children"] = ch;
       }
 
-      if (object.$slot === undefined) {
-        object.$slot = {};
-      }
+      // if (object.$slot === undefined) {
+      //   object.$slot = {};
+      // }
 
       let component: unknown | null = null;
       try {
-        if ((node.tag as Record<string, any>).props !== undefined) {
-          component = initPropsGuard(node.tag, object);
-        } else {
-          component = node.tag.call(this, object);
-        }
+        component = node.tag(object);
+        // if ((node.tag as Record<string, any>).props !== undefined) {
+        //   component = initPropsGuard(node.tag, object);
+        // } else {
+        //   component = node.tag.call(this, object);
+        // }
       } catch (error) {
         console.warn(`[${node.tag.name ?? "-"}()] Recursive `, error);
       }
 
-      if (component && isValidNode(component, node.tag.name) === true) {
-        if ((node.tag as Record<string, any>).hooks !== undefined) {
-          (component as any).hooks = (node.tag as Record<string, any>).hooks;
-        }
+      if (component && isValidNode(component, node.tag.name)) {
+        // if ((node.tag as Record<string, any>).hooks !== undefined) {
+        //   (component as any).hooks = (node.tag as Record<string, any>).hooks;
+        // }
 
         returnedNode = component as NodeO;
         quee.push(returnedNode);
@@ -135,6 +145,8 @@ export function recursiveNode(node: NodeO): NodeO | null {
   return returnedNode;
 }
 
+export let currentInstance: any = null;
+
 /**
  * Функция помогающая обработать компонент.
  * @param app Функция компонента
@@ -142,100 +154,94 @@ export function recursiveNode(node: NodeO): NodeO | null {
  * @returns Или объект или null
  */
 function parserNodeF(
+  this: any,
   app: (() => unknown) | NodeO,
   props: Props | null = null,
   parent: NodeOP | null = null,
 ): NodeOP | null {
+  currentInstance = generateInstace(parent);
   let component;
+  let _nameComponent = "Unknow Component";
 
   if (typeof app === "function") {
-    component = prepareComponent.call(this, app, props);
-
-    if (component === null) {
+    component = prepareComponent(app, props);
+    if (!component) {
       console.warn("Component don't be build");
       return null;
     }
 
-    component.nameC = app.name;
+    _nameComponent = app.name;
   } else {
     component = app;
   }
 
-  if (
-    this &&
-    this.globalComponents !== undefined &&
-    typeof component.tag === "string"
-  ) {
-    const nameTag = /([-_][a-z])/g.test(component.tag)
-      ? snakeToCamel(component.tag)
-      : component.tag;
+  // if (
+  //   this &&
+  //   this.globalComponents !== undefined &&
+  //   typeof component.tag === "string"
+  // ) {
+  //   const nameTag = /([-_][a-z])/g.test(component.tag)
+  //     ? snakeToCamel(component.tag)
+  //     : component.tag;
 
-    if (this.globalComponents[nameTag] !== undefined) {
-      component = prepareComponent.call(
-        this,
-        this.globalComponents[nameTag],
-        props,
-      );
-    }
-  }
+  //   if (this.globalComponents[nameTag] !== undefined) {
+  //     component = prepareComponent.call(
+  //       this,
+  //       this.globalComponents[nameTag],
+  //       props,
+  //     );
+  //   }
+  // }
 
-  if (component === null) {
-    return null;
-  }
-
-  let nameC;
+  // if (component === null) {
+  //   return null;
+  // }
   if (typeof component.tag === "function") {
     if (typeof app === "object") {
-      nameC = component.tag.name;
+      _nameComponent = component.tag.name;
     }
 
-    component = recursiveNode.call(this, component);
+    component = recursiveNode(component);
   }
 
   if (component === null) {
+    console.warn("ERRROR");
     return null;
   }
 
   const componentO = {
     type: TypeNode.Component,
     $sub: !this.__SUB__ ? new Line() : null,
+    context: currentInstance,
     ...component,
-    props: component.props as any,
     node: null,
     parent: !this.__CTX_PARENT__ ? parent : null,
+    nameComponent: _nameComponent,
   };
-  if (typeof app === "object") {
-    componentO.nameC = nameC ?? parent?.nameC ?? "Unknown component";
+
+  // if (REACTIVE_COMPONENT.includes(String(componentO.tag))) {
+  //   return reactiveWorkComponent.call(this, componentO) as any;
+  // }
+
+  currentInstance = null;
+  if (!isStepCreateApp) {
+    setIsStepCreateApp(true);
   }
 
-  if (REACTIVE_COMPONENT.includes(String(componentO.tag))) {
-    return reactiveWorkComponent.call(this, componentO) as any;
+  if (componentO.props) {
+    componentO.props = propsWorker(componentO.props);
   }
 
-  //NOTE beforeCreate
-  if (componentO.hooks && !InvokeHook(componentO, "beforeCreate")) {
+  if (componentO.children) {
+    componentO.children = parseChildren(componentO.children, componentO);
+  }
+
+  if (!InvokeHook(componentO, LifeHook.onCreated)) {
     console.error(
-      `[${componentO.nameC ?? "-"}()] hooks: "beforeCreate" - Error in hook`,
+      `[${componentO.nameComponent ?? "-"}()] hooks: "created" - Error in hook`,
     );
   }
 
-  if (componentO.props !== undefined) {
-    componentO.props = propsWorker.call(this, componentO.props);
-  }
-
-  if (componentO.children !== undefined) {
-    componentO.children = parseChildren.call(
-      this,
-      componentO.children,
-      componentO,
-    );
-  }
-
-  if (componentO.hooks && !InvokeHook(componentO, "created")) {
-    console.error(
-      `[${componentO.nameC ?? "-"}()] hooks: "created" - Error in hook`,
-    );
-  }
   return componentO;
 }
 

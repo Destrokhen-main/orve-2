@@ -1,8 +1,7 @@
-import { OrveInstance } from "../instance";
+import { isStepCreateApp, OrveInstance, setIsStepCreateApp } from "../instance";
 import { Node, Fragment } from "../jsx";
 import { NodeOP, parserNodeF } from "./parser";
-// import { mounterNode } from "../mounter";
-import { mounter } from "../mounter_n";
+import { mounterNode } from "../mounter";
 import { InvokeAllNodeHook } from "../helper/hookHelper";
 
 export interface OptionsInstance {
@@ -16,7 +15,7 @@ export interface CreateApp {
   ) => OrveInstance | false;
 }
 
-function isValidEntry(entry: unknown): boolean {
+function isValidEntry(entry: unknown): entry is () => unknown {
   const typeEntry = typeof entry;
 
   if (typeEntry !== "function") {
@@ -66,8 +65,7 @@ function createApp(
 
   const allContext = this;
 
-  const workFunction = entry as () => unknown;
-  allContext.tree = parserNodeF.call(allContext.context, workFunction);
+  allContext.tree = parserNodeF.call(allContext.context, entry);
 
   if (allContext.tree !== null && window !== undefined) {
     const beforeUnmounted = function () {
@@ -86,11 +84,11 @@ function createApp(
       typeof window !== "undefined" &&
       window.addEventListener !== undefined
     ) {
-      window?.addEventListener("beforeunload", beforeUnmounted);
+      window.addEventListener("beforeunload", beforeUnmounted);
 
       //window.onbeforeunload = beforeUnmounter;
 
-      window?.addEventListener("unload", unmounted);
+      window.addEventListener("unload", unmounted);
 
       //window.onunload = unmounter;
     }
@@ -119,7 +117,7 @@ function createApp(
       allContext.tree =
         render !== undefined
           ? render(rootElement, allContext.tree)
-          : mounter(rootElement, allContext.tree);
+          : mounterNode(rootElement, allContext.tree);
     }
   };
   return allContext;

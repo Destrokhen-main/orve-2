@@ -42,7 +42,7 @@ describe("парсинг children", () => {
         parent: null,
         $sub: null,
         type: "Component",
-        nameC: "Unknown component",
+        nameComponent: "Unknown component",
       },
     ]);
   });
@@ -69,7 +69,7 @@ describe("парсинг children", () => {
         $sub: null,
         parent: null,
         type: "Component",
-        nameC: "Component",
+        nameComponent: "Component",
       },
     ]);
   });

@@ -1,7 +1,15 @@
 import { isValidNode } from "./helper";
 import { NodeO, NodeOP, parserNodeF } from "./parser";
 import { TypeNode } from "./type";
-import { compareHTML, compareStatic, hasUnreformedArray, isComponent, isHtmlNode, isReactiveObject, setupRefCAsComponent } from "./childrenHelper";
+import {
+  compareHTML,
+  compareStatic,
+  hasUnreformedArray,
+  isComponent,
+  isHtmlNode,
+  isReactiveObject,
+  setupRefCAsComponent,
+} from "./childrenHelper";
 import { ReactiveType } from "../reactive/type";
 import { snakeToCamel } from "../utils/transformFunctions";
 
@@ -30,35 +38,35 @@ const parseSingleChildren = function (parent: NodeOP | null) {
 
       // Проверим есть ли globalComponent
 
-      if (
-        typeof component.tag === "string" &&
-        context !== null &&
-        context.globalComponents !== undefined
-      ) {
-        const nameTag = /([-_][a-z])/g.test(component.tag)
-          ? snakeToCamel(component.tag)
-          : component.tag;
+      // if (
+      //   typeof component.tag === "string" &&
+      //   context !== null &&
+      //   context.globalComponents !== undefined
+      // ) {
+      //   const nameTag = /([-_][a-z])/g.test(component.tag)
+      //     ? snakeToCamel(component.tag)
+      //     : component.tag;
 
-        if (context.globalComponents[nameTag] !== undefined) {
-          const parse = parserNodeF.call(
-            context,
-            context.globalComponents[nameTag],
-            component.props ?? null,
-            parent,
-          );
-          return parse !== null ? parse : null;
-        }
-      }
+      //   if (context.globalComponents[nameTag] !== undefined) {
+      //     const parse = parserNodeF.call(
+      //       context,
+      //       context.globalComponents[nameTag],
+      //       component.props ?? null,
+      //       parent,
+      //     );
+      //     return parse !== null ? parse : null;
+      //   }
+      // }
 
       // Проверь, есть ли tag реактивный объект.
-      if (
-        typeof component.tag === "object" &&
-        (component.tag as Record<string, any>).type !== undefined &&
-        (component.tag as Record<string, any>).type === ReactiveType.RefC
-      ) {
-        return setupRefCAsComponent.call(this, component, parent);
-      }
-      const parse = parserNodeF.call(context, component, null, parent);
+      // if (
+      //   typeof component.tag === "object" &&
+      //   (component.tag as Record<string, any>).type !== undefined &&
+      //   (component.tag as Record<string, any>).type === ReactiveType.RefC
+      // ) {
+      //   return setupRefCAsComponent.call(this, component, parent);
+      // }
+      const parse = parserNodeF.call({}, component, null, parent);
 
       return parse !== null ? parse : null;
     }
@@ -80,7 +88,7 @@ const parseSingleChildren = function (parent: NodeOP | null) {
     }
 
     return item;
-  }.bind(this);
+  };
 };
 
 /**
@@ -90,7 +98,7 @@ const parseSingleChildren = function (parent: NodeOP | null) {
  * @returns - обработанный массив
  */
 function parseChildren(arrayNode: unknown[], parent: NodeOP | null): any {
-  const singleChildParser = parseSingleChildren.call(this, parent);
+  const singleChildParser = parseSingleChildren(parent);
 
   // TODO
   // [ ] - Необходимо убедиться, что тут после flat всё ещё валидный массив

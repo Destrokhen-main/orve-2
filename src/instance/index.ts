@@ -85,6 +85,12 @@ function component(name: string, component: () => unknown): void {
   }
 }
 
+export let GlobalInstance: any = null;
+export let isStepCreateApp = false;
+
+export function setIsStepCreateApp(v: boolean) {
+  isStepCreateApp = v;
+}
 /**
  * Create instance Orve application
  * @returns Orve instance
@@ -108,6 +114,8 @@ function orveCreate() {
       console.warn("Приложение похоже не собралось");
     },
   };
+
+  GlobalInstance = instance.context;
 
   return instance;
 }

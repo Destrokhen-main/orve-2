@@ -70,6 +70,10 @@ type Computed<T> = {
 function computed<T>(func: () => T, deps: any[]) {
   const pack = ref(null);
 
+  if (!deps) {
+    return null;
+  }
+
   const startObj: Computed<T> = {
     type: ReactiveType.Ref,
     $sub: pack.$sub as any,
