@@ -46,6 +46,10 @@ function Node(
     return Fragment(props, ...children);
   }
 
+  if (typeof tag === "function" && tag.name === "If") {
+    return If(props, children) as NodeB;
+  }
+
   return {
     tag: tag,
     props: props ?? {},

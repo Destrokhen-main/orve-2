@@ -219,9 +219,9 @@ function parserNodeF(
     nameComponent: _nameComponent,
   };
 
-  // if (REACTIVE_COMPONENT.includes(String(componentO.tag))) {
-  //   return reactiveWorkComponent.call(this, componentO) as any;
-  // }
+  if (REACTIVE_COMPONENT.includes(String(componentO.tag))) {
+    return reactiveWorkComponent.call(this, componentO) as any;
+  }
 
   currentInstance = null;
   if (!isStepCreateApp) {
