@@ -1,7 +1,7 @@
 import { NodeOP } from "./parser";
 import { oifParsing } from "./reactiveComponentWorker/oIfParsing";
 
-export const REACTIVE_COMPONENT = ["o-if"];
+export const REACTIVE_COMPONENT = ["o-if", "o-for"];
 
 /**
  * Функция помогает распределить реактивные директивы.
@@ -10,7 +10,10 @@ export const REACTIVE_COMPONENT = ["o-if"];
  */
 function reactiveWorkComponent(componentO: NodeOP) {
   if (componentO.tag === "o-if") {
-    return oifParsing.call(this, componentO);
+    return oifParsing(componentO);
+  }
+  if (componentO.tag === "o-for") {
+    return componentO;
   }
   return null;
 }

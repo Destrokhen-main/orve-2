@@ -18,3 +18,5 @@ function createLifeHook(nameHook: LifeHook) {
 export const onMounted = createLifeHook(LifeHook.onMounted);
 export const onBeforeMounted = createLifeHook(LifeHook.onBeforeMounted);
 export const onCreated = createLifeHook(LifeHook.onCreated);
+export const onBeforeUnmounted = createLifeHook(LifeHook.onBeforeUnmounted);
+export const onUnmounted = createLifeHook(LifeHook.onUnmounted);

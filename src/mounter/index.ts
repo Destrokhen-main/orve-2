@@ -33,11 +33,14 @@ function mounterNode(root: Element | null, tree: NodeOP) {
   }
 
   if (tree.tag === FRAGMENT) {
+    tree.node = root;
+    tree.context!.el = root;
+
     return mounterChildren(root, tree.children!);
   }
 
   // before mount
-  if (tree.hooks && !InvokeHook(tree, "beforeMount")) {
+  if (!InvokeHook(tree, LifeHook.onBeforeMounted)) {
     console.warn(
       `[${
         tree.nameComponent ?? "-"
@@ -81,6 +84,14 @@ function mounterNode(root: Element | null, tree: NodeOP) {
   if (tree.ref !== undefined) {
     tree.ref.value = elem;
   }
+
+  elem.addEventListener("beforeunload", () => {
+    InvokeHook(tree, LifeHook.onBeforeUnmounted);
+  });
+
+  elem.addEventListener("unload", () => {
+    InvokeHook(tree, LifeHook.onUnmounted);
+  });
 
   if (!InvokeHook(tree, LifeHook.onMounted)) {
     console.warn(

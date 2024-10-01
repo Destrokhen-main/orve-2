@@ -9,15 +9,17 @@ import { ReactiveType } from "./reactive/type";
 
 function For(props: Props | null, children: Children[]) {
   return {
+    tag: "o-for",
     type: ReactiveType.RefArrFor,
-    value: children[0],
-    parent: props?.items,
+    callback: children[0],
+    each: props?.each,
   };
 }
 
 function If(props: Props | null, children: Children[]) {
   return {
     tag: "o-if",
+    type: ReactiveType.Oif,
     props,
     children,
   };
@@ -48,6 +50,10 @@ function Node(
 
   if (typeof tag === "function" && tag.name === "If") {
     return If(props, children) as NodeB;
+  }
+
+  if (typeof tag === "function" && tag.name === "For") {
+    return For(props, children) as NodeB;
   }
 
   return {

@@ -8,9 +8,11 @@ export function generateInstace(parent: any = null) {
   };
 
   if (parent) {
-    instance.parent = { ...parent.context };
-
-    if (Object.keys(parent.context.context).length > 0) {
+    instance.parent = parent.context;
+    if (
+      parent.context.context &&
+      Object.keys(parent.context.context).length > 0
+    ) {
       instance.context = { ...instance.context, ...parent.context.context };
     }
   }

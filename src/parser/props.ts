@@ -30,7 +30,7 @@ function workWithEvent(obj: Props, key: string): Props {
 
   obj[pKey] = {
     type: TypeProps.Event,
-    value: func, // TODO УБРАЛ ОТСЮДА bind
+    value: func,
   };
 
   return obj;
@@ -118,15 +118,6 @@ const dopCheck = ["checked", "disabled", "selected"];
  */
 function workWithStaticProps(obj: ParsedProps, key: string): boolean {
   const value = obj[key];
-  if (KEY_NEED_REWRITE_WITH_O.includes(key)) {
-    const fKey = key.slice(1, key.length);
-    delete obj[key];
-    obj[fKey] = {
-      type: TypeProps.Static,
-      value: value,
-    };
-    return true;
-  }
 
   if (SPECIFIC_KEYS.includes(key)) {
     return specificProps(obj, key);
@@ -182,10 +173,10 @@ function workWithStaticProps(obj: ParsedProps, key: string): boolean {
     return true;
   }
 
-  if (typeof value === "object" && key === `$${SLOT}`) {
-    obj[key] = value;
-    return true;
-  }
+  // if (typeof value === "object" && key === `$${SLOT}`) {
+  //   obj[key] = value;
+  //   return true;
+  // }
 
   if (typeof value === "object" || typeof value === "function") {
     obj[key] = {

@@ -38,6 +38,8 @@ function singleMounterChildren(root: Element | null, parent?: childrenParent) {
       }
 
       if (knowItem.tag === FRAGMENT && knowItem.children.length > 0) {
+        knowItem.node = root;
+        knowItem.context!.el = root;
         return mounterChildren(root, knowItem.children, parent);
       }
     }
@@ -62,40 +64,37 @@ function singleMounterChildren(root: Element | null, parent?: childrenParent) {
     }
 
     if (item.type === TypeNode.Reactive) {
-      const reactiveObject: Ref<any> = (item as any).value;
-      if (
-        reactiveObject.type === ReactiveType.Ref ||
-        reactiveObject.type === ReactiveType.RefO
-      ) {
-        RefChildCreator(root, reactiveObject, undefined, parent);
-        return item;
-      }
-
-      if (reactiveObject.type === ReactiveType.RefArrFor) {
-        RefArray.call(
-          (item as any).context,
-          root,
-          (reactiveObject as any).parent,
-          item,
-          reactiveObject.value as () => any,
-        );
-        return item;
-      }
-
-      if (reactiveObject.type === ReactiveType.Oif) {
-        OifWorker(root, reactiveObject);
-        return item;
-      }
-
-      if (reactiveObject.type === ReactiveType.RefCComponent) {
-        RefCComponentWorker.call(this, root, reactiveObject);
-        return item;
-      }
-
-      if (reactiveObject.type === ReactiveType.RefComputed) {
-        RefComputedWorker(root, reactiveObject);
-        return item;
-      }
+      return item;
+      // const reactiveObject: Ref<any> = (item as any).value;
+      // if (
+      //   reactiveObject.type === ReactiveType.Ref ||
+      //   reactiveObject.type === ReactiveType.RefO
+      // ) {
+      //   RefChildCreator(root, reactiveObject, undefined, parent);
+      //   return item;
+      // }
+      // if (reactiveObject.type === ReactiveType.RefArrFor) {
+      //   RefArray.call(
+      //     (item as any).context,
+      //     root,
+      //     (reactiveObject as any).parent,
+      //     item,
+      //     reactiveObject.value as () => any,
+      //   );
+      //   return item;
+      // }
+      // if (reactiveObject.type === ReactiveType.Oif) {
+      //   OifWorker(root, reactiveObject);
+      //   return item;
+      // }
+      // if (reactiveObject.type === ReactiveType.RefCComponent) {
+      //   RefCComponentWorker.call(this, root, reactiveObject);
+      //   return item;
+      // }
+      // if (reactiveObject.type === ReactiveType.RefComputed) {
+      //   RefComputedWorker(root, reactiveObject);
+      //   return item;
+      // }
     }
   };
 }

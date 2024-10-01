@@ -14,6 +14,8 @@ import { TypeNode } from "../type";
 function validationPropsParent(
   props: Record<string, any>,
 ): Record<string, any> | null {
+  if (!props) return null;
+
   if (props["rule"] === undefined) {
     logger("warn", '%c[o-if]%c: "rule" Не указано');
     return null;

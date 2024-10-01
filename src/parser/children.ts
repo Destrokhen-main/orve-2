@@ -12,6 +12,7 @@ import {
 } from "./childrenHelper";
 import { ReactiveType } from "../reactive/type";
 import { snakeToCamel } from "../utils/transformFunctions";
+import { generateInstace } from "../utils/instance";
 
 /**
  * if you wanna use this function u need do .call(context);
@@ -21,10 +22,16 @@ import { snakeToCamel } from "../utils/transformFunctions";
 const parseSingleChildren = function (parent: NodeOP | null) {
   return function (item: unknown) {
     if (typeof item === "object" && item !== null && isReactiveObject(item)) {
+      const _item = item as any;
+
+      if ([ReactiveType.Oif, ReactiveType.RefArrFor].includes(_item.type)) {
+        // валидировать надо
+      }
+
       return {
         type: TypeNode.Reactive,
-        context: { ...this },
-        value: item,
+        context: generateInstace(parent),
+        value: _item,
       };
     }
     if (

@@ -209,6 +209,8 @@ function parserNodeF(
     return null;
   }
 
+  console.log(component);
+
   const componentO = {
     type: TypeNode.Component,
     $sub: !this.__SUB__ ? new Line() : null,
@@ -219,14 +221,19 @@ function parserNodeF(
     nameComponent: _nameComponent,
   };
 
-  if (REACTIVE_COMPONENT.includes(String(componentO.tag))) {
-    return reactiveWorkComponent.call(this, componentO) as any;
-  }
-
   currentInstance = null;
   if (!isStepCreateApp) {
     setIsStepCreateApp(true);
   }
+
+  // if (REACTIVE_COMPONENT.includes(String(componentO.tag))) {
+  //   console.log(componentO.tag);
+  //   const result = reactiveWorkComponent(componentO) as any;
+  //   console.log("asd", componentO);
+  //   result.context = componentO.context;
+  //   console.log(result);
+  //   return result;
+  // }
 
   if (componentO.props) {
     componentO.props = propsWorker(componentO.props);
@@ -241,7 +248,6 @@ function parserNodeF(
       `[${componentO.nameComponent ?? "-"}()] hooks: "created" - Error in hook`,
     );
   }
-
   return componentO;
 }
 
