@@ -8,21 +8,11 @@ import { ReactiveType } from "./reactive/type";
 */
 
 function For(props: Props | null, children: Children[]) {
-  return {
-    tag: "o-for",
-    type: ReactiveType.RefArrFor,
-    callback: children[0],
-    each: props?.each,
-  };
+  return Node(ReactiveType.RefArrFor, props, ...children);
 }
 
 function If(props: Props | null, children: Children[]) {
-  return {
-    tag: "o-if",
-    type: ReactiveType.Oif,
-    props,
-    children,
-  };
+  return Node(ReactiveType.Oif, props, ...children);
 }
 
 function notNullChildren(array: unknown[]) {

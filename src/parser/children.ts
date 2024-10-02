@@ -41,8 +41,6 @@ const parseSingleChildren = function (parent: NodeOP | null) {
       isValidNode(item)
     ) {
       const component = item as NodeO;
-      const context = this ?? {};
-
       // Проверим есть ли globalComponent
 
       // if (

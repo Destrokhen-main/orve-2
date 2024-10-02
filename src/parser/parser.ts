@@ -15,6 +15,7 @@ import { logger } from "../utils/logger";
 import { generateInstace } from "../utils/instance";
 import { LifeHook } from "../utils/typeLifehooks";
 import { isStepCreateApp, setIsStepCreateApp } from "../instance";
+import { ReactiveType } from "../reactive/type";
 
 export interface NodeO extends NodeB {
   tag: string | ((props?: Record<string, any>) => unknown);
@@ -209,8 +210,6 @@ function parserNodeF(
     return null;
   }
 
-  console.log(component);
-
   const componentO = {
     type: TypeNode.Component,
     $sub: !this.__SUB__ ? new Line() : null,
@@ -226,14 +225,18 @@ function parserNodeF(
     setIsStepCreateApp(true);
   }
 
-  // if (REACTIVE_COMPONENT.includes(String(componentO.tag))) {
-  //   console.log(componentO.tag);
-  //   const result = reactiveWorkComponent(componentO) as any;
-  //   console.log("asd", componentO);
-  //   result.context = componentO.context;
-  //   console.log(result);
-  //   return result;
-  // }
+  if (
+    [ReactiveType.Oif, ReactiveType.RefArrFor].includes(
+      component.tag as ReactiveType,
+    )
+  ) {
+    const res = reactiveWorkComponent(componentO) as any;
+    if (res) {
+      res.context = componentO.context;
+      return res;
+    }
+    return null;
+  }
 
   if (componentO.props) {
     componentO.props = propsWorker(componentO.props);
