@@ -27,7 +27,7 @@ export interface NodeOP extends NodeO {
   keyNode?: string | number;
   node: Element | null;
   parent: NodeOP | null;
-  context?: Record<string, any>;
+  instance?: Record<string, any>;
   type: TypeNode;
   $sub?: Line | null;
 }
@@ -213,7 +213,7 @@ function parserNodeF(
   const componentO = {
     type: TypeNode.Component,
     $sub: !this.__SUB__ ? new Line() : null,
-    context: currentInstance,
+    instance: currentInstance,
     ...component,
     node: null,
     parent: !this.__CTX_PARENT__ ? parent : null,
@@ -232,7 +232,7 @@ function parserNodeF(
   ) {
     const res = reactiveWorkComponent(componentO) as any;
     if (res) {
-      res.context = componentO.context;
+      res.instance = componentO.instance;
       return res;
     }
     return null;

@@ -34,7 +34,7 @@ function mounterNode(root: Element | null, tree: NodeOP) {
 
   if (tree.tag === FRAGMENT) {
     tree.node = root;
-    tree.context!.el = root;
+    tree.instance!.el = root;
 
     return mounterChildren(root, tree.children!);
   }
@@ -62,7 +62,7 @@ function mounterNode(root: Element | null, tree: NodeOP) {
   }
 
   tree.node = elem;
-  tree.context!.el = elem;
+  tree.instance!.el = elem;
 
   // const beforeUpdate = scheduled();
   // const updated = scheduled();

@@ -15,8 +15,8 @@ export function InvokeHook(
   obj: NodeOP,
   nameHook: string | keyof NodeHooks,
 ): boolean {
-  if (obj.context && obj.context[nameHook]) {
-    obj.context[nameHook].forEach((f: () => void) => f());
+  if (obj.instance && obj.instance[nameHook]) {
+    obj.instance[nameHook].forEach((f: () => void) => f());
   }
 
   return true;

@@ -26,22 +26,20 @@ export type InsertType = NodeOP | NodeChild | NodeHtml;
  */
 function singleMounterChildren(root: Element | null, parent?: childrenParent) {
   return (item: InsertType) => {
-    if (item === undefined || item === null) {
+    if (!item) {
       return null;
     }
 
     if (item.type === TypeNode.Component) {
       const knowItem = item as NodeOP;
 
-      if (knowItem.tag !== FRAGMENT) {
-        return mounterNode(root, knowItem);
-      }
-
       if (knowItem.tag === FRAGMENT && knowItem.children.length > 0) {
         knowItem.node = root;
-        knowItem.context!.el = root;
+        knowItem.instance!.el = root;
         return mounterChildren(root, knowItem.children, parent);
       }
+
+      return mounterNode(root, knowItem);
     }
 
     if (item.type === TypeNode.Static) {
@@ -116,7 +114,7 @@ function mounterChildren(
 
   const finaly = listNode.map(prepaireFunction);
 
-  return finaly.filter((x) => x !== undefined && x !== null);
+  return finaly.filter((x) => x);
 }
 
 export { mounterChildren, singleMounterChildren };
