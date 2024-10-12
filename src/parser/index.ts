@@ -98,27 +98,27 @@ function createApp(
     root: string | Element,
     render?: (el: Element, tree: NodeOP) => unknown,
   ) => {
-    let rootElement: Element | null = null;
-    if (typeof root === "string") {
-      const item = document.querySelector(root);
-      if (item === null) {
-        console.warn(`"${root}" not founted`);
-        return false;
-      }
-      rootElement = item;
-    } else if (typeof root === "object" && root.nodeType === 1) {
-      rootElement = root;
-    }
-    if (rootElement === null) {
-      console.warn(" root is null ");
-      return false;
-    }
-    if (allContext.tree !== null) {
-      allContext.tree =
-        render !== undefined
-          ? render(rootElement, allContext.tree)
-          : mounterNode(rootElement, allContext.tree);
-    }
+    // let rootElement: Element | null = null;
+    // if (typeof root === "string") {
+    //   const item = document.querySelector(root);
+    //   if (item === null) {
+    //     console.warn(`"${root}" not founted`);
+    //     return false;
+    //   }
+    //   rootElement = item;
+    // } else if (typeof root === "object" && root.nodeType === 1) {
+    //   rootElement = root;
+    // }
+    // if (rootElement === null) {
+    //   console.warn(" root is null ");
+    //   return false;
+    // }
+    // if (allContext.tree !== null) {
+    //   allContext.tree =
+    //     render !== undefined
+    //       ? render(rootElement, allContext.tree)
+    //       : mounterNode(rootElement, allContext.tree);
+    // }
   };
   return allContext;
 }

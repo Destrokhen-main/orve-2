@@ -24,10 +24,6 @@ const parseSingleChildren = function (parent: NodeOP | null) {
     if (typeof item === "object" && item !== null && isReactiveObject(item)) {
       const _item = item as any;
 
-      if ([ReactiveType.Oif, ReactiveType.RefArrFor].includes(_item.type)) {
-        // валидировать надо
-      }
-
       return {
         type: TypeNode.Reactive,
         context: generateInstace(parent),

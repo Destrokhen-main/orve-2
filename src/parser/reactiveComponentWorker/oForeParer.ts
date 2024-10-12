@@ -2,8 +2,6 @@ import { ReactiveType } from "../../reactive/type";
 import { TypeNode } from "../type";
 
 export function oForParser(component: any) {
-  console.log(component);
-
   const props = component.props;
 
   if (!props.each) {

@@ -12,13 +12,21 @@ type Computed<T> = {
   _value?: unknown;
 };
 
+function getDepsAndValue<T>(_deps: Array<any> | undefined, caller: () => T) {
+  if (_deps !== undefined) {
+    return [_deps, caller()];
+  } else {
+    const [deps, _acc] = getDeps(caller);
+    return [deps, _acc];
+  }
+}
+
 /*
 [ ] - может вернуть jsx Node надо бы обрабатывать
 [ ] - если не используется, не пересчитываем
 [ ] - в линию проблемы получаются ( микротаска все портит
 */
-function computedEffect<T>(func: () => T) {
-  // const [deps, _acc] = getDeps(func);
+function computed<T>(func: () => T, _deps?: Array<any>) {
   const pack = ref(null);
 
   const startObj: Computed<T> = {
@@ -36,7 +44,7 @@ function computedEffect<T>(func: () => T) {
 
       if (p === "value" && !firstCall) {
         firstCall = true;
-        const [deps, _acc] = getDeps(func);
+        const [deps, _acc] = getDepsAndValue(_deps, func);
 
         reConnectDeps(deps);
         t.value = _acc;
@@ -56,13 +64,13 @@ function computedEffect<T>(func: () => T) {
   });
 
   const recall = () => {
-    const [deps, call] = getDeps(func);
+    const [deps, call] = getDepsAndValue(_deps, func);
     reConnectDeps(deps);
     obj._value = call;
   };
 
   let listFollow: any = null;
-  // [ ] - надо не всё вырубать, а просто проверить что там приехало
+  // [ ] - надо не всё вырубать, а просто проверить что там приехало !!!
   function reConnectDeps(deps: any) {
     if (
       listFollow !== null ||
@@ -84,4 +92,4 @@ function computedEffect<T>(func: () => T) {
   return obj as Computed<T>;
 }
 
-export { computedEffect };
+export { computed };
