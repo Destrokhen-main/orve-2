@@ -1,6 +1,6 @@
 import { NodeChild, NodeHtml, TypeNode } from "../parser/type";
 import { Ref } from "../reactive/ref";
-import { EtypeComment } from "./helperType";
+import { EtypeComment } from "./helperType_old";
 import { isHtmlNode } from "../parser/childrenHelper";
 import { ReactiveType } from "../reactive/type";
 import { unique } from "../utils/line/uniquaTransform";

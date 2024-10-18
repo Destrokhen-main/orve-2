@@ -6,24 +6,18 @@ export type Children = any;
 export type FragmentT = { props: Props | null; children: Children };
 
 export const HOOKS_STRING_NAME = [
-  "beforeCreate",
   "created",
   "beforeMount",
   "mounted",
-  "beforeUpdate",
-  "updated",
   "beforeUnmount",
   "unmounted",
 ];
 
 type hookCallback = (instance?: any) => void;
 export interface NodeHooks {
-  beforeCreate: hookCallback;
   created: hookCallback;
   beforeMount: hookCallback;
   mounted: hookCallback;
-  beforeUpdate: hookCallback;
-  updated: hookCallback;
   beforeUnmount: hookCallback;
   unmounted: hookCallback;
 }

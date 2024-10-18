@@ -1,120 +1,49 @@
-import { Line } from "../utils/line";
-import { FRAGMENT } from "../keys";
+import { mounterComponent } from ".";
 import { NodeOP } from "../parser/parser";
-import { NodeHtml, NodeChild } from "../parser/type";
 import { TypeNode } from "../parser/type";
-import { Ref } from "../reactive/ref";
-import { ReactiveType } from "../reactive/type";
-import {
-  textNodeCreator,
-  htmlNodeCreate,
-  RefChildCreator,
-  RefArray,
-  OifWorker,
-  RefCComponentWorker,
-} from "./helper";
+import { createText, insert } from "./dom";
 
-import { mounterNode } from "./index";
-import { RefComputedWorker } from "./reactive/refComputed";
+export function mountedStatic(root: Element | null, tree: any) {
+  const text = tree.value;
+  let result = null;
 
-export type InsertType = NodeOP | NodeChild | NodeHtml;
+  if (root) {
+    const textNode = createText(text);
+    insert(textNode, root);
+    result = textNode;
+  }
 
-/**
- * Обработка одиночноq node
- * @param root - HTMLElement
- * @returns - переработанный node
- */
-function singleMounterChildren(root: Element | null, parent?: childrenParent) {
-  return (item: InsertType) => {
-    if (!item) {
-      return null;
-    }
-
-    if (item.type === TypeNode.Component) {
-      const knowItem = item as NodeOP;
-
-      if (knowItem.tag === FRAGMENT && knowItem.children.length > 0) {
-        knowItem.node = root;
-        knowItem.instance!.el = root;
-        return mounterChildren(root, knowItem.children, parent);
-      }
-
-      return mounterNode(root, knowItem);
-    }
-
-    if (item.type === TypeNode.Static) {
-      const knowItem = textNodeCreator(item as NodeChild);
-
-      if (root !== null && knowItem.node !== null) {
-        root.appendChild(knowItem.node);
-      }
-
-      return knowItem;
-    }
-
-    if (item.type === TypeNode.HTML) {
-      const knowItem = htmlNodeCreate(item as NodeHtml);
-
-      if (root !== null && knowItem.node !== null) {
-        root.appendChild(knowItem.node);
-      }
-      return knowItem;
-    }
-
-    if (item.type === TypeNode.Reactive) {
-      return item;
-      // const reactiveObject: Ref<any> = (item as any).value;
-      // if (
-      //   reactiveObject.type === ReactiveType.Ref ||
-      //   reactiveObject.type === ReactiveType.RefO
-      // ) {
-      //   RefChildCreator(root, reactiveObject, undefined, parent);
-      //   return item;
-      // }
-      // if (reactiveObject.type === ReactiveType.RefArrFor) {
-      //   RefArray.call(
-      //     (item as any).context,
-      //     root,
-      //     (reactiveObject as any).parent,
-      //     item,
-      //     reactiveObject.value as () => any,
-      //   );
-      //   return item;
-      // }
-      // if (reactiveObject.type === ReactiveType.Oif) {
-      //   OifWorker(root, reactiveObject);
-      //   return item;
-      // }
-      // if (reactiveObject.type === ReactiveType.RefCComponent) {
-      //   RefCComponentWorker.call(this, root, reactiveObject);
-      //   return item;
-      // }
-      // if (reactiveObject.type === ReactiveType.RefComputed) {
-      //   RefComputedWorker(root, reactiveObject);
-      //   return item;
-      // }
-    }
-  };
+  return result;
 }
 
-type childrenParent = { type: TypeNode; $sub: Line | null | undefined };
+export function mountedHTML(root: Element | null, tree: any) {
+  const element = new DOMParser()
+    .parseFromString(tree.value, "text/html")
+    .getElementsByTagName("body")[0];
 
-/**
- * Монтирование node
- * @param root - HTMLElement
- * @param listNode - массив node
- * @returns - обработанные массив node
- */
-function mounterChildren(
-  root: Element | null,
-  listNode: InsertType[],
-  parent?: childrenParent,
-): any {
-  const prepaireFunction = singleMounterChildren(root, parent);
+  const node = element.firstChild as HTMLElement;
 
-  const finaly = listNode.map(prepaireFunction);
+  if (root) {
+    insert(node, root);
+  }
 
-  return finaly.filter((x) => x);
+  return node;
 }
 
-export { mounterChildren, singleMounterChildren };
+export function mounterChildren(root: Element | null, tree: NodeOP) {
+  if (tree.type === TypeNode.Component) {
+    return mounterComponent(root, tree);
+  }
+
+  if (tree.type === TypeNode.Static) {
+    return mountedStatic(root, tree);
+  }
+
+  if (tree.type === TypeNode.HTML) {
+    return mountedHTML(root, tree);
+  }
+
+  if (tree.type === TypeNode.Reactive) {
+    //
+  }
+}

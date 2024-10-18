@@ -3,7 +3,7 @@
 import { getDeps } from "../../utils/getDepsOfFunction";
 // import { isEqual } from "lodash-es";
 // import { returnNewClone } from "../../utils/returnClone";
-import { singleMounterChildren } from "../children";
+import { singleMounterChildren } from "../children_old";
 // import { RefCComponentWorker } from "./refC";
 import { unique } from "../../utils/line/uniquaTransform";
 // import { parseSingleChildren } from "../../parser/children";

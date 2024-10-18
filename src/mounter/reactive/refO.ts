@@ -1,5 +1,5 @@
 import { ReactiveType } from "../../reactive/type";
-import { RefChildCreator } from "../helper";
+import { RefChildCreator } from "../helper_old";
 
 type refOItem = {
   isDefined: boolean;

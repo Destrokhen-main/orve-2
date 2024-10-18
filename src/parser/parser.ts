@@ -27,7 +27,7 @@ export interface NodeOP extends NodeO {
   keyNode?: string | number;
   node: Element | null;
   parent: NodeOP | null;
-  instance?: Record<string, any>;
+  instance: Record<string, any>;
   type: TypeNode;
   $sub?: Line | null;
 }

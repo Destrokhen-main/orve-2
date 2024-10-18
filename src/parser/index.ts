@@ -1,7 +1,7 @@
 import { isStepCreateApp, OrveInstance, setIsStepCreateApp } from "../instance";
 import { Node, Fragment } from "../jsx";
 import { NodeOP, parserNodeF } from "./parser";
-import { mounterNode } from "../mounter";
+import { mounterComponent } from "../mounter";
 import { InvokeAllNodeHook } from "../helper/hookHelper";
 
 export interface OptionsInstance {
@@ -66,7 +66,7 @@ function createApp(
   const allContext = this;
 
   allContext.tree = parserNodeF.call(allContext.context, entry);
-  console.log("final", allContext.tree);
+
   if (allContext.tree !== null && window !== undefined) {
     const beforeUnmounted = function () {
       if (allContext.tree) {
@@ -98,27 +98,28 @@ function createApp(
     root: string | Element,
     render?: (el: Element, tree: NodeOP) => unknown,
   ) => {
-    // let rootElement: Element | null = null;
-    // if (typeof root === "string") {
-    //   const item = document.querySelector(root);
-    //   if (item === null) {
-    //     console.warn(`"${root}" not founted`);
-    //     return false;
-    //   }
-    //   rootElement = item;
-    // } else if (typeof root === "object" && root.nodeType === 1) {
-    //   rootElement = root;
-    // }
-    // if (rootElement === null) {
-    //   console.warn(" root is null ");
-    //   return false;
-    // }
-    // if (allContext.tree !== null) {
-    //   allContext.tree =
-    //     render !== undefined
-    //       ? render(rootElement, allContext.tree)
-    //       : mounterNode(rootElement, allContext.tree);
-    // }
+    let rootElement: Element | null = null;
+    if (typeof root === "string") {
+      const item = document.querySelector(root);
+      if (item === null) {
+        console.warn(`"${root}" not founted`);
+        return false;
+      }
+      rootElement = item;
+    } else if (typeof root === "object" && root.nodeType === 1) {
+      rootElement = root;
+    }
+    if (rootElement === null) {
+      console.warn(" root is null ");
+      return false;
+    }
+    console.log(allContext.tree);
+    if (allContext.tree !== null) {
+      allContext.tree =
+        render !== undefined
+          ? render(rootElement, allContext.tree)
+          : mounterComponent(rootElement, allContext.tree);
+    }
   };
   return allContext;
 }

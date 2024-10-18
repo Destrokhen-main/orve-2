@@ -1,6 +1,6 @@
 import { parserNodeF, NodeOP } from "../../parser/parser";
 import { unique } from "../../utils/line/uniquaTransform";
-import { singleMounterChildren } from "../children";
+import { singleMounterChildren } from "../children_old";
 
 /* TODO
 Эта конструкция даёт возможность сделать вот такую штуку

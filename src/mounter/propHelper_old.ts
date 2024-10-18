@@ -1,4 +1,4 @@
-import { toString } from "../mounter/helper";
+import { toString } from "./helper_old";
 
 /**
  * Функция помогает правильно менять атрибуты у HTMLElement

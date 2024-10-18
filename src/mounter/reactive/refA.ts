@@ -2,7 +2,7 @@ import { parseSingleChildren } from "../../parser/children";
 import { returnType } from "../../reactive/ref";
 import { ReactiveType } from "../../reactive/type";
 import { DiffType, DifferentItems } from "../../utils/DiffArray";
-import { singleMounterChildren } from "../children";
+import { singleMounterChildren } from "../children_old";
 
 function callerWorker(
   value: any[],
