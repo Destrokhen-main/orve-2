@@ -71,7 +71,6 @@ function returnClassesLine(val: any) {
 function analyzeClasses(prev: any, next: any) {
   const prevValues = returnClassesLine(prev);
   const nextValues = returnClassesLine(next);
-  console.log(prevValues, nextValues);
 
   const total: any = [];
 
@@ -118,7 +117,6 @@ function classProps(root: Element | null, item: any) {
         }
       });
       prev = newValue;
-      // classProps(root, newValue);
     });
     return;
   }
