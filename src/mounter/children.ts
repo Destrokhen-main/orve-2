@@ -10,23 +10,17 @@ import {
   setText,
 } from "./dom";
 
-function isComment(el: any) {
-  return el.nodeType === 8;
-}
-
-function isHtmlNode(item: string): boolean {
+export function isHtmlNode(item: string): boolean {
   const REQEX = /<\/?[a-z][\s\S]*>/i;
   return REQEX.test(item);
 }
 
 export function mountedStatic(root: Element | null, tree: any) {
   const text = tree.value;
-  let result = null;
+  const result = createText(text);
 
   if (root) {
-    const textNode = createText(text);
-    insert(textNode, root);
-    result = textNode;
+    insert(result, root);
   }
 
   return result;
