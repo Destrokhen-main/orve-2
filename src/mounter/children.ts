@@ -14,6 +14,11 @@ function isComment(el: any) {
   return el.nodeType === 8;
 }
 
+function isHtmlNode(item: string): boolean {
+  const REQEX = /<\/?[a-z][\s\S]*>/i;
+  return REQEX.test(item);
+}
+
 export function mountedStatic(root: Element | null, tree: any) {
   const text = tree.value;
   let result = null;
@@ -41,28 +46,47 @@ export function mountedHTML(root: Element | null, tree: any) {
   return node;
 }
 
+/*
+[x] - text | number
+[X] - HTML
+*/
 export function mountedRef(root: Element | null, item: any) {
-  console.log(item);
-
   const value = item.value;
-
   let startNode: any = null;
+  let lastMountedType: string = "";
 
   if (value === null || value === undefined || typeof value === "boolean") {
     startNode = createComment("Ref");
+    lastMountedType = "Comment";
   }
 
   if (typeof value === "string" || typeof value === "number") {
-    startNode = createText(value.toString());
+    if (typeof value === "string" && isHtmlNode(value)) {
+      startNode = mountedHTML(null, { value });
+      lastMountedType = "HTML";
+    } else {
+      startNode = createText(value.toString());
+      lastMountedType = "Text";
+    }
   }
 
   item.$sub.subscribe((nexValue: any) => {
-    if (isComment(startNode)) {
-      const el = createText(nexValue.toString());
-      replaceElement(startNode, el);
-      startNode = el;
+    if (typeof nexValue === "string" && isHtmlNode(nexValue)) {
+      const node = mountedHTML(null, { value: nexValue });
+      replaceElement(startNode, node);
+      startNode = node;
+      lastMountedType = "HTML";
     } else {
-      setText(startNode, nexValue.toString());
+      if (lastMountedType !== "Text") {
+        const node = createText(nexValue.toString());
+        replaceElement(startNode, node);
+        startNode = node;
+        lastMountedType = "Text";
+      }
+
+      if (lastMountedType === "Text") {
+        setText(startNode, nexValue.toString());
+      }
     }
   });
 
