@@ -10,22 +10,26 @@ export function patchProps(
   key: string,
   prevValue: any,
   nextValue: any,
-  namespace?: "svg" | "mathml",
-  prevChildren?: any[],
-  parentComponent?: any | null,
-  parentSuspense?: any | null,
-  unmountChildren?: any,
+  // namespace?: "svg" | "mathml",
+  // prevChildren?: any[],
+  // parentComponent?: any | null,
+  // parentSuspense?: any | null,
+  // unmountChildren?: any,
 ) {
   if (key === "style") {
     patchStyle(el, nextValue);
   } else if (key === "class") {
-    patchClass(key, nextValue);
-  } else if (key.startsWith("on")) {
-    patchListener(el, key, prevValue, nextValue);
+    patchClass(el, nextValue);
   } else if (key === "src") {
     patchImage(el, nextValue);
   } else if (nextValue === null) {
     el.removeAttribute(key);
+  } else if (typeof nextValue === "boolean") {
+    if (nextValue) {
+      el.setAttribute(key, "");
+    } else {
+      el.removeAttribute(key);
+    }
   } else {
     el.setAttribute(key, nextValue);
   }

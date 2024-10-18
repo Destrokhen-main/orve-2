@@ -8,5 +8,5 @@ export function patchListener(
     el.removeEventListener(key, prevValue);
   }
 
-  el.addEventListener(key, nextValue);
+  if (nextValue !== null) el.addEventListener(key, nextValue);
 }

@@ -14,7 +14,7 @@ export interface ParsedProps {
   [key: string]: PropsItem;
 }
 
-export const SPECIFIC_KEYS = ["style"];
+export const SPECIFIC_KEYS = ["style", "src", "class"];
 
 /**
  * Функция помогающая работать с событиями
@@ -52,6 +52,30 @@ export function objectToCss(obj: Props): string {
   return o;
 }
 
+function hasReactive(obj: Record<string, any> | Array<any>): boolean {
+  if (Array.isArray(obj)) {
+    return obj.some((e: any) => {
+      if (typeof e === "object") {
+        if (e.type === ReactiveType.Ref) {
+          return true;
+        } else {
+          return hasReactive(e);
+        }
+      }
+      return false;
+    });
+  }
+
+  const keys = Object.keys(obj);
+  return keys.some((key: string) => {
+    if (typeof obj[key] === "object" && obj[key].type === ReactiveType.Ref) {
+      return true;
+    }
+
+    return false;
+  });
+}
+
 /**
  * Существует специальные атрибуты в тегах, с которыми нужно производить специальные операции.
  * @param obj - props
@@ -64,8 +88,8 @@ function specificProps(obj: Props, key: string): boolean {
   if (key === "style") {
     if (typeof value === "object" && value.type === undefined) {
       obj[key] = {
-        type: TypeProps.Static,
-        value: objectToCss(value),
+        type: hasReactive(value) ? TypeProps.Reactive : TypeProps.Static,
+        value: value,
       };
 
       return true;
@@ -80,7 +104,7 @@ function specificProps(obj: Props, key: string): boolean {
       value.type === ReactiveType.RefO
     ) {
       obj[key] = {
-        type: TypeProps.StaticReactive,
+        type: TypeProps.Reactive,
         value: value,
       };
       return true;
@@ -91,7 +115,12 @@ function specificProps(obj: Props, key: string): boolean {
   }
 
   if (key === "src") {
-    if (typeof value === "object" && value.default !== undefined) {
+    if (typeof value === "object" && value.type === ReactiveType.Ref) {
+      obj[key] = {
+        type: TypeProps.Reactive,
+        value: value,
+      };
+    } else if (typeof value === "object" && value.default !== undefined) {
       obj[key] = {
         type: TypeProps.Static,
         value: value.default,
@@ -102,6 +131,31 @@ function specificProps(obj: Props, key: string): boolean {
         value: value,
       };
     }
+    return true;
+  }
+
+  if (key === "class") {
+    if (typeof value === "string") {
+      obj[key] = {
+        type: TypeProps.Static,
+        value: value,
+      };
+      return true;
+    }
+
+    if (typeof value === "object" && value.type === ReactiveType.Ref) {
+      obj[key] = {
+        type: TypeProps.Reactive,
+        value: value,
+      };
+      return true;
+    }
+
+    obj[key] = {
+      type: hasReactive(value) ? TypeProps.Reactive : TypeProps.Static,
+      value: value,
+    };
+
     return true;
   }
 
@@ -153,25 +207,25 @@ function workWithStaticProps(obj: ParsedProps, key: string): boolean {
     value.type === ReactiveType.RefO
   ) {
     obj[key] = {
-      type: TypeProps.StaticReactive,
+      type: TypeProps.Reactive,
       value: value,
     };
 
     return true;
   }
 
-  if (
-    typeof value === "object" &&
-    value.type !== undefined &&
-    value.type === ReactiveType.RefComputed
-  ) {
-    obj[key] = {
-      type: TypeProps.ReactiveComputed,
-      value: value,
-    };
+  // if (
+  //   typeof value === "object" &&
+  //   value.type !== undefined &&
+  //   value.type === ReactiveType.RefComputed
+  // ) {
+  //   obj[key] = {
+  //     type: TypeProps.ReactiveComputed,
+  //     value: value,
+  //   };
 
-    return true;
-  }
+  //   return true;
+  // }
 
   // if (typeof value === "object" && key === `$${SLOT}`) {
   //   obj[key] = value;
