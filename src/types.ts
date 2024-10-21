@@ -4,4 +4,4 @@ type Props = {
   [key: string]: any;
 };
 
-export type Component<T extends Props = object> = (props: T) => any;
+// export type Component<T extends Props = object> = (props: T) => any;

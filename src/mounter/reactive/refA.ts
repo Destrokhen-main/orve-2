@@ -1,8 +1,11 @@
+import { mounterComponent } from "..";
 import { parseSingleChildren } from "../../parser/children";
+import { parserNodeF } from "../../parser/parser";
 import { returnType } from "../../reactive/ref";
 import { ReactiveType } from "../../reactive/type";
 import { DiffType, DifferentItems } from "../../utils/DiffArray";
 import { singleMounterChildren } from "../children_old";
+import { insert, remove, replaceElement } from "../dom";
 
 function callerWorker(
   value: any[],
@@ -194,4 +197,88 @@ function RefArray(
   }
 }
 
-export { RefArray };
+function callbackHelper(item: any, callback: any) {
+  if (Array.isArray(item)) {
+    return item.map(callback);
+  } else {
+    const keys = Object.keys(item);
+    return keys.map((e) => {
+      return callback(item[e], e);
+    });
+  }
+}
+
+/*
+[ ] - заменя на коммент и обратно
+[ ] - был массив станет объект и обратно
+[ ] - удалился реактивный элемент и не нужно теперь слушать
+
+*/
+function mountedFor(root: Element | null, item: any) {
+  const each = item.each;
+  const callback = item.callback;
+
+  let eachArray: any;
+  let isReactive = false;
+
+  let beforeArray: any = [];
+
+  if (returnType(each) === "object" && each.type === ReactiveType.Ref) {
+    eachArray = each.value;
+    isReactive = true;
+  } else {
+    eachArray = each;
+  }
+
+  const arrayEntry = callbackHelper(eachArray, callback);
+
+  beforeArray = arrayEntry;
+
+  const renderArray = arrayEntry.map((e) => {
+    // хз может тут фрагмент упадёт, и надо посмотреть на него как на список
+    const item = mounterComponent(null, parserNodeF(e) as any);
+    return item.instance.el;
+  });
+
+  renderArray.length > 0 &&
+    renderArray.forEach((e) => {
+      insert(e, root);
+    });
+
+  if (isReactive) {
+    each.$sub.subscribe((value: any) => {
+      const newEachArray = callbackHelper(value, callback);
+      const diffArray = DifferentItems(beforeArray, newEachArray);
+
+      diffArray.length > 0 &&
+        diffArray.forEach((e: any) => {
+          if ([DiffType.New, DiffType.Modify].includes(e.type)) {
+            const newItem = newEachArray[e.index];
+            const item = mounterComponent(null, parserNodeF(newItem) as any);
+            const element = item.instance.el;
+
+            if (e.type === DiffType.New) {
+              insert(
+                element,
+                root,
+                renderArray[renderArray.length - 1].nextSibling,
+              );
+              renderArray.push(element);
+            }
+            if (e.type === DiffType.Modify) {
+              replaceElement(renderArray[e.index], element);
+              renderArray[e.index] = element;
+            }
+          }
+          if (e.type === DiffType.Delete) {
+            remove(renderArray[e.index]);
+            renderArray.splice(e.index, 1);
+          }
+        });
+
+      beforeArray = newEachArray;
+    });
+  }
+}
+
+export { RefArray, mountedFor };

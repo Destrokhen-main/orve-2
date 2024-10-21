@@ -161,6 +161,8 @@ function parserNodeF(
   parent: NodeOP | null = null,
 ): NodeOP | null {
   currentInstance = generateInstace(parent);
+  const localThis = this ?? {};
+
   let component;
   let _nameComponent = "Unknow Component";
 
@@ -212,11 +214,11 @@ function parserNodeF(
 
   const componentO = {
     type: TypeNode.Component,
-    $sub: !this.__SUB__ ? new Line() : null,
+    $sub: !localThis.__SUB__ ? new Line() : null,
     instance: currentInstance,
     ...component,
     node: null,
-    parent: !this.__CTX_PARENT__ ? parent : null,
+    parent: !localThis.__CTX_PARENT__ ? parent : null,
     nameComponent: _nameComponent,
   };
 

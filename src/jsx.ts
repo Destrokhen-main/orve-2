@@ -3,16 +3,16 @@ import { KEY_NEED_REWRITE } from "./keys";
 import { FRAGMENT } from "./keys";
 import { ReactiveType } from "./reactive/type";
 
-/* TODO 
-[ ] - Если пользовать использует RefC slot тоже должен работать
-*/
-
 function For(props: Props | null, children: Children[]) {
   return Node(ReactiveType.RefArrFor, props, ...children);
 }
 
 function If(props: Props | null, children: Children[]) {
   return Node(ReactiveType.Oif, props, ...children);
+}
+
+function Component(props: Props | null, children: Children[]) {
+  return Node(ReactiveType.Component, props, ...children);
 }
 
 function notNullChildren(array: unknown[]) {
@@ -138,4 +138,4 @@ function Fragment(props: Props | null, ...children: any[]): NodeB {
   return a;
 }
 
-export { Node, Fragment, For, If };
+export { Node, Fragment, For, If, Component };

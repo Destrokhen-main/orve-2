@@ -9,6 +9,7 @@ import {
   replaceElement,
   setText,
 } from "./dom";
+import { mountedFor } from "./reactive/refA";
 
 export function isHtmlNode(item: string): boolean {
   const REQEX = /<\/?[a-z][\s\S]*>/i;
@@ -105,8 +106,12 @@ export function mounterChildren(root: Element | null, tree: NodeOP) {
   if (tree.type === TypeNode.Reactive) {
     const i = tree as any;
 
-    if (typeof i.value === "object" && i.value.type === ReactiveType.Ref) {
+    if (i.value.type === ReactiveType.Ref) {
       mountedRef(root, i.value);
+    }
+
+    if (i.value.type === ReactiveType.RefArrFor) {
+      mountedFor(root, i.value);
     }
   }
 }
