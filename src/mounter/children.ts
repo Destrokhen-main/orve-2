@@ -65,24 +65,27 @@ export function mountedRef(root: Element | null, item: any) {
     }
   }
 
-  item.$sub.subscribe((nexValue: any) => {
-    if (typeof nexValue === "string" && isHtmlNode(nexValue)) {
-      const node = mountedHTML(null, { value: nexValue });
-      replaceElement(startNode, node);
-      startNode = node;
-      lastMountedType = "HTML";
-    } else {
-      if (lastMountedType !== "Text") {
-        const node = createText(nexValue.toString());
+  item.$sub.subscribe({
+    type: 1,
+    f: (nexValue: any) => {
+      if (typeof nexValue === "string" && isHtmlNode(nexValue)) {
+        const node = mountedHTML(null, { value: nexValue });
         replaceElement(startNode, node);
         startNode = node;
-        lastMountedType = "Text";
-      }
+        lastMountedType = "HTML";
+      } else {
+        if (lastMountedType !== "Text") {
+          const node = createText(nexValue.toString());
+          replaceElement(startNode, node);
+          startNode = node;
+          lastMountedType = "Text";
+        }
 
-      if (lastMountedType === "Text") {
-        setText(startNode, nexValue.toString());
+        if (lastMountedType === "Text") {
+          setText(startNode, nexValue.toString());
+        }
       }
-    }
+    },
   });
 
   if (root && startNode !== null) {

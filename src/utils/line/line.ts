@@ -1,5 +1,6 @@
 import { Call } from "./type";
 
+const MAX_TYPE = 2;
 function buildSchedual() {
   let isWork = false;
   let value: any = null;
@@ -11,9 +12,23 @@ function buildSchedual() {
       isWork = true;
       queueMicrotask(() => {
         isWork = false;
-        deps.forEach((dep) => {
-          dep(value);
+
+        const typeObj: Record<number, ((val: any) => void)[]> = {};
+        deps.forEach((e: any) => {
+          if (!typeObj[e.type]) {
+            typeObj[e.type] = [];
+          }
+          typeObj[e.type].push(e.f);
         });
+
+        for (let i = 1; i !== MAX_TYPE + 1; i++) {
+          const item = typeObj[i];
+          if (item) {
+            item.forEach((f: (val: any) => void) => {
+              f(value);
+            });
+          }
+        }
       });
     }
   };

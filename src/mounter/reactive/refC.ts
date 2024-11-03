@@ -34,8 +34,9 @@ function RefCComponentWorker(root: Element | null, item: Record<string, any>) {
     mountedNode = COMMENT;
   }
 
-  item.proxy.$sub.subscribe(
-    unique(
+  item.proxy.$sub.subscribe({
+    type: 1,
+    f: unique(
       (next: any) => {
         let _next = next;
         if (next === "update") {
@@ -63,7 +64,7 @@ function RefCComponentWorker(root: Element | null, item: Record<string, any>) {
       item.proxy.value,
       ["update"],
     ),
-  );
+  });
 
   return mountedNode !== null ? mountedNode : null;
 }

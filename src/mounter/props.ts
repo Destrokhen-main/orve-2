@@ -12,8 +12,11 @@ function styleProps(root: Element | null, item: any) {
     const value = item.value;
     patchProps(root, "style", null, value);
 
-    item.$sub.subscribe((newValue: any) => {
-      patchProps(root, "style", null, newValue);
+    item.$sub.subscribe({
+      type: 1,
+      f: (newValue: any) => {
+        patchProps(root, "style", null, newValue);
+      },
     });
   } else {
     Object.keys(item).forEach((key) => {
@@ -21,8 +24,11 @@ function styleProps(root: Element | null, item: any) {
       if (typeof it === "object" && it.type === ReactiveType.Ref) {
         patchSingleStyle(root, key, it.value);
 
-        it.$sub.subscribe((newValue: any) => {
-          patchSingleStyle(root, key, newValue);
+        it.$sub.subscribe({
+          type: 1,
+          f: (newValue: any) => {
+            patchSingleStyle(root, key, newValue);
+          },
         });
       } else {
         patchSingleStyle(root, key, it);
@@ -106,17 +112,20 @@ function classProps(root: Element | null, item: any) {
     const value = item.value;
     classProps(root, value);
     let prev = value;
-    item.$sub.subscribe((newValue: any) => {
-      const item = analyzeClasses(prev, newValue);
-      item.forEach((e: any) => {
-        if (e.type === "add") {
-          patchSingleClass(root, e.key, true);
-        }
-        if (e.type === "remove") {
-          patchSingleClass(root, e.key, null);
-        }
-      });
-      prev = newValue;
+    item.$sub.subscribe({
+      type: 1,
+      f: (newValue: any) => {
+        const item = analyzeClasses(prev, newValue);
+        item.forEach((e: any) => {
+          if (e.type === "add") {
+            patchSingleClass(root, e.key, true);
+          }
+          if (e.type === "remove") {
+            patchSingleClass(root, e.key, null);
+          }
+        });
+        prev = newValue;
+      },
     });
     return;
   }
@@ -128,10 +137,13 @@ function classProps(root: Element | null, item: any) {
 
         patchSingleClass(root, value, value);
         let prev = value;
-        e.$sub.subscribe((newValue: any) => {
-          patchSingleClass(root, prev, null);
-          patchSingleClass(root, newValue, newValue);
-          prev = newValue;
+        e.$sub.subscribe({
+          type: 1,
+          f: (newValue: any) => {
+            patchSingleClass(root, prev, null);
+            patchSingleClass(root, newValue, newValue);
+            prev = newValue;
+          },
         });
         return;
       }
@@ -152,8 +164,11 @@ function classProps(root: Element | null, item: any) {
         const value = isActive.value;
         patchSingleClass(root, key, value);
 
-        isActive.$sub.subscribe((newValue: any) => {
-          patchSingleClass(root, key, newValue);
+        isActive.$sub.subscribe({
+          type: 1,
+          f: (newValue: any) => {
+            patchSingleClass(root, key, newValue);
+          },
         });
       } else {
         patchSingleClass(root, key, !item[key] ? null : true);
@@ -167,12 +182,15 @@ function srcProps(root: Element | null, item: any) {
 
   patchProps(root, "src", null, value);
 
-  item.$sub.subscribe((newValue: any) => {
-    if (typeof newValue === "object" && newValue.default !== undefined) {
-      patchProps(root, "src", null, newValue.default);
-    } else {
-      patchProps(root, "src", null, newValue);
-    }
+  item.$sub.subscribe({
+    type: 1,
+    f: (newValue: any) => {
+      if (typeof newValue === "object" && newValue.default !== undefined) {
+        patchProps(root, "src", null, newValue.default);
+      } else {
+        patchProps(root, "src", null, newValue);
+      }
+    },
   });
 }
 
@@ -189,13 +207,16 @@ function eventProps(root: Element | null, key: string, item: any) {
     }
 
     let prev = value;
-    item.$sub.subscribe((newValue: any) => {
-      if (typeof newValue === "function") {
-        patchListener(root, key, prev, newValue);
-        prev = newValue;
-      } else {
-        patchListener(root, key, prev, null);
-      }
+    item.$sub.subscribe({
+      type: 1,
+      f: (newValue: any) => {
+        if (typeof newValue === "function") {
+          patchListener(root, key, prev, newValue);
+          prev = newValue;
+        } else {
+          patchListener(root, key, prev, null);
+        }
+      },
     });
   }
 }

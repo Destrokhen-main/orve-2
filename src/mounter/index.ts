@@ -119,10 +119,14 @@ export function mounterComponent(root: Element | null, tree: NodeOP) {
   if (tree.tag === FRAGMENT) {
     tree.instance.el = root;
 
-    tree.children.forEach((child: any) => {
-      mounterChildren(root, child);
+    const childrenMounter = tree.children.map((child: any) => {
+      return mounterChildren(root, child);
     });
-    return;
+
+    if (root === null) {
+      return childrenMounter;
+    }
+    return tree;
   }
 
   if (!InvokeHook(tree, LifeHook.onBeforeMounted)) {

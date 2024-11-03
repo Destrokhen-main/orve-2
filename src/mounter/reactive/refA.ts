@@ -5,7 +5,7 @@ import { returnType } from "../../reactive/ref";
 import { ReactiveType } from "../../reactive/type";
 import { DiffType, DifferentItems } from "../../utils/DiffArray";
 import { singleMounterChildren } from "../children_old";
-import { insert, remove, replaceElement } from "../dom";
+import { createComment, insert, remove, replaceElement } from "../dom";
 
 function callerWorker(
   value: any[],
@@ -193,7 +193,10 @@ function RefArray(
       arrayBefore = pars;
       allInstruction = allInstruction.filter((item: any) => item !== null);
     };
-    item.$sub.subscribe(func);
+    item.$sub.subscribe({
+      type: 1,
+      f: func,
+    });
   }
 }
 
@@ -218,6 +221,9 @@ function mountedFor(root: Element | null, item: any) {
   const each = item.each;
   const callback = item.callback;
 
+  const COMMENT = createComment("For");
+  let isExistNode: boolean = false; // отвечает за то, коммент это сейчас на экране или нет
+
   let eachArray: any;
   let isReactive = false;
 
@@ -237,46 +243,67 @@ function mountedFor(root: Element | null, item: any) {
   const renderArray = arrayEntry.map((e) => {
     // хз может тут фрагмент упадёт, и надо посмотреть на него как на список
     const item = mounterComponent(null, parserNodeF(e) as any);
+    console.log(item);
     return item.instance.el;
   });
 
-  renderArray.length > 0 &&
+  if (renderArray.length > 0) {
     renderArray.forEach((e) => {
       insert(e, root);
     });
+    isExistNode = true;
+  } else {
+    insert(COMMENT, root);
+    isExistNode = false;
+  }
 
   if (isReactive) {
-    each.$sub.subscribe((value: any) => {
-      const newEachArray = callbackHelper(value, callback);
-      const diffArray = DifferentItems(beforeArray, newEachArray);
+    each.$sub.subscribe({
+      type: 1,
+      f: (value: any) => {
+        const newEachArray = callbackHelper(value, callback);
+        const diffArray = DifferentItems(beforeArray, newEachArray);
 
-      diffArray.length > 0 &&
-        diffArray.forEach((e: any) => {
-          if ([DiffType.New, DiffType.Modify].includes(e.type)) {
-            const newItem = newEachArray[e.index];
-            const item = mounterComponent(null, parserNodeF(newItem) as any);
-            const element = item.instance.el;
+        if (diffArray.length > 0) {
+          diffArray.forEach((e: any) => {
+            if ([DiffType.New, DiffType.Modify].includes(e.type)) {
+              const newItem = newEachArray[e.index];
+              const item = mounterComponent(null, parserNodeF(newItem) as any);
+              const element = item.instance.el;
 
-            if (e.type === DiffType.New) {
-              insert(
-                element,
-                root,
-                renderArray[renderArray.length - 1].nextSibling,
-              );
-              renderArray.push(element);
+              if (e.type === DiffType.New) {
+                if (!isExistNode) {
+                  isExistNode = true;
+                  replaceElement(COMMENT, element);
+                } else {
+                  insert(
+                    element,
+                    root,
+                    renderArray[renderArray.length - 1].nextSibling,
+                  );
+                }
+                renderArray.push(element);
+              }
+              if (e.type === DiffType.Modify) {
+                replaceElement(renderArray[e.index], element);
+                renderArray[e.index] = element;
+              }
             }
-            if (e.type === DiffType.Modify) {
-              replaceElement(renderArray[e.index], element);
-              renderArray[e.index] = element;
-            }
-          }
-          if (e.type === DiffType.Delete) {
-            remove(renderArray[e.index]);
-            renderArray.splice(e.index, 1);
-          }
-        });
+            if (e.type === DiffType.Delete) {
+              if (renderArray.length === 1) {
+                isExistNode = false;
+                replaceElement(renderArray[e.index], COMMENT);
+              } else {
+                remove(renderArray[e.index]);
+              }
 
-      beforeArray = newEachArray;
+              renderArray.splice(e.index, 1);
+            }
+          });
+        }
+
+        beforeArray = newEachArray;
+      },
     });
   }
 }

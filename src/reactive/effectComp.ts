@@ -84,7 +84,10 @@ function computed<T>(func: () => T, _deps?: Array<any>) {
     if (deps.length > 0) {
       listFollow = deps.map((dep: any) => {
         const func = unique(recall, dep.value ?? null);
-        return dep.$sub.subscribe(func);
+        return dep.$sub.subscribe({
+          type: 2,
+          f: func,
+        });
       });
     }
   }
