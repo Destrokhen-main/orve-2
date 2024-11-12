@@ -148,6 +148,8 @@ export function mounterComponent(root: Element | null, tree: NodeOP) {
 
   if (root) {
     insert(element, root);
+  } else {
+    return element;
   }
 
   if (!InvokeHook(tree, LifeHook.onMounted)) {

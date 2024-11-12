@@ -1,1 +1,4 @@
-export type Call = (value: unknown) => void;
+export type Call = {
+  type: number;
+  f: (value: unknown) => void;
+};
