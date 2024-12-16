@@ -255,10 +255,10 @@ function getLastItemInArray(ar: any) {
 }
 
 /*
-[ ] - заменя на коммент и обратно
+[X] - заменя на коммент и обратно
 [ ] - был массив станет объект и обратно
 [ ] - удалился реактивный элемент и не нужно теперь слушать
-
+[ ] - Может быть ещё for в for
 */
 function mountedFor(root: Element | null, item: any) {
   const each = item.each;

@@ -9,6 +9,7 @@ import {
   replaceElement,
   setText,
 } from "./dom";
+import { mounterOif } from "./reactive/oif";
 import { mountedFor } from "./reactive/refA";
 
 export function isHtmlNode(item: string): boolean {
@@ -116,5 +117,11 @@ export function mounterChildren(root: Element | null, tree: NodeOP) {
     if (i.value.type === ReactiveType.RefArrFor) {
       mountedFor(root, i.value);
     }
+
+    if (i.value.type === ReactiveType.Oif) {
+      mounterOif(root, i.value);
+    }
+
+    // console.log("Children", i.value);
   }
 }
