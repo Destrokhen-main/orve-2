@@ -9,6 +9,7 @@ import {
   replaceElement,
   setText,
 } from "./dom";
+import { mountedRefO } from "./reactive/refO";
 import { mounterOif } from "./reactive/oif";
 import { mountedFor } from "./reactive/refA";
 
@@ -122,6 +123,8 @@ export function mounterChildren(root: Element | null, tree: NodeOP) {
       mounterOif(root, i.value);
     }
 
-    // console.log("Children", i.value);
+    if (i.value.type === ReactiveType.RefO) {
+      mountedRefO(root, i.value);
+    }
   }
 }

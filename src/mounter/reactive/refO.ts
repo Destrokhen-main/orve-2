@@ -1,4 +1,7 @@
+import { getValueAtPath } from "../../reactive/refHelper";
 import { ReactiveType } from "../../reactive/type";
+import { returnType } from "../../utils";
+import { createComment, createText, setText } from "../dom";
 import { RefChildCreator } from "../helper_old";
 
 type refOItem = {
@@ -94,4 +97,39 @@ function RefOWorker(root: Element | null, item: Record<string, any>) {
   }
 }
 
-export { RefOWorker };
+function mountedRefO(root: Element | null, item: any) {
+  const ref = item.parent;
+  const paths = item.keyPath;
+  const COMMENT = createComment("RefO");
+  let currentNode: Element | Comment | null = null;
+
+  const initValue = getValueAtPath(ref.value, paths);
+  const _v =
+    returnType(initValue) === "object" ? JSON.stringify(initValue) : initValue;
+
+  if (_v) {
+    const node = createText(_v);
+    root?.appendChild(node);
+    currentNode = node;
+  } else {
+    root?.append(COMMENT);
+    currentNode = COMMENT;
+  }
+
+  ref.$sub.subscribe({
+    type: 1,
+    f: (v: any) => {
+      const value = getValueAtPath(v, paths);
+      const _v = returnType(value) === "object" ? JSON.stringify(value) : value;
+      if (currentNode?.nodeType === 8) {
+        const node = createText(_v);
+        currentNode.replaceWith(node);
+        currentNode = node;
+      } else {
+        setText(currentNode, _v);
+      }
+    },
+  });
+}
+
+export { RefOWorker, mountedRefO };
