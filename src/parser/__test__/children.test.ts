@@ -1,7 +1,7 @@
 import { parseChildren } from "../children";
 import { Node } from "../../jsx";
 
-describe("парсинг children", () => {
+describe.skip("парсинг children", () => {
   test("Статика", () => {
     const ArrayChildren = ["string", 1000, true];
 

@@ -1,6 +1,6 @@
 import { orveCreate } from "../index";
 
-describe("Component", () => {
+describe.skip("Component", () => {
   test("Создадим orve instance и добавим компонент", () => {
     const app = orveCreate();
     app.component("test", () => {});

@@ -1,11 +1,13 @@
+import { returnType } from "../utils";
 import { logger } from "../utils/logger";
-import { OptionsRef, createReactiveObject, returnType } from "./ref";
+import { createReactiveObject } from "./ref";
+import { OptionsRef } from "./ref";
 
 function modifyAr<T>(arr: T[], obj: any, options: OptionsRef = {}) {
   return arr.map((item) => {
     if (!options.shallow) {
       if (returnType(item) === "object") {
-        return createReactiveObject(item, obj, options);
+        return createReactiveObject(item as any, obj, options);
       }
       if (returnType(item) === "array") {
         return refArrayBuilder(item as T[], obj, true, options); // TODO хз тотально
@@ -117,4 +119,8 @@ export function refArrayBuilder<T>(
   });
 
   return pr;
+}
+
+export function getValueAtPath(obj: Record<string, any>, path: string): any {
+  return path.split(".").reduce((acc, part) => acc && acc[part], obj);
 }

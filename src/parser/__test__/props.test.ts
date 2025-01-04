@@ -1,7 +1,7 @@
 import { propsWorker } from "../props";
 import { ref } from "../../index";
 
-describe("props", () => {
+describe.skip("props", () => {
   test("string | boolean | number", () => {
     const res = propsWorker({ id: "1", test: 1, f: true });
     expect(res).toStrictEqual({

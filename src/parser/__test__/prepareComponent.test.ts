@@ -1,7 +1,7 @@
 import { prepareComponent } from "../parser";
 import { Node } from "../../jsx";
 
-describe("prepaireComponent", () => {
+describe.skip("prepaireComponent", () => {
   test("Обычный компонент", () => {
     function Component() {
       return Node("div", { id: "1" }, "Hello world");

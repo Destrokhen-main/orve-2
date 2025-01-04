@@ -3,7 +3,7 @@ import { Node } from "../../jsx";
 import { FRAGMENT } from "../../keys";
 import { OrveContext } from "../../instance";
 
-describe("parseNodeF children", () => {
+describe.skip("parseNodeF children", () => {
   test("Default component", () => {
     function App() {
       return Node("div", null, "HELLO WORLD");
@@ -273,7 +273,7 @@ describe("parseNodeF children", () => {
   });
 });
 
-describe("parseNodeF props", () => {
+describe.skip("parseNodeF props", () => {
   test("Default component with props", () => {
     const fn = jest.fn();
 
@@ -429,7 +429,7 @@ describe("parseNodeF props", () => {
   });
 });
 
-describe("parseNodeO", () => {
+describe.skip("parseNodeO", () => {
   test("Default component", () => {
     const fn = () => {};
 

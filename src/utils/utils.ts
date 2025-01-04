@@ -1,4 +1,5 @@
 import { Props } from "../jsx-type";
+import { RefImp } from "../reactive/ref";
 
 export function getName(
   component: ((props?: Props) => unknown) | Record<string, unknown>,
@@ -8,4 +9,33 @@ export function getName(
   }
 
   return (component.nameComponent as string) ?? "Unknown Component";
+}
+
+export function returnType(v: unknown): string {
+  const type = typeof v;
+
+  if (type === "number") {
+    if (Number.isNaN(v)) {
+      return "NaN";
+    }
+    return "number";
+  }
+
+  if (type === "object") {
+    if (v instanceof RefImp) {
+      return "ref";
+    }
+
+    if (Array.isArray(v)) {
+      return "array";
+    }
+
+    if (v === null) {
+      return "null";
+    }
+
+    return "object";
+  }
+
+  return type;
 }

@@ -34,6 +34,17 @@ function buildSchedual() {
   };
 }
 
+export const nextTick = (fn?: () => void | undefined) => {
+  if (fn === undefined) {
+    return new Promise<void>((resolve) => {
+      queueMicrotask(() => {
+        resolve();
+      });
+    });
+  }
+  return queueMicrotask(fn);
+};
+
 export class Line {
   private _dep = new Set<Call>();
   private worker = buildSchedual();
