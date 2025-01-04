@@ -3,7 +3,7 @@ import { FRAGMENT } from "../keys";
 import { NodeOP } from "../parser/parser";
 import { NodeHtml, NodeChild } from "../parser/type";
 import { TypeNode } from "../parser/type";
-import { Ref } from "../reactive/ref";
+
 import { ReactiveType } from "../reactive/type";
 import {
   textNodeCreator,

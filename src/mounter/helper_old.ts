@@ -1,5 +1,6 @@
+/* eslint-disable @typescript-eslint/ban-ts-comment */
 import { NodeChild, NodeHtml, TypeNode } from "../parser/type";
-import { Ref } from "../reactive/ref";
+import { RefImp } from "../reactive/ref";
 import { EtypeComment } from "./helperType_old";
 import { isHtmlNode } from "../parser/childrenHelper";
 import { ReactiveType } from "../reactive/type";
@@ -82,7 +83,7 @@ function worker(_after: any, item: any, isHTML: any, textNode: any) {
 
 function RefChildCreator(
   root: Element | null,
-  item: Ref<any>,
+  item: RefImp<any>,
   replaceItem?: Element | Comment,
   parent?: any,
 ) {
@@ -102,6 +103,7 @@ function RefChildCreator(
     // parent && parent.$sub.next("updated");
   }, item.value);
 
+  // @ts-ignore
   sub.subscribe(func);
 
   if (replaceItem !== undefined) {
