@@ -121,6 +121,25 @@ export function refArrayBuilder<T>(
   return pr;
 }
 
-export function getValueAtPath(obj: Record<string, any>, path: string): any {
-  return path.split(".").reduce((acc, part) => acc && acc[part], obj);
+export function getValueAtPath(
+  obj: Record<string, any>,
+  path: string | null,
+): any {
+  if (!path) {
+    return undefined;
+  }
+
+  const paths = path.split(".");
+
+  let current = obj;
+  for (let i = 0; i !== paths.length; i++) {
+    const p = paths[i];
+
+    if (current[p]) {
+      current = current[p];
+    } else {
+      return undefined;
+    }
+  }
+  return current;
 }
