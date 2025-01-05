@@ -35,4 +35,10 @@ describe("getValueAtPath", () => {
     const result = getValueAtPath(obj, path);
     expect(result).toBeUndefined();
   });
+
+  it("should return undefined if is not an object", () => {
+    const obj = 42;
+    const path = "b.c";
+    expect(getValueAtPath(obj as any, path)).toBeUndefined();
+  });
 });
