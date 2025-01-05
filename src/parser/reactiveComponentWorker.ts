@@ -5,6 +5,9 @@ import { oForParser } from "./reactiveComponentWorker/oForeParer";
 
 export const REACTIVE_COMPONENT = ["o-if", "o-for"];
 
+/*
+[ ] - Контекст
+*/
 /**
  * Функция помогает распределить реактивные директивы.
  * @param componentO - Component

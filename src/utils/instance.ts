@@ -1,7 +1,7 @@
 import { GlobalInstance, isStepCreateApp } from "../instance";
 
 export function generateInstace(parent: any = null) {
-  let instance = {
+  const instance = {
     el: null,
     context: {},
     parent: null,
@@ -18,15 +18,9 @@ export function generateInstace(parent: any = null) {
   }
 
   if (!isStepCreateApp && GlobalInstance) {
-    const { context, ...all } = GlobalInstance;
     instance.context = {
       ...instance.context,
-      ...context,
-    };
-
-    instance = {
-      ...instance,
-      ...all,
+      ...GlobalInstance,
     };
   }
 
