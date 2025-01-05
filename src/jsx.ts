@@ -1,5 +1,4 @@
-import { Children, DIRECTIVES_ORVE, NodeB, Props, Tag } from "./jsx-type";
-import { KEY_NEED_REWRITE } from "./keys";
+import { Children, NodeB, Props, Tag } from "./jsx-type";
 import { FRAGMENT } from "./keys";
 import { ReactiveType } from "./reactive/type";
 

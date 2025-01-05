@@ -5,11 +5,14 @@ import { propsWorker } from "./props";
 import { TypeNode } from "./type";
 import { InvokeHook } from "../helper/hookHelper";
 import {
-  REACTIVE_COMPONENT,
+  // REACTIVE_COMPONENT,
   reactiveWorkComponent,
 } from "./reactiveComponentWorker";
-import { definedProps, getName } from "../utils";
-import { snakeToCamel } from "../utils/transformFunctions";
+import {
+  // definedProps,
+  getName,
+} from "../utils";
+// import { snakeToCamel } from "../utils/transformFunctions";
 import { Line } from "../utils/line";
 import { logger } from "../utils/logger";
 import { generateInstace } from "../utils/instance";

@@ -8,10 +8,10 @@ import {
   isComponent,
   isHtmlNode,
   isReactiveObject,
-  setupRefCAsComponent,
+  // setupRefCAsComponent,
 } from "./childrenHelper";
-import { ReactiveType } from "../reactive/type";
-import { snakeToCamel } from "../utils/transformFunctions";
+// import { ReactiveType } from "../reactive/type";
+// import { snakeToCamel } from "../utils/transformFunctions";
 import { generateInstace } from "../utils/instance";
 
 /**

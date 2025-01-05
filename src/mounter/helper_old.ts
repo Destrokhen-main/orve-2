@@ -85,7 +85,7 @@ function RefChildCreator(
   root: Element | null,
   item: RefImp<any>,
   replaceItem?: Element | Comment,
-  parent?: any,
+  // parent?: any,
 ) {
   let textNode = document.createTextNode("");
   const sub = item.$sub;

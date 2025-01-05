@@ -1,4 +1,4 @@
-import { currentInstance } from "../../parser/parser";
+// import { currentInstance } from "../../parser/parser";
 import { checkExistInstance, getInstance } from "./helper";
 
 export function getCurrentInstance() {

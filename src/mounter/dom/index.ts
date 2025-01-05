@@ -1,4 +1,4 @@
-import { patchListener } from "./patch/listener";
+// import { patchListener } from "./patch/listener";
 import { patchClass } from "./patch/class";
 import { patchStyle } from "./patch/style";
 import { patchImage } from "./patch/image";

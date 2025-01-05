@@ -1,6 +1,6 @@
-import { KEY_NEED_REWRITE_WITH_O } from "../keys";
+// import { KEY_NEED_REWRITE_WITH_O } from "../keys";
 import { Props } from "../jsx-type";
-import { SLOT } from "../keys";
+// import { SLOT } from "../keys";
 import { ReactiveType } from "../reactive/type";
 import { camelToSnakeCase } from "../utils/transformFunctions";
 import { TypeProps } from "./type";

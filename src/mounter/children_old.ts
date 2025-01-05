@@ -4,17 +4,17 @@ import { NodeOP } from "../parser/parser";
 import { NodeHtml, NodeChild } from "../parser/type";
 import { TypeNode } from "../parser/type";
 
-import { ReactiveType } from "../reactive/type";
+// import { ReactiveType } from "../reactive/type";
 import {
   textNodeCreator,
   htmlNodeCreate,
-  RefChildCreator,
+  // RefChildCreator,
   // RefArray,
-  RefCComponentWorker,
+  // RefCComponentWorker,
 } from "./helper_old";
 
 import { mounterComponent } from "./index";
-import { RefComputedWorker } from "./reactive/refComputed";
+// import { RefComputedWorker } from "./reactive/refComputed";
 
 export type InsertType = NodeOP | NodeChild | NodeHtml;
 

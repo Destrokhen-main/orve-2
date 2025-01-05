@@ -1,10 +1,10 @@
 import { mounterComponent } from "..";
-import { parseSingleChildren } from "../../parser/children";
+// import { parseSingleChildren } from "../../parser/children";
 import { parserNodeF } from "../../parser/parser";
-import { ReactiveType } from "../../reactive/type";
+// import { ReactiveType } from "../../reactive/type";
 import { returnType } from "../../utils";
 import { DiffType, DifferentItems } from "../../utils/DiffArray";
-import { singleMounterChildren } from "../children_old";
+// import { singleMounterChildren } from "../children_old";
 import { createComment, insert, remove, replaceElement } from "../dom";
 
 // function callerWorker(
