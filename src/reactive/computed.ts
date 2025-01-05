@@ -1,134 +1,83 @@
-// function computed(func: () => unknown, dep: unknown[] = []) {
-//   if (typeof func !== "function") {
-//     console.error("Первым параметром ожидается функция");
-//     return;
-//   }
-
-//   if (dep && !Array.isArray(dep)) {
-//     dep = [dep];
-//   }
-
-//   const firstCall = func();
-//   const obj = new Proxy(
-//     {
-//       type: ReactiveType.RefComputed,
-//       dep,
-//       func,
-//       value: firstCall,
-//       $sub: new BehaviorSubject(firstCall),
-//       $recall: function () {
-//         const res = this.func();
-//         this.value = res;
-//         this.$sub.next(res);
-//         return res;
-//       },
-//     },
-//     {
-//       get(t, p) {
-//         if (p === Symbol.toPrimitive) {
-//           return () => t.value;
-//         }
-
-//         return Reflect.get(t, p);
-//       },
-//     },
-//   );
-//   if (Array.isArray(dep) && dep.length > 0) {
-//     dep.forEach((d: any) => {
-//       if (d.$sub !== undefined) {
-//         d.$sub
-//           .pipe(
-//             distinctUntilChanged((prevHigh: any, temp: any) => {
-//               return temp === prevHigh;
-//             }),
-//           )
-//           .subscribe(() => {
-//             obj.$recall();
-//           });
-//       }
-//     });
-//   }
-//   return obj;
-// }
-
-// Запретить изменять ref сверху.
-import { Line } from "../utils/line";
-import { ref } from "./ref";
-import { ReactiveType } from "./type";
-import { logger } from "../utils/logger";
-import { unique } from "../utils/line/uniquaTransform";
 import { buffer } from "../utils/buffer";
+import { getDeps } from "../utils/getDepsOfFunction";
+import { unique } from "../utils/line/uniquaTransform";
+import { logger } from "../utils/logger";
+import { ref, RefImp } from "./ref";
 
-type Computed<T> = {
-  type: ReactiveType;
-  $sub: Line;
-  value: T | null;
-  _value?: unknown;
-};
+function getDepsAndValue<T>(_deps: Array<any> | null, caller: () => T) {
+  if (_deps !== null) {
+    return [_deps, caller()];
+  } else {
+    const [deps, _acc] = getDeps(caller);
+    return [deps, _acc];
+  }
+}
 
-function computed<T>(func: () => T, deps: any[]) {
-  const pack = ref(null);
+class ComputedImp<T> {
+  callback: () => T;
+  reffer: RefImp<T | null>;
+  $sub: any;
+  _value: T | null = null;
+  _firstCall = false;
+  _deps: any[] | null = null;
+  listFollower: any[] = [];
 
-  if (!deps) {
-    return null;
+  constructor(callback: () => T, deps: any[] | null = null) {
+    this.callback = callback;
+    this.reffer = ref<T | null>(null);
+    this.$sub = this.reffer.$sub;
+    if (!deps) {
+      this._deps = deps;
+    }
   }
 
-  const startObj: Computed<T> = {
-    type: ReactiveType.Ref,
-    $sub: pack.$sub as any,
-    value: pack.value,
-  };
+  get value() {
+    if (buffer !== null) {
+      buffer.push(this);
+    }
 
-  const recall = () => {
-    obj._value = func();
-  };
+    if (!this._firstCall) {
+      this._firstCall = true;
 
-  const connectDeps = () => {
+      const [_deps, _acc] = getDepsAndValue(this._deps, this.callback);
+
+      this.depsWorker(_deps);
+      this._value = _acc;
+      return _acc;
+    }
+
+    return this._value;
+  }
+
+  depsWorker(deps: any[]) {
+    if (this.listFollower.length > 0) {
+      this.listFollower.forEach((f) => f());
+    }
     if (deps.length > 0) {
-      deps.forEach((dep) => {
-        // let lastValue: any;
-        // if (dep.type === ReactiveType.RefO) {
-        //   lastValue = returnNewClone(dep.parent[dep.key]);
-        // }
-        const func = unique(recall, dep.value ?? null);
-        dep.$sub.subscribe({
+      this.listFollower = deps.map((dep) => {
+        const func = unique(() => this.recall(), dep.value ?? null);
+        return dep.$sub.subscribe({
           type: 2,
-          f: (value: any) => func(value),
+          f: func,
         });
       });
     }
-  };
+  }
 
-  let firstCall = false;
-  const obj: Computed<T> = new Proxy(startObj, {
-    set(t, p, v) {
-      if (p === "_value") {
-        t.value = v;
-        pack.value = v;
-        return true;
-      }
+  recall() {
+    const [_deps, call] = getDepsAndValue(this._deps, this.callback);
+    this.depsWorker(_deps);
+    this._value = call;
+    this.$sub.next(this._value);
+  }
 
-      logger("warn", "%c[computed]%c Нельзя перезаписывать значение computed");
-      return false;
-    },
-    get(t, p) {
-      if (p === "value" && buffer !== null) {
-        buffer.push(t);
-      }
-
-      if (p === "value" && !firstCall) {
-        firstCall = true;
-        const acc = func();
-        connectDeps();
-        t.value = acc;
-        return acc;
-      }
-
-      return Reflect.get(t, p);
-    },
-  });
-
-  return obj;
+  set value(_) {
+    logger("warn", "%c[computed]%c Нельзя перезаписывать значение computed");
+  }
 }
 
-export { computed };
+function computed<T>(callback: () => T, deps: any[] | null = null) {
+  return new ComputedImp(callback, deps);
+}
+
+export { computed, ComputedImp };

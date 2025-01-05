@@ -1,4 +1,5 @@
 import { Props } from "../jsx-type";
+import { ComputedImp } from "../reactive/computed";
 import { RefImp } from "../reactive/ref";
 
 export function getName(
@@ -22,7 +23,7 @@ export function returnType(v: unknown): string {
   }
 
   if (type === "object") {
-    if (v instanceof RefImp) {
+    if (v instanceof RefImp || v instanceof ComputedImp) {
       return "ref";
     }
 

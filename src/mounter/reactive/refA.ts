@@ -272,7 +272,7 @@ function mountedFor(root: Element | null, item: any) {
 
   let beforeArray: any = [];
 
-  if (returnType(each) === "object" && each.type === ReactiveType.Ref) {
+  if (returnType(each) === "ref") {
     eachArray = each.value;
     isReactive = true;
   } else {
