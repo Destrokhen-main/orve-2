@@ -9,9 +9,9 @@ import {
   replaceElement,
   setText,
 } from "./dom";
-import { mountedRefO } from "./reactive/refO";
 import { mounterOif } from "./reactive/oif";
 import { mountedFor } from "./reactive/refA";
+import { mountedRefO } from "./reactive/refO";
 
 export function isHtmlNode(item: string): boolean {
   const REQEX = /<\/?[a-z][\s\S]*>/i;

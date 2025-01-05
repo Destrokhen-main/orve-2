@@ -2,6 +2,7 @@
 import { Props } from "../jsx-type";
 // import { SLOT } from "../keys";
 import { ReactiveType } from "../reactive/type";
+import { returnType } from "../utils";
 import { camelToSnakeCase } from "../utils/transformFunctions";
 import { TypeProps } from "./type";
 
@@ -55,12 +56,11 @@ export function objectToCss(obj: Props): string {
 function hasReactive(obj: Record<string, any> | Array<any>): boolean {
   if (Array.isArray(obj)) {
     return obj.some((e: any) => {
-      if (typeof e === "object") {
-        if (e.type === ReactiveType.Ref) {
-          return true;
-        } else {
-          return hasReactive(e);
-        }
+      if (returnType(e) === "ref") {
+        return true;
+      }
+      if (returnType(e) === "object") {
+        return hasReactive(e);
       }
       return false;
     });
@@ -68,7 +68,7 @@ function hasReactive(obj: Record<string, any> | Array<any>): boolean {
 
   const keys = Object.keys(obj);
   return keys.some((key: string) => {
-    if (typeof obj[key] === "object" && obj[key].type === ReactiveType.Ref) {
+    if (returnType(obj[key]) === "ref") {
       return true;
     }
 
@@ -100,7 +100,7 @@ function specificProps(obj: Props, key: string): boolean {
       };
       return true;
     } else if (
-      (typeof value === "object" && value.type === ReactiveType.Ref) ||
+      returnType(value) === "ref" ||
       value.type === ReactiveType.RefO
     ) {
       obj[key] = {
@@ -115,7 +115,7 @@ function specificProps(obj: Props, key: string): boolean {
   }
 
   if (key === "src") {
-    if (typeof value === "object" && value.type === ReactiveType.Ref) {
+    if (returnType(value) === "ref") {
       obj[key] = {
         type: TypeProps.Reactive,
         value: value,
@@ -143,7 +143,7 @@ function specificProps(obj: Props, key: string): boolean {
       return true;
     }
 
-    if (typeof value === "object" && value.type === ReactiveType.Ref) {
+    if (returnType(value) === "ref") {
       obj[key] = {
         type: TypeProps.Reactive,
         value: value,
@@ -200,12 +200,7 @@ function workWithStaticProps(obj: ParsedProps, key: string): boolean {
     return true;
   }
 
-  if (
-    (typeof value === "object" &&
-      value.type !== undefined &&
-      value.type === ReactiveType.Ref) ||
-    value.type === ReactiveType.RefO
-  ) {
+  if (returnType(value) === "ref" || value.type === ReactiveType.RefO) {
     obj[key] = {
       type: TypeProps.Reactive,
       value: value,

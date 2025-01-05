@@ -8,7 +8,7 @@ import { patchListener } from "./dom/patch/listener";
 import { patchSingleStyle } from "./dom/patch/style";
 
 function styleProps(root: Element | null, item: any) {
-  if (item.type === ReactiveType.Ref) {
+  if (returnType(item) === "ref") {
     const value = item.value;
     patchProps(root, "style", null, value);
 
@@ -21,7 +21,7 @@ function styleProps(root: Element | null, item: any) {
   } else {
     Object.keys(item).forEach((key) => {
       const it = item[key];
-      if (typeof it === "object" && it.type === ReactiveType.Ref) {
+      if (returnType(it) === "ref") {
         patchSingleStyle(root, key, it.value);
 
         it.$sub.subscribe({
@@ -108,7 +108,7 @@ function analyzeClasses(prev: any, next: any) {
 }
 
 function classProps(root: Element | null, item: any) {
-  if (typeof item === "object" && item.type === ReactiveType.Ref) {
+  if (returnType(item) === "ref") {
     const value = item.value;
     classProps(root, value);
     let prev = value;
@@ -132,7 +132,7 @@ function classProps(root: Element | null, item: any) {
 
   if (Array.isArray(item)) {
     item.forEach((e) => {
-      if (typeof e === "object" && e.type === ReactiveType.Ref) {
+      if (returnType(e) === "ref") {
         const value = e.value;
 
         patchSingleClass(root, value, value);
@@ -160,7 +160,7 @@ function classProps(root: Element | null, item: any) {
   if (typeof item === "object") {
     Object.keys(item).forEach((key) => {
       const isActive = item[key];
-      if (typeof isActive === "object" && isActive.type === ReactiveType.Ref) {
+      if (returnType(isActive) === "ref") {
         const value = isActive.value;
         patchSingleClass(root, key, value);
 
@@ -199,7 +199,7 @@ function eventProps(root: Element | null, key: string, item: any) {
     patchListener(root, key, null, item);
     return;
   }
-  if (typeof item === "object" && item.type === ReactiveType.Ref) {
+  if (returnType(item) === "ref") {
     const value = item.value;
 
     if (typeof value === "function") {
