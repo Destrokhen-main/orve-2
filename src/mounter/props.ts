@@ -194,6 +194,20 @@ function srcProps(root: Element | null, item: any) {
   });
 }
 
+function anotherProps(root: Element | null, key: string, item: any) {
+  if (root) {
+    patchProps(root, key, null, item.value);
+    root.setAttribute(key, item.value);
+
+    item.$sub.subscribe({
+      type: 1,
+      f: (newValue: any) => {
+        patchProps(root, key, null, newValue);
+      },
+    });
+  }
+}
+
 function eventProps(root: Element | null, key: string, item: any) {
   if (typeof item === "function") {
     patchListener(root, key, null, item);
@@ -223,16 +237,18 @@ function eventProps(root: Element | null, key: string, item: any) {
 
 function reactivePropsWorker(root: Element | null, key: string, item: any) {
   if (key === "style") {
-    styleProps(root, item);
+    return styleProps(root, item);
   }
 
   if (key === "class") {
-    classProps(root, item);
+    return classProps(root, item);
   }
 
   if (key === "src") {
-    srcProps(root, item);
+    return srcProps(root, item);
   }
+
+  anotherProps(root, key, item);
 }
 
 /**

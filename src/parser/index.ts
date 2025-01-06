@@ -117,7 +117,7 @@ function createApp(
       console.warn(" root is null ");
       return false;
     }
-    console.log(allContext.tree);
+    // console.log(allContext.tree);
     if (allContext.tree !== null) {
       allContext.tree =
         render !== undefined
