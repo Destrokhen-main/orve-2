@@ -24,6 +24,8 @@ export function patchProps(
     patchImage(el, nextValue);
   } else if (nextValue === null) {
     el.removeAttribute(key);
+  } else if (key === "value") {
+    el.value = nextValue;
   } else if (typeof nextValue === "boolean") {
     if (nextValue) {
       el.setAttribute(key, "");
