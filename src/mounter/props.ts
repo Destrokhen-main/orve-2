@@ -197,7 +197,6 @@ function srcProps(root: Element | null, item: any) {
 function anotherProps(root: Element | null, key: string, item: any) {
   if (root) {
     patchProps(root, key, null, item.value);
-    root.setAttribute(key, item.value);
 
     item.$sub.subscribe({
       type: 1,
