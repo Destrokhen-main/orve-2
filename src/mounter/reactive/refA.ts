@@ -292,7 +292,7 @@ function mountedFor(root: Element | null, item: any) {
 
   beforeArray = arrayEntry;
 
-  const renderArray = arrayEntry.map((e) => returnMounterNode(e));
+  let renderArray = arrayEntry.map((e) => returnMounterNode(e));
   if (renderArray.length > 0) {
     insertArray(renderArray as any, root);
     isExistNode = true;
@@ -360,9 +360,10 @@ function mountedFor(root: Element | null, item: any) {
                 const ar = renderArray[e.index];
                 ar.forEach((e) => remove(e));
               }
-              renderArray.splice(e.index, 1);
+              renderArray[e.index] = [];
             }
           });
+          renderArray = renderArray.filter((e) => e.length > 0);
         }
         beforeArray = newEachArray;
       },
