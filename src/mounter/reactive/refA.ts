@@ -213,6 +213,15 @@ function callbackHelper<T>(
   if (Array.isArray(item)) {
     return item.map(callback);
   } else {
+    if (returnType(item) === "number") {
+      const end = item as unknown as number;
+      const ar = [];
+      for (let i = 0; i !== end; i++) {
+        ar.push(callback(i as any, i));
+      }
+      return ar;
+    }
+
     const keys = Object.keys(item) as Array<string | number>;
     return keys.map((e) => {
       return callback(item[e], e);

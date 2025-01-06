@@ -28,7 +28,7 @@ class ComputedImp<T> {
     this.callback = callback;
     this.reffer = ref<T | null>(null);
     this.$sub = this.reffer.$sub;
-    if (!deps) {
+    if (deps) {
       this._deps = deps;
     }
   }
