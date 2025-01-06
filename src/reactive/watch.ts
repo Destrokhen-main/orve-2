@@ -47,7 +47,7 @@ function watch(
   });
 
   if (options && options.immediate) {
-    func(undefined, undefined);
+    func(d.value, undefined);
   }
 
   if (options && options.once) {

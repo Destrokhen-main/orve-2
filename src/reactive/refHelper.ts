@@ -125,7 +125,7 @@ export function getValueAtPath(
   obj: Record<string, any>,
   path: string | null,
 ): any {
-  if (!path) {
+  if (!path || !obj) {
     return undefined;
   }
 

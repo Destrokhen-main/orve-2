@@ -41,4 +41,10 @@ describe("getValueAtPath", () => {
     const path = "b.c";
     expect(getValueAtPath(obj as any, path)).toBeUndefined();
   });
+
+  it("should return undefined if the obj is null", () => {
+    const obj = null;
+    const path = "b.c";
+    expect(getValueAtPath(obj as any, path)).toBeUndefined();
+  });
 });

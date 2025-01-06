@@ -284,7 +284,6 @@ function mountedFor(root: Element | null, item: any) {
   beforeArray = arrayEntry;
 
   const renderArray = arrayEntry.map((e) => returnMounterNode(e));
-
   if (renderArray.length > 0) {
     insertArray(renderArray as any, root);
     isExistNode = true;
