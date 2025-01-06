@@ -1,4 +1,5 @@
 import { ReactiveType } from "../reactive/type";
+import { returnType } from "../utils";
 import { returnNewClone } from "../utils/returnClone";
 import { NodeO } from "./parser";
 import { NodeChild, TypeNode, NodeHtml, IRefCSetup } from "./type";
@@ -47,8 +48,9 @@ function isReactiveObject(item: unknown): boolean {
   const workObject = item as Record<string, any>;
 
   if (
-    workObject.type !== undefined &&
-    Object.keys(ReactiveType).includes(workObject.type)
+    (workObject.type !== undefined &&
+      Object.keys(ReactiveType).includes(workObject.type)) ||
+    returnType(workObject) === "ref"
   ) {
     return true;
   }

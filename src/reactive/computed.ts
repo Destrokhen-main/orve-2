@@ -3,6 +3,7 @@ import { getDeps } from "../utils/getDepsOfFunction";
 import { unique } from "../utils/line/uniquaTransform";
 import { logger } from "../utils/logger";
 import { ref, RefImp } from "./ref";
+import { ReactiveType } from "./type";
 
 function getDepsAndValue<T>(_deps: Array<any> | null, caller: () => T) {
   if (_deps !== null) {
@@ -21,6 +22,7 @@ class ComputedImp<T> {
   _firstCall = false;
   _deps: any[] | null = null;
   listFollower: any[] = [];
+  type = ReactiveType.Ref;
 
   constructor(callback: () => T, deps: any[] | null = null) {
     this.callback = callback;

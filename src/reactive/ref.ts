@@ -41,6 +41,7 @@ class RefImp<T> {
   _value: T;
   _options: OptionsRef;
   $sub: Line | null;
+  type = ReactiveType.Ref;
 
   constructor(initValue: T, options: OptionsRef) {
     const initType = returnType(initValue);
