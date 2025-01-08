@@ -16,7 +16,7 @@ import {
 import { Line } from "../utils/line";
 import { logger } from "../utils/logger";
 import { generateInstace } from "../utils/instance";
-import { LifeHook } from "../utils/typeLifehooks";
+import { LifeHook } from "../utils/composables/lifeHook";
 import { ReactiveType } from "../reactive/type";
 
 export interface NodeO extends NodeB {

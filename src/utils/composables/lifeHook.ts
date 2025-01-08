@@ -1,5 +1,12 @@
 import { checkExistInstance, getInstance } from "./helper";
-import { LifeHook } from "../../utils/typeLifehooks";
+
+export enum LifeHook {
+  onMounted = "onMounted",
+  onBeforeMounted = "onBeforeMounted",
+  onCreated = "onCreated",
+  onBeforeUnmounted = "onBeforeUnmounted",
+  onUnmounted = "onUnmounted",
+}
 
 function createLifeHook(nameHook: LifeHook) {
   return function (fn: () => void) {

@@ -109,7 +109,7 @@
 import { NodeOP } from "../parser/parser";
 import { FRAGMENT } from "../keys";
 import { InvokeHook } from "../helper/hookHelper";
-import { LifeHook } from "../utils/typeLifehooks";
+import { LifeHook } from "../utils/composables/lifeHook";
 import { createElement, insert } from "./dom";
 
 import { mounterChildren } from "./children";
