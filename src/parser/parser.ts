@@ -17,7 +17,6 @@ import { Line } from "../utils/line";
 import { logger } from "../utils/logger";
 import { generateInstace } from "../utils/instance";
 import { LifeHook } from "../utils/typeLifehooks";
-import { isStepCreateApp, setIsStepCreateApp } from "../instance";
 import { ReactiveType } from "../reactive/type";
 
 export interface NodeO extends NodeB {
@@ -164,6 +163,7 @@ function parserNodeF(
   parent: NodeOP | null = null,
 ): NodeOP | null {
   currentInstance = generateInstace(parent);
+
   const localThis = this ?? {};
 
   let component;
@@ -226,9 +226,6 @@ function parserNodeF(
   };
 
   currentInstance = null;
-  if (!isStepCreateApp) {
-    setIsStepCreateApp(true);
-  }
 
   if (
     [ReactiveType.Oif, ReactiveType.RefArrFor].includes(

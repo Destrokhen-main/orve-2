@@ -1,5 +1,5 @@
 import { currentInstance } from "../../parser/parser";
-import { GlobalInstance, isStepCreateApp } from "../../instance";
+import { GlobalInstance } from "../../instance";
 
 export function checkExistInstance() {
   if (!getInstance()) {
@@ -10,5 +10,5 @@ export function checkExistInstance() {
 }
 
 export function getInstance() {
-  return isStepCreateApp ? currentInstance : GlobalInstance;
+  return !GlobalInstance ? currentInstance : GlobalInstance;
 }

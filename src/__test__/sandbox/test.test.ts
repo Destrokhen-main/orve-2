@@ -1,4 +1,4 @@
-import { orveCreate, ref, Node, computed } from "../../index";
+import { orveCreate, ref, Node, computed, Fragment } from "../../index";
 import { nextTick } from "../../utils/line";
 
 describe("Global tests", () => {
@@ -15,7 +15,7 @@ describe("Global tests", () => {
     instance.createApp(App).mount("#app");
     expect(document.getElementById("main")?.textContent).toBe("Hello world");
   });
-  test("create app and ref and chec what it update", async () => {
+  test("create app and ref and check what it update", async () => {
     let a;
     function App() {
       a = ref(1);
@@ -31,7 +31,7 @@ describe("Global tests", () => {
 
     expect(document.getElementById("main")?.textContent).toBe("2");
   });
-  test("create app and computed and chec what it update", async () => {
+  test("create app and computed and check what it update", async () => {
     let a;
     function App() {
       a = ref(1);
@@ -67,5 +67,20 @@ describe("Global tests", () => {
 
     expect(document.getElementById("main")?.getAttribute("attr1")).toBe("2");
     expect(document.getElementById("main")?.getAttribute("attr2")).toBe("2");
+  });
+
+  test("ref in fragment component", () => {
+    function Component() {
+      const a = ref(1);
+      return Node(Fragment, null, [Node("span", { id: "1" }, [a])]);
+    }
+
+    function App() {
+      return Node(Fragment, null, [Node(Component, null, [])]);
+    }
+
+    const instance = orveCreate();
+    instance.createApp(App).mount("#app");
+    expect(document.getElementById("1")?.textContent).toBe("1");
   });
 });

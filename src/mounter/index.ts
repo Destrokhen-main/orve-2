@@ -119,12 +119,20 @@ export function mounterComponent(root: Element | null, tree: NodeOP) {
   if (tree.tag === FRAGMENT) {
     tree.instance.el = root;
 
+    if (!InvokeHook(tree, LifeHook.onBeforeMounted)) {
+      console.log("error", LifeHook.onBeforeMounted);
+    }
+
     const childrenMounter = tree.children.map((child: any) => {
       return mounterChildren(root, child);
     });
 
     if (root === null) {
       return childrenMounter;
+    }
+
+    if (!InvokeHook(tree, LifeHook.onMounted)) {
+      console.log("error", LifeHook.onBeforeMounted);
     }
     return tree;
   }
@@ -148,12 +156,14 @@ export function mounterComponent(root: Element | null, tree: NodeOP) {
 
   if (root) {
     insert(element, root);
-  } else {
-    return element;
   }
 
   if (!InvokeHook(tree, LifeHook.onMounted)) {
     console.log("error", LifeHook.onBeforeMounted);
+  }
+
+  if (!root) {
+    return element;
   }
 
   return tree as any;

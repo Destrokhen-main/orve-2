@@ -1,4 +1,5 @@
-import { GlobalInstance, isStepCreateApp } from "../instance";
+import { GlobalInstance, emptyGlobalInstance } from "../instance";
+import { AVAILABLE_HOOKS } from "./composables";
 
 export function generateInstace(parent: any = null) {
   const instance = {
@@ -17,11 +18,18 @@ export function generateInstace(parent: any = null) {
     }
   }
 
-  if (!isStepCreateApp && GlobalInstance) {
-    instance.context = {
-      ...instance.context,
-      ...GlobalInstance,
-    };
+  if (GlobalInstance) {
+    const context: Record<string, any> = {};
+    Object.keys(GlobalInstance).forEach((key) => {
+      if (AVAILABLE_HOOKS.includes(key)) {
+        (instance as any)[key] = GlobalInstance![key];
+      } else {
+        context[key] = GlobalInstance![key];
+      }
+    });
+
+    instance.context = context;
+    emptyGlobalInstance();
   }
 
   return instance;

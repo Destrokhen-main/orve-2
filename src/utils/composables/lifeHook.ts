@@ -20,3 +20,11 @@ export const onBeforeMounted = createLifeHook(LifeHook.onBeforeMounted);
 export const onCreated = createLifeHook(LifeHook.onCreated);
 export const onBeforeUnmounted = createLifeHook(LifeHook.onBeforeUnmounted);
 export const onUnmounted = createLifeHook(LifeHook.onUnmounted);
+
+export const AVAILABLE_HOOKS = [
+  "onMounted",
+  "onBeforeMounted",
+  "onCreated",
+  "onBeforeUnmounted",
+  "onUnmounted",
+];

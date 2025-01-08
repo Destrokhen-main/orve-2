@@ -85,12 +85,12 @@ function component(name: string, component: () => unknown): void {
   }
 }
 
-export let GlobalInstance: any = null;
-export let isStepCreateApp = false;
+export let GlobalInstance: Record<string, any> | null = null;
 
-export function setIsStepCreateApp(v: boolean) {
-  isStepCreateApp = v;
+export function emptyGlobalInstance() {
+  GlobalInstance = null;
 }
+
 /**
  * Create instance Orve application
  * @returns Orve instance
@@ -99,10 +99,6 @@ function orveCreate() {
   if (typeof window === "undefined" && typeof global !== "undefined") {
     global.window = global as any;
   }
-
-  // if (window.Orve === undefined) {
-  //   window.Orve = {};
-  // }
 
   const instance: OrveInstance = {
     tree: null,

@@ -69,7 +69,7 @@ function createApp(
 
   const allContext = this;
 
-  allContext.tree = parserNodeF.call(allContext.context, entry);
+  allContext.tree = parserNodeF(entry);
 
   if (allContext.tree !== null && window !== undefined) {
     const beforeUnmounted = function () {
