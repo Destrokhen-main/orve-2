@@ -1,3 +1,4 @@
+import { genUID } from "../helper";
 import { buffer } from "../utils/buffer";
 import { getDeps } from "../utils/getDepsOfFunction";
 import { unique } from "../utils/line/uniquaTransform";
@@ -15,6 +16,7 @@ function getDepsAndValue<T>(_deps: Array<any> | null, caller: () => T) {
 }
 
 class ComputedImp<T> {
+  id = genUID();
   callback: () => T;
   reffer: RefImp<T | null>;
   $sub: any;
@@ -52,16 +54,53 @@ class ComputedImp<T> {
   }
 
   depsWorker(deps: any[]) {
-    if (this.listFollower.length > 0) {
-      this.listFollower.forEach((f) => f());
-    }
-    if (deps.length > 0) {
+    if (this.listFollower.length === 0 && deps.length > 0) {
       this.listFollower = deps.map((dep) => {
         const func = unique(() => this.recall(), dep.value ?? null);
-        return dep.$sub.subscribe({
-          type: 2,
-          f: func,
-        });
+        return {
+          dep,
+          remove: dep.$sub.subscribe({
+            type: 2,
+            f: func,
+          }),
+        };
+      });
+    }
+
+    if (this.listFollower.length > 0 && deps.length > 0) {
+      const depsMap: Record<string, any> = {};
+
+      deps.forEach((dep) => {
+        depsMap[dep.id] = dep;
+      });
+
+      const listFollowerMap: Record<string, any> = {};
+
+      this.listFollower.forEach((dep) => {
+        listFollowerMap[dep.dep.id] = dep;
+      });
+
+      // Отписался из листа те которых нет в новом
+      this.listFollower.forEach((dep) => {
+        if (!depsMap[dep.dep.id]) {
+          dep.remove();
+          dep.dep = null;
+        }
+      });
+
+      this.listFollower = this.listFollower.filter((dep) => dep.dep !== null);
+
+      deps.forEach((dep) => {
+        if (!listFollowerMap[dep.id]) {
+          const func = unique(() => this.recall(), dep.value ?? null);
+          this.listFollower.push({
+            dep,
+            remove: dep.$sub.subscribe({
+              type: 2,
+              f: func,
+            }),
+          });
+        }
       });
     }
   }

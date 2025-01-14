@@ -1,3 +1,4 @@
+import { genUID } from "../helper";
 import { returnType } from "../utils";
 import { buffer } from "../utils/buffer";
 import { Line } from "../utils/line";
@@ -38,6 +39,7 @@ type OptionsRef = {
 };
 
 class RefImp<T> {
+  id = genUID();
   _value: T;
   _options: OptionsRef;
   $sub: Line | null;
