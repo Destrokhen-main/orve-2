@@ -68,12 +68,14 @@ class ComputedImp<T> {
     }
 
     if (this.listFollower.length > 0 && deps.length > 0) {
+      // Новые зависимости
       const depsMap: Record<string, any> = {};
 
       deps.forEach((dep) => {
         depsMap[dep.id] = dep;
       });
 
+      // Существующие подписки
       const listFollowerMap: Record<string, any> = {};
 
       this.listFollower.forEach((dep) => {
@@ -88,6 +90,7 @@ class ComputedImp<T> {
         }
       });
 
+      // Убрал из списка
       this.listFollower = this.listFollower.filter((dep) => dep.dep !== null);
 
       deps.forEach((dep) => {
