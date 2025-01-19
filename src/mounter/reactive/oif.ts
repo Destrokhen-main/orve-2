@@ -418,25 +418,28 @@ export function mounterOif(root: Element | null, tree: any) {
     insertNode(root, currentNode);
   }
 
-  watch((n) => {
-    let component = answer[n];
-    let _nodes = null;
+  reactiveDep.$sub.subscribe({
+    type: 1,
+    f: (n: any) => {
+      let component = answer[n];
+      let _nodes = null;
 
-    if (!component && answer.else) {
-      component = answer.else;
-    }
+      if (!component && answer.else) {
+        component = answer.else;
+      }
 
-    if (!component) {
-      _nodes = COMMENT;
-    }
+      if (!component) {
+        _nodes = COMMENT;
+      }
 
-    if (component) {
-      _nodes = mounterComponent(null, component);
-    }
+      if (component) {
+        _nodes = mounterComponent(null, component);
+      }
 
-    replaceNode(currentNode, _nodes);
-    currentNode = _nodes;
-  }, reactiveDep);
+      replaceNode(currentNode, _nodes);
+      currentNode = _nodes;
+    },
+  });
 
   return currentNode;
 }
