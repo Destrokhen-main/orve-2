@@ -12,7 +12,7 @@
 // import { ReactiveType } from "../../reactive/type";
 import { mounterComponent } from "..";
 import { insert, insertAfter, remove, replaceElement } from "../dom";
-import { computed, watch } from "../../reactive";
+import { computed } from "../../reactive";
 
 // ПЕРЕПИСЫВАЕМ, НЕ РАБОТАЕТ КАК ХОЧУУУ
 

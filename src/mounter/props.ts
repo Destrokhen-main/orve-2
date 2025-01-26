@@ -1,6 +1,5 @@
 import { Props } from "../jsx-type";
 import { TypeProps } from "../parser/type";
-import { ReactiveType } from "../reactive/type";
 import { returnType } from "../utils";
 import { patchProps } from "./dom";
 import { patchSingleClass } from "./dom/patch/class";
