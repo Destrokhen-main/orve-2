@@ -1,129 +1,127 @@
-// function computed(func: () => unknown, dep: unknown[] = []) {
-//   if (typeof func !== "function") {
-//     console.error("Первым параметром ожидается функция");
-//     return;
-//   }
-
-//   if (dep && !Array.isArray(dep)) {
-//     dep = [dep];
-//   }
-
-//   const firstCall = func();
-//   const obj = new Proxy(
-//     {
-//       type: ReactiveType.RefComputed,
-//       dep,
-//       func,
-//       value: firstCall,
-//       $sub: new BehaviorSubject(firstCall),
-//       $recall: function () {
-//         const res = this.func();
-//         this.value = res;
-//         this.$sub.next(res);
-//         return res;
-//       },
-//     },
-//     {
-//       get(t, p) {
-//         if (p === Symbol.toPrimitive) {
-//           return () => t.value;
-//         }
-
-//         return Reflect.get(t, p);
-//       },
-//     },
-//   );
-//   if (Array.isArray(dep) && dep.length > 0) {
-//     dep.forEach((d: any) => {
-//       if (d.$sub !== undefined) {
-//         d.$sub
-//           .pipe(
-//             distinctUntilChanged((prevHigh: any, temp: any) => {
-//               return temp === prevHigh;
-//             }),
-//           )
-//           .subscribe(() => {
-//             obj.$recall();
-//           });
-//       }
-//     });
-//   }
-//   return obj;
-// }
-
-// Запретить изменять ref сверху.
-import { Line } from "../utils/line";
-import { ref } from "./ref";
-import { ReactiveType } from "./type";
-import { logger } from "../utils/logger";
-import { unique } from "../utils/line/uniquaTransform";
+import { genUID } from "../helper";
 import { buffer } from "../utils/buffer";
-import { scheduled } from "../utils/line/schedual";
+import { getDeps } from "../utils/getDepsOfFunction";
+import { unique } from "../utils/line/uniquaTransform";
+import { logger } from "../utils/logger";
+import { ref, RefImp } from "./ref";
+import { ReactiveType } from "./type";
 
-type Computed<T> = {
-  type: ReactiveType;
-  $sub: Line;
-  value: T | null;
-  _value?: unknown;
-};
-
-function computed<T>(func: () => T, deps: any[]) {
-  const pack = ref(null);
-
-  const startObj: Computed<T> = {
-    type: ReactiveType.Ref,
-    $sub: pack.$sub as any,
-    value: pack.value,
-  };
-
-  const recall = () => {
-    obj._value = func();
-  };
-
-  const connectDeps = () => {
-    if (deps.length > 0) {
-      const sc = scheduled();
-      deps.forEach((dep) => {
-        // let lastValue: any;
-        // if (dep.type === ReactiveType.RefO) {
-        //   lastValue = returnNewClone(dep.parent[dep.key]);
-        // }
-        const func = unique(recall, dep.value ?? null);
-        dep.$sub.subscribe((value: any) => func(value));
-      });
-    }
-  };
-
-  let firstCall = false;
-  const obj: Computed<T> = new Proxy(startObj, {
-    set(t, p, v) {
-      if (p === "_value") {
-        t.value = v;
-        pack.value = v;
-        return true;
-      }
-
-      logger("warn", "%c[computed]%c Нельзя перезаписывать значение computed");
-      return false;
-    },
-    get(t, p) {
-      if (p === "value" && buffer !== null) {
-        buffer.push(t);
-      }
-
-      if (p === "value" && !firstCall) {
-        firstCall = true;
-        const acc = func();
-        connectDeps();
-        t.value = acc;
-        return acc;
-      }
-
-      return Reflect.get(t, p);
-    },
-  });
-
-  return obj;
+function getDepsAndValue<T>(_deps: Array<any> | null, caller: () => T) {
+  if (_deps !== null) {
+    return [_deps, caller()];
+  } else {
+    const [deps, _acc] = getDeps(caller);
+    return [deps, _acc];
+  }
 }
 
-export { computed };
+class ComputedImp<T> {
+  id = genUID();
+  callback: () => T;
+  reffer: RefImp<T | null>;
+  $sub: any;
+  _value: T | null = null;
+  _firstCall = false;
+  _deps: any[] | null = null;
+  listFollower: any[] = [];
+  type = ReactiveType.Ref;
+
+  constructor(callback: () => T, deps: any[] | null = null) {
+    this.callback = callback;
+    this.reffer = ref<T | null>(null);
+    this.$sub = this.reffer.$sub;
+    if (deps) {
+      this._deps = deps;
+    }
+  }
+
+  get value() {
+    if (buffer !== null) {
+      buffer.push(this);
+    }
+
+    if (!this._firstCall) {
+      this._firstCall = true;
+
+      const [_deps, _acc] = getDepsAndValue(this._deps, this.callback);
+
+      this.depsWorker(_deps);
+      this._value = _acc;
+      return _acc;
+    }
+
+    return this._value;
+  }
+
+  depsWorker(deps: any[]) {
+    if (this.listFollower.length === 0 && deps.length > 0) {
+      this.listFollower = deps.map((dep) => {
+        const func = unique(() => this.recall(), dep.value ?? null);
+        return {
+          dep,
+          remove: dep.$sub.subscribe({
+            type: 2,
+            f: func,
+          }),
+        };
+      });
+    }
+
+    if (this.listFollower.length > 0 && deps.length > 0) {
+      // Новые зависимости
+      const depsMap: Record<string, any> = {};
+
+      deps.forEach((dep) => {
+        depsMap[dep.id] = dep;
+      });
+
+      // Существующие подписки
+      const listFollowerMap: Record<string, any> = {};
+
+      this.listFollower.forEach((dep) => {
+        listFollowerMap[dep.dep.id] = dep;
+      });
+
+      // Отписался из листа те которых нет в новом
+      this.listFollower.forEach((dep) => {
+        if (!depsMap[dep.dep.id]) {
+          dep.remove();
+          dep.dep = null;
+        }
+      });
+
+      // Убрал из списка
+      this.listFollower = this.listFollower.filter((dep) => dep.dep !== null);
+
+      deps.forEach((dep) => {
+        if (!listFollowerMap[dep.id]) {
+          const func = unique(() => this.recall(), dep.value ?? null);
+          this.listFollower.push({
+            dep,
+            remove: dep.$sub.subscribe({
+              type: 2,
+              f: func,
+            }),
+          });
+        }
+      });
+    }
+  }
+
+  recall() {
+    const [_deps, call] = getDepsAndValue(this._deps, this.callback);
+    this.depsWorker(_deps);
+    this._value = call;
+    this.$sub.next(this._value);
+  }
+
+  set value(_) {
+    logger("warn", "%c[computed]%c Нельзя перезаписывать значение computed");
+  }
+}
+
+function computed<T>(callback: () => T, deps: any[] | null = null) {
+  return new ComputedImp(callback, deps);
+}
+
+export { computed, ComputedImp };

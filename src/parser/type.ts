@@ -1,4 +1,4 @@
-import { Ref } from "../reactive/ref";
+import { RefImp } from "../reactive/ref";
 import { ReactiveType } from "../reactive/type";
 
 export enum TypeNode {
@@ -15,6 +15,7 @@ export enum TypeProps {
   EventReactiveF = "EventReactiveF",
   StaticReactive = "StaticReactive",
   ReactiveComputed = "ReactiveComputed",
+  Reactive = "Reactive",
 }
 
 // Static Child Node
@@ -32,7 +33,7 @@ export interface NodeHtml {
 
 export interface ReactiveNode {
   type: TypeNode;
-  value: Ref<any>;
+  value: RefImp<any>;
   node: HTMLElement | null;
 }
 

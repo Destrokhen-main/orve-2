@@ -14,6 +14,8 @@ import { TypeNode } from "../type";
 function validationPropsParent(
   props: Record<string, any>,
 ): Record<string, any> | null {
+  if (!props) return null;
+
   if (props["rule"] === undefined) {
     logger("warn", '%c[o-if]%c: "rule" Не указано');
     return null;
@@ -67,8 +69,11 @@ interface IChildrenOif {
  * @param children - массив children
  * @returns массив обработанных children
  */
-function validationChildren(children: Array<any>) {
-  const parserInstance = parseSingleChildren.call(this, null);
+function validationChildren(
+  children: Array<any>,
+  parent: NodeOP | null = null,
+) {
+  const parserInstance = parseSingleChildren(parent);
 
   if (children.length === 0) return null;
 
@@ -156,7 +161,7 @@ function oifParsing(component: NodeOP) {
     ) {
       answerSettings = component.children[0];
     } else {
-      newChildren = validationChildren.call(this, component.children!);
+      newChildren = validationChildren(component.children!, component);
 
       if (newChildren === null) return null;
 
@@ -175,7 +180,6 @@ function oifParsing(component: NodeOP) {
       type: ReactiveType.Oif,
       answer: answerSettings,
       ...newProps,
-      context: this,
     },
   };
 }

@@ -1,39 +1,86 @@
-import { DifferentItems } from "../../utils/DiffArray";
-import { ref, computed } from "../../index";
+import { orveCreate, ref, Node, computed, Fragment } from "../../index";
+import { nextTick } from "../../utils/line";
 
-describe("Тестирование", () => {
-  test("Проверка реактивности", () => {
-    const a = ref<number>(1);
-    const b = ref<number>(2);
-
-    const c = computed<number>(() => a.value + b.value, [a, b]);
-    expect(c.value).toBe(3);
-    a.value += 1;
-    expect(c.value).toBe(4);
+describe("Global tests", () => {
+  beforeEach(() => {
+    document.body.innerHTML = "<div id='app'></div>";
   });
 
-  test.only("тест", () => {
-    const a = [1, 2, 3, 4];
-    const b = [1, 2, 4, 5];
+  test("create app and check exist it on the document", () => {
+    function App() {
+      return Node("div", { id: "main" }, ["Hello world"]);
+    }
 
-    const a1: any[] = [];
-    const b1 = [1, 2, 3];
+    const instance = orveCreate();
+    instance.createApp(App).mount("#app");
+    expect(document.getElementById("main")?.textContent).toBe("Hello world");
+  });
+  test("create app and ref and check what it update", async () => {
+    let a;
+    function App() {
+      a = ref(1);
+      return Node("div", { id: "main" }, [a]);
+    }
 
-    const a2 = [1];
-    const b2 = [2, 1, 3];
-    expect(DifferentItems(a, b)).toStrictEqual([
-      { type: "Modify", index: 2 },
-      { type: "Modify", index: 3 },
-    ]);
-    expect(DifferentItems(a1, b1)).toStrictEqual([
-      { type: "New", index: 0 },
-      { type: "New", index: 1 },
-      { type: "New", index: 2 },
-    ]);
-    expect(DifferentItems(a2, b2)).toStrictEqual([
-      { type: "Modify", index: 0 },
-      { type: "New", index: 1 },
-      { type: "New", index: 2 },
-    ]);
+    const instance = orveCreate();
+    instance.createApp(App).mount("#app");
+    expect(document.getElementById("main")?.textContent).toBe("1");
+
+    a!.value = 2;
+    await nextTick();
+
+    expect(document.getElementById("main")?.textContent).toBe("2");
+  });
+  test("create app and computed and check what it update", async () => {
+    let a;
+    function App() {
+      a = ref(1);
+      const b = computed(() => a!.value);
+      return Node("div", { id: "main" }, [b]);
+    }
+
+    const instance = orveCreate();
+    instance.createApp(App).mount("#app");
+    expect(document.getElementById("main")?.textContent).toBe("1");
+
+    a!.value = 2;
+    await nextTick();
+
+    expect(document.getElementById("main")?.textContent).toBe("2");
+  });
+
+  test("ref and computed in attrs", async () => {
+    let a;
+    function App() {
+      a = ref(1);
+      const b = computed(() => a!.value);
+      return Node("div", { id: "main", attr1: a, attr2: b }, ["test"]);
+    }
+
+    const instance = orveCreate();
+    instance.createApp(App).mount("#app");
+    expect(document.getElementById("main")?.getAttribute("attr1")).toBe("1");
+    expect(document.getElementById("main")?.getAttribute("attr2")).toBe("1");
+
+    a!.value = 2;
+    await nextTick();
+
+    expect(document.getElementById("main")?.getAttribute("attr1")).toBe("2");
+    expect(document.getElementById("main")?.getAttribute("attr2")).toBe("2");
+  });
+
+  test("ref in fragment component", () => {
+    function Component() {
+      const a = ref(1);
+      return Node(Fragment, null, [Node("span", { id: "1" }, [a])]);
+    }
+
+    function App() {
+      return Node(Fragment, null, [Node(Component, null, [])]);
+    }
+
+    const instance = orveCreate();
+    instance.createApp(App).mount("#app");
+    expect(document.getElementById("1")?.textContent).toBe("1");
   });
 });

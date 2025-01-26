@@ -39,14 +39,15 @@ function watch(
   if (d.$sub === undefined) {
     return false;
   }
-  const cur: any = d.$sub.subscribe(
-    uniqueWithPast((newV: any, oldV: any) => {
+  const cur: any = d.$sub.subscribe({
+    type: 2,
+    f: uniqueWithPast((newV: any, oldV: any) => {
       func(newV, oldV);
     }, d.value ?? null),
-  );
+  });
 
   if (options && options.immediate) {
-    func(undefined, undefined);
+    func(d.value, undefined);
   }
 
   if (options && options.once) {

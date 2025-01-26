@@ -1,26 +1,21 @@
-import { Children, DIRECTIVES_ORVE, NodeB, Props, Tag } from "./jsx-type";
-import { KEY_NEED_REWRITE } from "./keys";
+import { Children, NodeB, Props, Tag } from "./jsx-type";
 import { FRAGMENT } from "./keys";
 import { ReactiveType } from "./reactive/type";
 
-/* TODO 
-[ ] - Если пользовать использует RefC slot тоже должен работать
-*/
-
 function For(props: Props | null, children: Children[]) {
-  return {
-    type: ReactiveType.RefArrFor,
-    value: children[0],
-    parent: props?.items,
-  };
+  return Node(ReactiveType.RefArrFor, props, ...children);
 }
 
 function If(props: Props | null, children: Children[]) {
-  return {
-    tag: "o-if",
-    props,
-    children,
-  };
+  return Node(ReactiveType.Oif, props, ...children);
+}
+
+function Component(props: Props | null, children: Children[]) {
+  return Node(ReactiveType.Component, props, ...children);
+}
+
+function notNullChildren(array: unknown[]) {
+  return array.filter((ch) => ch !== null && ch !== undefined);
 }
 
 /**
@@ -37,83 +32,91 @@ function Node(
 ): NodeB {
   if (
     (typeof tag === "function" && tag.name === FRAGMENT) ||
-    (typeof tag === "string" && tag === FRAGMENT.toLowerCase())
+    (typeof tag === "string" && tag.toLowerCase() === FRAGMENT.toLowerCase())
   ) {
     return Fragment(props, ...children);
   }
 
-  if (typeof tag === "string" && tag === "o-for") {
-    return For(props, children) as any;
+  if (typeof tag === "function" && tag.name === "If") {
+    return If(props, children) as NodeB;
   }
 
-  const Node: NodeB = { tag };
-
-  if (props !== null) {
-    const SetProps: Record<string, any> = {};
-
-    Object.keys(props).forEach((key) => {
-      if (KEY_NEED_REWRITE.includes(key)) {
-        SetProps[`o${key}`] = props[key];
-      } else if (DIRECTIVES_ORVE.includes(key)) {
-        const insertedKey = key.replace("o-", "").toLocaleLowerCase().trim();
-
-        if (insertedKey === "key") {
-          Node.keyNode = String(props[key]);
-        } else {
-          Node[insertedKey as keyof NodeB] = props[key];
-        }
-      } else {
-        SetProps[key] = props[key];
-      }
-    });
-
-    Node.props = SetProps;
+  if (typeof tag === "function" && tag.name === "For") {
+    return For(props, children) as NodeB;
   }
 
-  if (
-    children.length > 0 &&
-    (typeof tag === "function" ||
-      (typeof tag === "object" &&
-        (tag as Record<string, any>).type === ReactiveType.RefC))
-  ) {
-    // Проведём работы, чтобы избавиться от всех slot
-    const newChild: any[] = [];
+  return {
+    tag: tag,
+    props: props ?? {},
+    children: notNullChildren(children),
+  };
 
-    const slot: Record<string, any> = {};
-
-    children.forEach((e: any) => {
-      if (typeof e !== "object") {
-        newChild.push(e);
-        return;
-      }
-
-      if (e.tag !== undefined && e.tag === FRAGMENT) {
-        if (e.props !== undefined && e.props.name !== undefined) {
-          slot[e.props.name] = e.children;
-        } else {
-          newChild.push(e);
-        }
-      } else {
-        newChild.push(e);
-      }
-    });
-
-    if (Object.keys(slot).length > 0) {
-      if (Node.props) {
-        Node.props.$slot = slot;
-      } else {
-        Node.props = { $slot: slot };
-      }
-    }
-
-    if (newChild.length > 0) {
-      Node.children = newChild;
-    }
-  } else if (children.length > 0) {
-    Node.children = children;
-  }
-
-  return Node;
+  // if (
+  //   (typeof tag === "function" && tag.name === FRAGMENT) ||
+  //   (typeof tag === "string" && tag === FRAGMENT.toLowerCase())
+  // ) {
+  //   return Fragment(props, ...children);
+  // }
+  // if (typeof tag === "string" && tag === "o-for") {
+  //   return For(props, children) as any;
+  // }
+  // const Node: NodeB = { tag };
+  // if (props !== null) {
+  //   const SetProps: Record<string, any> = {};
+  //   Object.keys(props).forEach((key) => {
+  //     if (KEY_NEED_REWRITE.includes(key)) {
+  //       SetProps[`o${key}`] = props[key];
+  //     } else if (DIRECTIVES_ORVE.includes(key)) {
+  //       const insertedKey = key.replace("o-", "").toLocaleLowerCase().trim();
+  //       if (insertedKey === "key") {
+  //         Node.keyNode = String(props[key]);
+  //       } else {
+  //         Node[insertedKey as keyof NodeB] = props[key];
+  //       }
+  //     } else {
+  //       SetProps[key] = props[key];
+  //     }
+  //   });
+  //   Node.props = SetProps;
+  // }
+  // if (
+  //   children.length > 0 &&
+  //   (typeof tag === "function" ||
+  //     (typeof tag === "object" &&
+  //       (tag as Record<string, any>).type === ReactiveType.RefC))
+  // ) {
+  //   // Проведём работы, чтобы избавиться от всех slot
+  //   const newChild: any[] = [];
+  //   const slot: Record<string, any> = {};
+  //   children.forEach((e: any) => {
+  //     if (typeof e !== "object") {
+  //       newChild.push(e);
+  //       return;
+  //     }
+  //     if (e.tag !== undefined && e.tag === FRAGMENT) {
+  //       if (e.props !== undefined && e.props.name !== undefined) {
+  //         slot[e.props.name] = e.children;
+  //       } else {
+  //         newChild.push(e);
+  //       }
+  //     } else {
+  //       newChild.push(e);
+  //     }
+  //   });
+  //   if (Object.keys(slot).length > 0) {
+  //     if (Node.props) {
+  //       Node.props.$slot = slot;
+  //     } else {
+  //       Node.props = { $slot: slot };
+  //     }
+  //   }
+  //   if (newChild.length > 0) {
+  //     Node.children = newChild;
+  //   }
+  // } else if (children.length > 0) {
+  //   Node.children = children;
+  // }
+  // return Node;
 }
 
 /**
@@ -134,4 +137,4 @@ function Fragment(props: Props | null, ...children: any[]): NodeB {
   return a;
 }
 
-export { Node, Fragment, For, If };
+export { Node, Fragment, For, If, Component };

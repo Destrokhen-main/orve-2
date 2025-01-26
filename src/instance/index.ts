@@ -11,10 +11,7 @@ export interface OrveInstance {
   };
   use: (obj?: unknown) => boolean | OrveInstance;
   component: (nameComponent: string, component: () => unknown) => void;
-  createApp: (
-    entry: unknown,
-    options?: OptionsInstance | null,
-  ) => boolean | null;
+  createApp: (entry: unknown, options?: OptionsInstance | null) => OrveInstance;
   mount: (
     root: string | Element,
     render?: (el: Element, tree: NodeOP) => unknown,
@@ -40,34 +37,33 @@ declare global {
  * @param obj - object plugin
  * @returns false if has any errors or return Orve Instance
  */
-function use(obj: unknown = null) {
+function use(this: OrveInstance, obj: unknown = null) {
   if (obj === null) {
     console.warn("obj is null");
-    return false;
+    return this;
   }
 
   if (typeof obj !== "object" && obj !== null) {
     console.warn("Insert item not a object");
-    return false;
+    return this;
   }
 
   const workObject: Record<string, any> = obj;
-  const context: OrveInstance = this;
 
   if (
     workObject.setup !== undefined &&
     typeof workObject.setup === "function"
   ) {
-    workObject.setup(context.context);
-    return context;
+    workObject.setup(this.context);
+    return this;
   }
 
   if (workObject.setup === undefined) {
-    context.context["options"] = { ...obj };
-    return context;
+    this.context["options"] = { ...obj };
+    return this;
   }
 
-  return false;
+  return this;
 }
 
 /**
@@ -89,6 +85,12 @@ function component(name: string, component: () => unknown): void {
   }
 }
 
+export let GlobalInstance: Record<string, any> | null = null;
+
+export function emptyGlobalInstance() {
+  GlobalInstance = null;
+}
+
 /**
  * Create instance Orve application
  * @returns Orve instance
@@ -98,18 +100,18 @@ function orveCreate() {
     global.window = global as any;
   }
 
-  // if (window.Orve === undefined) {
-  //   window.Orve = {};
-  // }
-
   const instance: OrveInstance = {
     tree: null,
     context: {},
     component,
     use: use,
     createApp,
-    mount: () => { console.warn("Приложение похоже не собралось"); }
+    mount: () => {
+      console.warn("Приложение похоже не собралось");
+    },
   };
+
+  GlobalInstance = instance.context;
 
   return instance;
 }

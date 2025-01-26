@@ -91,8 +91,11 @@ describe("scopedStyle", () => {
   });
 
   test("returns an empty object and logs a warning when styles is not an object", () => {
+    const mock = jest.fn();
+    console.warn = mock;
     const styles = "invalid styles";
     const result = scopedStyle(styles as any);
     expect(result).toEqual({});
+    expect(mock).toHaveBeenCalledTimes(1);
   });
 });

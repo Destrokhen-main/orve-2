@@ -8,6 +8,7 @@ export enum ReactiveType {
   RefO = "RefO",
 
   Oif = "Oif",
+  Component = "Component",
 
   RefC = "RefC",
   RefCComponent = "RefCComponent",

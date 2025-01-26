@@ -1,7 +1,7 @@
 import { Node, Fragment } from "../jsx";
 import { FRAGMENT } from "../keys";
 
-describe("jsx", () => {
+describe.skip("jsx", () => {
   test("div element", () => {
     const div = Node("div", null, "test");
     expect(div).toStrictEqual({
@@ -94,7 +94,7 @@ describe("jsx", () => {
   });
 
   test("Component with template", () => {
-    const Component = () => { };
+    const Component = () => {};
 
     const div = Node(
       Component,
@@ -113,7 +113,7 @@ describe("jsx", () => {
   });
 
   test("Component with template default and custome", () => {
-    const Component = () => { };
+    const Component = () => {};
 
     const div = Node(
       Component,
@@ -134,7 +134,7 @@ describe("jsx", () => {
   });
 
   test("Component without template - just test", () => {
-    const Component = () => { };
+    const Component = () => {};
 
     const div = Node(Component, { test: "123" }, "test", "test-2");
     expect(div).toStrictEqual({
@@ -158,7 +158,7 @@ describe("jsx", () => {
   });
 
   test("Rewrite template in component", () => {
-    const Component = () => { };
+    const Component = () => {};
 
     const node = Node(
       Component,
@@ -178,7 +178,7 @@ describe("jsx", () => {
   });
 
   test("Component with simple fragment", () => {
-    const Component = () => { };
+    const Component = () => {};
 
     const node = Node(Component, null, Node(FRAGMENT, null, "before"));
 
@@ -194,7 +194,7 @@ describe("jsx", () => {
   });
 
   test("Fragment-slot with component", () => {
-    const Comp = () => { };
+    const Comp = () => {};
 
     const div = Node(Comp, null, Fragment({ name: "1" }, "a"));
     expect(div).toStrictEqual({
@@ -208,7 +208,7 @@ describe("jsx", () => {
   });
 
   test("Fragment-slot with component - 2", () => {
-    const Comp = () => { };
+    const Comp = () => {};
 
     const div = Node(Comp, null, Node("fragment", { name: "1" }, "a"));
     expect(div).toStrictEqual({

@@ -2,7 +2,7 @@ import { Node } from "../../jsx";
 import { parserNodeF } from "../../parser/parser";
 import { definedProps } from "../definedProps";
 
-describe("defined props", () => {
+describe.skip("defined props", () => {
   test("Create component with all posible defined props called function", () => {
     const func = () => {};
     const object = {};

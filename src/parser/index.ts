@@ -1,7 +1,11 @@
-import { OrveInstance } from "../instance";
+import {
+  // isStepCreateApp,
+  OrveInstance,
+  // setIsStepCreateApp
+} from "../instance";
 import { Node, Fragment } from "../jsx";
 import { NodeOP, parserNodeF } from "./parser";
-import { mounterNode } from "../mounter";
+import { mounterComponent } from "../mounter";
 import { InvokeAllNodeHook } from "../helper/hookHelper";
 
 export interface OptionsInstance {
@@ -15,7 +19,7 @@ export interface CreateApp {
   ) => OrveInstance | false;
 }
 
-function isValidEntry(entry: unknown): boolean {
+function isValidEntry(entry: unknown): entry is () => unknown {
   const typeEntry = typeof entry;
 
   if (typeEntry !== "function") {
@@ -50,22 +54,22 @@ function optionsInstance(options: OptionsInstance) {
  * @returns
  */
 function createApp(
+  this: OrveInstance,
   entry: unknown = null,
   options: OptionsInstance | null = null,
-): boolean | null {
+): OrveInstance {
   if (options !== null) {
     optionsInstance(options);
   }
 
   if (!isValidEntry(entry)) {
     console.warn("Entry not a function");
-    return null;
+    return this;
   }
 
-  const allContext: OrveInstance = this;
+  const allContext = this;
 
-  const workFunction = entry as () => unknown;
-  allContext.tree = parserNodeF.call(allContext.context, workFunction);
+  allContext.tree = parserNodeF(entry);
 
   if (allContext.tree !== null && window !== undefined) {
     const beforeUnmounted = function () {
@@ -84,11 +88,11 @@ function createApp(
       typeof window !== "undefined" &&
       window.addEventListener !== undefined
     ) {
-      window?.addEventListener("beforeunload", beforeUnmounted);
+      window.addEventListener("beforeunload", beforeUnmounted);
 
       //window.onbeforeunload = beforeUnmounter;
 
-      window?.addEventListener("unload", unmounted);
+      window.addEventListener("unload", unmounted);
 
       //window.onunload = unmounter;
     }
@@ -113,14 +117,15 @@ function createApp(
       console.warn(" root is null ");
       return false;
     }
+    // console.log(allContext.tree);
     if (allContext.tree !== null) {
       allContext.tree =
         render !== undefined
           ? render(rootElement, allContext.tree)
-          : mounterNode(rootElement, allContext.tree);
+          : mounterComponent(rootElement, allContext.tree);
     }
   };
-  return true;
+  return allContext;
 }
 
 export { createApp };

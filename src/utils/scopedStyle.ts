@@ -16,6 +16,7 @@ interface IOptions {
 [X] - стили по типу .class-1, .class-2 должны правильно отрабатывать.
 [X] - помимо string в стилях можно отправить и object ("display: 'flex'" === { display: "flex"}). В таком случаи это тоже надо обработать. 
 [X] - Можно использовать функции для вызова повторного кода из объекта выше
+[ ] - class attrs 
 */
 
 /**
@@ -40,21 +41,21 @@ function scopedStyle(
 
   styledKeys.forEach((key: string) => {
     let partString;
-    if (key.indexOf(',') !== -1) {
-      const parseClass = key.split(',').map((e) => e.trim());
+    if (key.indexOf(",") !== -1) {
+      const parseClass = key.split(",").map((e) => e.trim());
 
       const afterWorkClass = parseClass.map((parsedKey: string) => {
         const prKey =
           options?.scoped === false
             ? parsedKey.replace(/[#.]/gm, "")
             : `${parsedKey.replace(/[#.]/gm, "")}__${genUID(8)}`;
-        obj[parsedKey.replace('.', '')] = prKey;
+        obj[parsedKey.replace(".", "")] = prKey;
 
         const partString = `${parsedKey.startsWith("#") ? "#" : "."}${prKey}`;
         return partString;
       });
 
-      partString = afterWorkClass.join(', ');
+      partString = afterWorkClass.join(", ");
     } else {
       const prKey =
         options?.scoped === false
@@ -73,8 +74,9 @@ function scopedStyle(
       fn = styles[key];
     }
 
-    finalStyle += `${partString} {${typeof fn === "object" ? objectToCss(fn) : fn
-      }}\n`;
+    finalStyle += `${partString} {${
+      typeof fn === "object" ? objectToCss(fn) : fn
+    }}\n`;
   });
 
   if (options?.single === true) {
