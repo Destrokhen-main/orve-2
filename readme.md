@@ -40,3 +40,21 @@ const app = orveCreate();
 app.createApp(App)
 app.mount("#app");
 ```
+
+
+# Some tests
+
+| Operation            | time (ms)   |
+|----------------------|-------------|
+| Create 1000 row      | 30ms - 31ms |
+| Create 10000 row     | 236ms-240ms |
+| Append 1000 row []   | 29.99 ms    |
+| Append 1000 -> 10000 | 393 ms      |
+| Update               | 47ms        |
+| Clear 1000           | 15.33ms     |
+| Clear 10000          | 103.3ms     |
+| Splice first (1000)  | 47.3ms      |
+| Splice first (10000) | 350ms       |
+| Select               | 1.4ms       |
+
+*The library is not ready, the required optimization levels are not used yet. The indicators will be updated over time.*
