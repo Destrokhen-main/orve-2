@@ -13,12 +13,18 @@
     "resolveJsonModule": true,
     "noImplicitThis": false,
     "declaration": true,
-    "jsx": "preserve"
+    "jsx": "preserve",
+    "jsxImportSource": "orve",
+    "baseUrl": ".",
+    "paths": {
+      "orve/jsx-runtime": ["src/jsx-runtime.ts"]
+    },
   },
   "include": [
     "./src/**/*"
   ],
   "exclude": [
     "./node_modules/**/*"
-  ]
+  ],
+  
 }

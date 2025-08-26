@@ -8,3 +8,4 @@ export { mounterComponent } from "./mounter/index";
 // export * from "./types";
 export * from "./jsx";
 export * from "./utils/composables";
+export type * from "./jsx-runtime";
